@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard - Smart Education</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Oriya:wght@400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #2a2a2a;
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --text-muted: #666666;
+      --accent-primary: #ffffff;
+      --accent-secondary: #cccccc;
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --success: #10b981;
+      --error: #ef4444;
+      --shadow-light: rgba(255, 255, 255, 0.1);
+      --shadow-dark: rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      position: relative;
+      direction: ltr;
+    }
+
+    /* Language Switcher */
+    .language-switcher {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .language-select {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 120px;
+    }
+
+    .language-select:hover,
+    .language-select:focus {
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+    }
+
+    .language-select option {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      padding: 8px;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    .loading-text {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    /* Animated Background Grid */
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridMove 25s linear infinite;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(20px, 20px) scale(1.02); }
+      100% { transform: translate(40px, 40px) scale(1); }
+    }
+
+    /* Floating Particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      animation: float 18s linear infinite;
+      opacity: 0.4;
+      box-shadow: 0 0 8px var(--accent-primary);
+    }
+
+    .particle::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      opacity: 0.2;
+      animation: pulse 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.4;
+      }
+      90% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-100px) translateX(150px) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.2; }
+      100% { transform: scale(1.8); opacity: 0.05; }
+    }
+
+    /* Main Container */
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 650px;
+      margin: 2rem auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
+      padding: 3rem 2.5rem;
+      border-radius: 24px;
+      box-shadow: 
+        0 25px 50px -12px var(--shadow-dark),
+        0 0 0 1px var(--glass-border),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      animation: slideUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Header */
+    h2 {
+      text-align: center;
+      font-size: 2.75rem;
+      font-weight: 800;
+      margin-bottom: 2.5rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      letter-spacing: -0.02em;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 2px;
+      animation: underlineGlow 4s ease-in-out infinite;
+    }
+
+    @keyframes underlineGlow {
+      0%, 100% { 
+        width: 80px; 
+        opacity: 0.7;
+        box-shadow: 0 0 5px var(--accent-primary);
+      }
+      50% { 
+        width: 120px; 
+        opacity: 1;
+        box-shadow: 0 0 15px var(--accent-primary);
+      }
+    }
+
+    /* Profile Picture Section */
+    .profile-section {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .profile-pic-container {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 1.5rem;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .profile-pic-container:hover {
+      transform: scale(1.08);
+    }
+
+    #profilePic {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid transparent;
+      background: linear-gradient(45deg, var(--bg-secondary), var(--bg-tertiary));
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 0 0 4px rgba(255, 255, 255, 0.1),
+        0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .profile-pic-container:hover #profilePic {
+      border-color: var(--accent-primary);
+      box-shadow: 
+        0 0 0 4px rgba(255, 255, 255, 0.2),
+        0 0 30px rgba(255, 255, 255, 0.15),
+        0 12px 35px rgba(0, 0, 0, 0.5);
+      transform: scale(1.05);
+    }
+
+    .upload-overlay {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: var(--accent-primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.9;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transform: scale(0);
+    }
+
+    .profile-pic-container:hover .upload-overlay {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .upload-overlay:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .upload-overlay svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--bg-primary);
+    }
+
+    #profileInput {
+      display: none;
+    }
+
+    .profile-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease-out 0.3s forwards;
+    }
+
+    /* Form Elements */
+    .form-section {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.7s ease-out forwards;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .form-group:nth-child(1) { animation-delay: 0.4s; }
+    .form-group:nth-child(2) { animation-delay: 0.5s; }
+    .form-group:nth-child(3) { animation-delay: 0.6s; }
+    .form-group:nth-child(4) { animation-delay: 0.7s; }
+
+    .form-group label {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 18px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 2px solid var(--glass-border);
+      border-radius: 16px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 400;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .form-group input::placeholder {
+      color: transparent;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: rgba(255, 255, 255, 0.04);
+      box-shadow: 
+        0 0 0 4px rgba(255, 255, 255, 0.06),
+        0 0 20px rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .form-group input:focus + label,
+    .form-group input:not(:placeholder-shown) + label {
+      transform: translateY(-28px) scale(0.85);
+      color: var(--accent-primary);
+      font-weight: 600;
+    }
+
+    .form-group input:disabled {
+      background: rgba(255, 255, 255, 0.01);
+      color: var(--text-muted);
+      border-color: rgba(255, 255, 255, 0.05);
+      cursor: not-allowed;
+    }
+
+    /* Button Styles */
+    .btn {
+      width: 100%;
+      padding: 16px 24px;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      margin-top: 1rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out 0.8s forwards;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+      transition: left 0.6s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 
+        0 20px 30px -10px rgba(255, 255, 255, 0.15),
+        0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    #logout {
+      background: linear-gradient(135deg, var(--text-muted) 0%, var(--text-secondary) 100%);
+      margin-top: 0.75rem;
+      animation-delay: 0.9s;
+    }
+
+    #logout:hover {
+      box-shadow: 
+        0 20px 30px -10px rgba(179, 179, 179, 0.2),
+        0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Message */
+    #message {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      min-height: 20px;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    #message.show {
+      opacity: 1;
+      transform: translateY(0);
+      animation: messagePulse 0.6s ease-out;
+    }
+
+    #message.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    #message.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    @keyframes messagePulse {
+      0% { transform: scale(0.95); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--bg-primary);
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        margin: 1rem;
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+      }
+      
+      h2 {
+        font-size: 2.25rem;
+        margin-bottom: 2rem;
+      }
+      
+      .profile-pic-container {
+        width: 140px;
+        height: 140px;
+      }
+      
+      .upload-overlay {
+        width: 36px;
+        height: 36px;
+      }
+      
+      .form-group input {
+        padding: 16px 18px;
+        font-size: 0.95rem;
+      }
+      
+      .btn {
+        padding: 14px 20px;
+        font-size: 0.95rem;
+      }
+
+      .language-switcher {
+        top: 10px;
+        right: 10px;
+      }
+
+      .language-select {
+        width: 100px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      h2 {
+        font-size: 1.875rem;
+      }
+      
+      .profile-pic-container {
+        width: 120px;
+        height: 120px;
+      }
+
+      .language-select {
+        width: 90px;
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-primary);
+      border-radius: 4px;
+      opacity: 0.5;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      opacity: 1;
+    }
+
+    /* RTL Support for Hindi */
+    [lang="hi"] {
+      direction: ltr;
+      font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+    }
+
+    /* Odia Font Support */
+    [lang="or"] {
+      direction: ltr;
+      font-family: 'Noto Sans Oriya', 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <!-- Language Switcher -->
+  <div class="language-switcher">
+    <select class="language-select" id="languageSelect">
+      <option value="en">🇺🇸 English</option>
+      <option value="hi">🇮🇳 हिंदी</option>
+      <option value="or">🇮🇳 ଓଡ଼ିଆ</option>
+    </select>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" data-translate="loading">Loading Dashboard...</div>
+  </div>
+
+  <div class="bg-grid"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="container">
+    <h2 data-translate="title">Student Dashboard</h2>
+    
+    <div class="profile-section">
+      <div class="profile-pic-container">
+        <img src="https://via.placeholder.com/120" alt="Profile Picture" id="profilePic">
+        <label for="profileInput" class="upload-overlay">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+          </svg>
+        </label>
+        <input type="file" id="profileInput" accept="image/*">
+      </div>
+      <div class="profile-name" id="profileName" data-translate="loadingName">Loading...</div>
+    </div>
+    
+    <div class="form-section">
+      <div class="form-group">
+        <input type="text" id="name" placeholder=" " required>
+        <label for="name" data-translate="fullName">Full Name</label>
+      </div>
+      
+      <div class="form-group">
+        <input type="email" id="email" placeholder=" " readonly>
+        <label for="email" data-translate="emailAddress">Email Address</label>
+      </div>
+      
+      <div class="form-group">
+        <input type="tel" id="mobile" placeholder=" " required>
+        <label for="mobile" data-translate="mobileNumber">Mobile Number</label>
+      </div>
+      
+      <div class="form-group">
+        <input type="text" id="grade" placeholder=" " required>
+        <label for="grade" data-translate="gradeClass">Grade/Class</label>
+      </div>
+    </div>
+
+    <button class="btn" id="saveBtn">
+      <span id="saveText" data-translate="saveChanges">Save Changes</span>
+    </button>
+    
+    <button class="btn" id="logout">
+      <span id="logoutText" data-translate="signOut">Sign Out</span>
+    </button>
+    <button class="btn" id="studyBtn">
+      <span data-translate="goToStudyHub">Go to Study Hub</span>
+    </button>
+    
+    <p id="message"></p>
+  </div>
+
+  <script type="module">
+    // Language Translations
+    const translations = {
+      en: {
+        title: "Student Dashboard",
+        loading: "Loading Dashboard...",
+        loadingName: "Loading...",
+        fullName: "Full Name",
+        emailAddress: "Email Address",
+        mobileNumber: "Mobile Number",
+        gradeClass: "Grade/Class",
+        saveChanges: "Save Changes",
+        signOut: "Sign Out",
+        goToStudyHub: "Go to Study Hub",
+        welcomeBack: "Welcome back! Profile loaded.",
+        welcomeNew: "Welcome! Please complete your profile.",
+        profileUpdated: "Profile updated successfully!",
+        loginFirst: "Please log in first",
+        fieldsRequired: "Name and Mobile cannot be empty!",
+        invalidMobile: "Please enter a valid 10-digit mobile number",
+        profileLoadError: "Error loading profile",
+        saveError: "Error saving profile",
+        logoutSuccess: "Successfully logged out! See you soon...",
+        logoutError: "Logout error",
+        sessionExpired: "Please log in to continue"
+      },
+      hi: {
+        title: "छात्र डैशबोर्ड",
+        loading: "डैशबोर्ड लोड हो रहा है...",
+        loadingName: "लोड हो रहा है...",
+        fullName: "पूरा नाम",
+        emailAddress: "ईमेल पता",
+        mobileNumber: "मोबाइल नंबर",
+        gradeClass: "कक्षा/ग्रेड",
+        saveChanges: "परिवर्तन सहेजें",
+        signOut: "साइन आउट",
+        goToStudyHub: "अध्ययन केंद्र पर जाएं",
+        welcomeBack: "स्वागत है! प्रोफाइल लोड हो गया।",
+        welcomeNew: "स्वागत है! कृपया अपना प्रोफाइल पूरा करें।",
+        profileUpdated: "प्रोफाइल सफलतापूर्वक अपडेट हो गया!",
+        loginFirst: "कृपया पहले लॉग इन करें",
+        fieldsRequired: "नाम और मोबाइल खाली नहीं हो सकते!",
+        invalidMobile: "कृपया वैध 10-अंकीय मोबाइल नंबर दर्ज करें",
+        profileLoadError: "प्रोफाइल लोड करने में त्रुटि",
+        saveError: "प्रोफाइल सहेजने में त्रुटि",
+        logoutSuccess: "सफलतापूर्वक लॉग आउट! जल्द मिलते हैं...",
+        logoutError: "लॉगआउट त्रुटि",
+        sessionExpired: "कृपया जारी रखने के लिए लॉग इन करें"
+      },
+      or: {
+        title: "ଛାତ୍ର ଡ୍ୟାଶବୋର୍ଡ",
+        loading: "ଡ୍ୟାଶବୋର୍ଡ ଲୋଡ୍ ହେଉଛି...",
+        loadingName: "ଲୋଡ୍ ହେଉଛି...",
+        fullName: "ପୂର୍ଣ୍ଣ ନାମ",
+        emailAddress: "ଇମେଲ୍ ଠିକଣା",
+        mobileNumber: "ମୋବାଇଲ୍ ନମ୍ବର",
+        gradeClass: "କ୍ଲାସ୍/ଗ୍ରେଡ୍",
+        saveChanges: "ପରିବର୍ତ୍ତନ ସଂରକ୍ଷଣ କରନ୍ତୁ",
+        signOut: "ସାଇନ୍ ଆଉଟ୍",
+        goToStudyHub: "ଅଧ୍ୟୟନ୍ କେନ୍ଦ୍ରକୁ ଯାଆନ୍ତୁ",
+        welcomeBack: "ସ୍ୱାଗତ! ପ୍ରୋଫାଇଲ୍ ଲୋଡ୍ ହୋଇଗଲା।",
+        welcomeNew: "ସ୍ୱାଗତ! ଦୟାକରି ଆପଣଙ୍କ ପ୍ରୋଫାଇଲ୍ ପୂର୍ଣ୍ଣ କରନ୍ତୁ।",
+        profileUpdated: "ପ୍ରୋଫାଇଲ୍ ସଫଳତାସହିତ ଅପଡେଟ୍ ହୋଇଗଲା!",
+        loginFirst: "ଦୟାକରି ପ୍ରଥମେ ଲଗ୍ଇନ୍ କରନ୍ତୁ",
+        fieldsRequired: "ନାମ ଓ ମୋବାଇଲ୍ ଖାଲି ରହିପାରିବ ନାହିଁ!",
+        invalidMobile: "ଦୟାକରି ବୈଧ 10 ଅଙ୍କର ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ",
+        profileLoadError: "ପ୍ରୋଫାଇଲ୍ ଲୋଡ୍ କରିବାରେ ତ୍ରୁଟି",
+        saveError: "ପ୍ରୋଫାଇଲ୍ ସଂରକ୍ଷଣରେ ତ୍ରୁଟି",
+        logoutSuccess: "ସଫଳତାସହିତ ଲଗ୍ଆଉଟ୍! ଶୀଘ୍ର ମିଳିବା ପାଇଁ ଅପେକ୍ଷା ରହନ୍ତୁ...",
+        logoutError: "ଲଗ୍ଆଉଟ୍ ତ୍ରୁଟି",
+        sessionExpired: "ଚାଲୁ ରଖିବା ପାଇଁ ଦୟାକରି ଲଗ୍ଇନ୍ କରନ୍ତୁ"
+      }
+    };
+
+    // Firebase v12 Modular SDK Imports - UNIFIED
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
+
+    // Firebase Configuration - UNIFIED
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPMlHzrEOLXOWZldw6fkk5nWf1m0g45L8",
+      authDomain: "studentportal-bc1ec.firebaseapp.com",
+      projectId: "studentportal-bc1ec",
+      storageBucket: "studentportal-bc1ec.firebasestorage.app",
+      messagingSenderId: "516315325736",
+      appId: "1:516315325736:web:21a4418f69f3f6019fdc1d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // DOM Elements
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const profilePic = document.getElementById('profilePic');
+    const profileInput = document.getElementById('profileInput');
+    const profileName = document.getElementById('profileName');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const mobileInput = document.getElementById('mobile');
+    const gradeInput = document.getElementById('grade');
+    const saveBtn = document.getElementById('saveBtn');
+    const logoutBtn = document.getElementById('logout');
+    const message = document.getElementById('message');
+    const saveText = document.getElementById('saveText');
+    const logoutText = document.getElementById('logoutText');
+    const languageSelect = document.getElementById('languageSelect');
+
+    let currentUser = null;
+    let photoFile = null;
+    let isInitialized = false;
+    let currentLanguage = 'en';
+
+    // Language Management
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      document.documentElement.lang = lang;
+      document.body.setAttribute('lang', lang);
+      
+      // Update all translatable elements
+      document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[lang] && translations[lang][key]) {
+          element.textContent = translations[lang][key];
+        }
+      });
+
+      // Update title
+      document.title = translations[lang].title + ' - Smart Education';
+      
+      // Update placeholders (for form inputs)
+      nameInput.placeholder = translations[lang].fullName;
+      emailInput.placeholder = translations[lang].emailAddress;
+      mobileInput.placeholder = translations[lang].mobileNumber;
+      gradeInput.placeholder = translations[lang].gradeClass;
+
+      // Save language preference to localStorage
+      localStorage.setItem('preferredLanguage', lang);
+    }
+
+    // Initialize language
+    function initLanguage() {
+      const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+      languageSelect.value = savedLang;
+      setLanguage(savedLang);
+    }
+
+    // Language change event
+    languageSelect.addEventListener('change', (e) => {
+      setLanguage(e.target.value);
+      speak(`Language changed to ${e.target.value === 'en' ? 'English' : e.target.value === 'hi' ? 'Hindi' : 'Odia'}`);
+    });
+
+    // Hide loading overlay
+    function hideLoadingOverlay() {
+      loadingOverlay.classList.add('hidden');
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+      }, 300);
+    }
+
+    // Check user login - PERFECTED with better handling
+    onAuthStateChanged(auth, async (user) => {
+      console.log('Dashboard auth state changed:', user ? 'User found' : 'No user');
+      
+      if (isInitialized && user) return; // Prevent multiple executions only when user exists
+      isInitialized = true;
+      
+      if (user) {
+        // User is authenticated - load dashboard
+        console.log('Loading dashboard for user:', user.email);
+        currentUser = user;
+        emailInput.value = user.email || '';
+        await loadProfile();
+        hideLoadingOverlay();
+      } else {
+        // No user - redirect to login with smooth transition
+        console.log('No user found, redirecting to login...');
+        if (currentUser) {
+          // This means we just logged out
+          showMessage(translations[currentLanguage].logoutSuccess, 'success');
+          setTimeout(() => {
+            window.location.href = 'student.html';
+          }, 2000);
+        } else {
+          // Initial load - no user
+          showMessage(translations[currentLanguage].sessionExpired, 'error');
+          setTimeout(() => {
+            window.location.href = 'student.html';
+          }, 1500);
+        }
+        hideLoadingOverlay();
+      }
+    });
+
+    // Load profile data - CONVERTED to v12
+    async function loadProfile() {
+      if (!currentUser) return;
+      
+      try {
+        console.log('Loading profile for UID:', currentUser.uid);
+        const docRef = doc(db, 'students', currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          console.log('Profile data loaded:', data);
+          nameInput.value = data.name || '';
+          mobileInput.value = data.mobile || '';
+          gradeInput.value = data.grade || '';
+          profileName.textContent = data.name || translations[currentLanguage].loadingName;
+          
+          if (data.photoURL) {
+            profilePic.src = data.photoURL;
+          } else {
+            // Default avatar based on name
+            profilePic.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'Student')}&size=160&background=1a1a1a&color=ffffff`;
+          }
+
+          // Animate labels if fields are filled
+          setTimeout(() => {
+            document.querySelectorAll('input').forEach(input => {
+              if (input.value) {
+                const label = input.nextElementSibling;
+                if (label) {
+                  label.style.transform = 'translateY(-28px) scale(0.85)';
+                  label.style.color = 'var(--accent-primary)';
+                }
+              }
+            });
+          }, 500);
+          
+          showMessage(translations[currentLanguage].welcomeBack, 'success');
+        } else {
+          // Create default profile if none exists
+          console.log('No profile found, creating default');
+          const docRef = doc(db, 'students', currentUser.uid);
+          await updateDoc(docRef, {
+            name: '',
+            email: currentUser.email,
+            mobile: '',
+            grade: '',
+            photoURL: '',
+            createdAt: serverTimestamp(),
+            lastUpdate: serverTimestamp()
+          }, { merge: true });
+          profileName.textContent = translations[currentLanguage].loadingName;
+          showMessage(translations[currentLanguage].welcomeNew, 'success');
+        }
+      } catch (err) {
+        console.error('Profile load error:', err);
+        showMessage(translations[currentLanguage].profileLoadError + ': ' + err.message, 'error');
+      }
+    }
+
+    // Click on profile pic to select image
+    profilePic.addEventListener('click', () => profileInput.click());
+    
+    profileInput.addEventListener('change', (e) => {
+      photoFile = e.target.files[0];
+      if (photoFile) {
+        // Show loading effect
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          profilePic.src = e.target.result;
+          profilePic.style.filter = 'blur(2px)';
+          setTimeout(() => {
+            profilePic.style.filter = 'blur(0)';
+          }, 300);
+        };
+        reader.readAsDataURL(photoFile);
+      }
+    });
+    
+
+    // Save changes - CONVERTED to v12
+    saveBtn.addEventListener('click', async () => {
+      if (!currentUser) {
+        showMessage(translations[currentLanguage].loginFirst, 'error');
+        return;
+      }
+
+      const updatedName = nameInput.value.trim();
+      const updatedMobile = mobileInput.value.trim();
+      const updatedGrade = gradeInput.value.trim();
+
+      if (!updatedName || !updatedMobile) {
+        showMessage(translations[currentLanguage].fieldsRequired, 'error');
+        return;
+      }
+
+      if (!/^\d{10}$/.test(updatedMobile.replace(/\s/g, ''))) {
+        showMessage(translations[currentLanguage].invalidMobile, 'error');
+        return;
+      }
+
+      saveText.textContent = translations[currentLanguage].saveChanges;
+      saveText.innerHTML = '<span class="loading"></span>' + translations[currentLanguage].saving;
+      saveBtn.disabled = true;
+      message.classList.remove('show');
+
+      let photoURL = profilePic.src;
+
+      try {
+        console.log('Saving profile changes...');
+        
+        // Upload photo if changed
+        if (photoFile) {
+          const storageRef = ref(storage, `profilePics/${currentUser.uid}`);
+          await uploadBytes(storageRef, photoFile);
+          photoURL = await getDownloadURL(storageRef);
+        }
+
+        // Update Firestore
+        const docRef = doc(db, 'students', currentUser.uid);
+        await updateDoc(docRef, {
+          name: updatedName,
+          mobile: updatedMobile,
+          grade: updatedGrade,
+          photoURL: photoURL,
+          lastUpdate: serverTimestamp()
+        });
+
+        profileName.textContent = updatedName;
+        showMessage(translations[currentLanguage].profileUpdated, 'success');
+        
+        // Reset photo file reference
+        photoFile = null;
+      } catch (err) {
+        console.error('Save error:', err);
+        showMessage(translations[currentLanguage].saveError + ': ' + err.message, 'error');
+      }
+
+      saveText.innerHTML = translations[currentLanguage].saveChanges;
+      saveBtn.disabled = false;
+    });
+
+    // Logout - PERFECTED with auto-refresh and smooth redirect
+    logoutBtn.addEventListener('click', async () => {
+      logoutText.innerHTML = '<span class="loading"></span>' + translations[currentLanguage].signingOut;
+      logoutBtn.disabled = true;
+
+      try {
+        console.log('Logging out...');
+        await signOut(auth);
+        // Show success message and let onAuthStateChanged handle the redirect
+        showMessage(translations[currentLanguage].logoutSuccess, 'success');
+        // The onAuthStateChanged will detect the logout and redirect automatically
+      } catch (err) {
+        console.error('Logout error:', err);
+        showMessage(translations[currentLanguage].logoutError + ': ' + err.message, 'error');
+        logoutText.innerHTML = translations[currentLanguage].signOut;
+        logoutBtn.disabled = false;
+      }
+    });
+
+    // Message handler
+    function showMessage(text, type) {
+      console.log('Dashboard message:', text);
+      message.textContent = text;
+      message.className = type;
+      message.classList.add('show');
+      
+      setTimeout(() => {
+        message.classList.remove('show');
+      }, 4000);
+    }
+
+    // Create enhanced particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 40;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random size and speed
+        const size = Math.random() * 2 + 2;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 18 + 's';
+        particle.style.animationDuration = (Math.random() * 12 + 12) + 's';
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Initialize after DOM loads
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize language
+      initLanguage();
+      
+      // Input focus effects
+      document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'translateY(-2px)';
+        });
+
+        input.addEventListener('blur', function() {
+          if (!this.value) {
+            this.parentElement.style.transform = 'translateY(0)';
+          }
+        });
+      });
+
+      // Create particles after a delay
+      setTimeout(createParticles, 1000);
+    });
+
+    // Dynamic background animation
+    let gridHue = 0;
+    setInterval(() => {
+      gridHue = (gridHue + 0.3) % 360;
+      const opacity = 0.08 + Math.sin(Date.now() * 0.001) * 0.02;
+      document.querySelector('.bg-grid').style.backgroundImage = 
+        `linear-gradient(rgba(255, 255, 255, ${opacity}) 1px, transparent 1px),
+         linear-gradient(90deg, rgba(255, 255, 255, ${opacity}) 1px, transparent 1px)`;
+    }, 4000);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        saveBtn.click();
+      }
+      if (e.key === 'Escape') {
+        document.activeElement.blur();
+      }
+    });
+    
+    document.getElementById('studyBtn').addEventListener('click', () => {
+      window.location.href = 'study.html';
+    });
+  </script>
+</body>
+</html>

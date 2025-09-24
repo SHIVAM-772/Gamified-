@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal - Smart Education</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --accent-primary: #00d4ff;
+      --accent-secondary: #ff6b9d;
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --success: #10b981;
+      --error: #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      color: var(--text-primary);
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    .loading-text {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    /* Animated Background Grid */
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridMove 20s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    /* Floating Particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      animation: float 15s linear infinite;
+      opacity: 0.6;
+    }
+
+    .particle::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.6;
+      }
+      90% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-100px) translateX(100px) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.3; }
+      100% { transform: scale(1.5); opacity: 0.1; }
+    }
+
+    /* Main Container */
+    .container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      padding: 3rem 2.5rem;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+      z-index: 10;
+      animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Header */
+    h2 {
+      text-align: center;
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 2px;
+      animation: underlineGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes underlineGlow {
+      0%, 100% { width: 60px; opacity: 0.8; }
+      50% { width: 100px; opacity: 1; }
+    }
+
+    /* Form Elements */
+    .form-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 400;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    input::placeholder {
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 
+        0 0 0 3px rgba(0, 212, 255, 0.1),
+        0 0 0 1px var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    input:focus + .input-label {
+      transform: translateY(-25px) scale(0.85);
+      color: var(--accent-primary);
+    }
+
+    .input-label {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 400;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Button Styles */
+    button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, #00aaff 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 
+        0 20px 25px -5px rgba(0, 212, 255, 0.3),
+        0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: translateY(-1px);
+    }
+
+    .toggle {
+      background: linear-gradient(135deg, var(--accent-secondary) 0%, #ff4081 100%);
+      margin-top: 1rem;
+    }
+
+    .toggle:hover {
+      box-shadow: 
+        0 20px 25px -5px rgba(255, 107, 157, 0.3),
+        0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Hidden Class */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Message */
+    #auth-msg {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      min-height: 20px;
+    }
+
+    #auth-msg.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    #auth-msg.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* Form Toggle Animation */
+    .form-section {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .container {
+        margin: 1rem;
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+      }
+      
+      h2 {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      input {
+        padding: 14px 16px;
+        font-size: 0.95rem;
+      }
+      
+      button {
+        padding: 14px;
+        font-size: 0.95rem;
+      }
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Entrance Stagger */
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.2s; }
+    .form-group:nth-child(3) { animation-delay: 0.3s; }
+    .form-group:nth-child(4) { animation-delay: 0.4s; }
+    .form-group:nth-child(5) { animation-delay: 0.5s; }
+
+    .form-group {
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-primary);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-secondary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Initializing Portal...</div>
+  </div>
+
+  <!-- Animated Background -->
+  <div class="bg-grid"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="container" id="auth-container">
+    <h2 id="form-title">Student Portal</h2>
+    
+    <div id="login-form" class="form-section">
+      <div class="form-group">
+        <input type="email" id="login-email" placeholder=" " required>
+        <label class="input-label" for="login-email">Email Address</label>
+      </div>
+      <div class="form-group">
+        <input type="password" id="login-password" placeholder=" " required>
+        <label class="input-label" for="login-password">Password</label>
+      </div>
+      <button id="login-btn">
+        <span id="login-text">Enter Portal</span>
+      </button>
+      <button class="toggle" id="switch-to-signup">Create Account</button>
+    </div>
+
+    <div id="signup-form" class="form-section hidden">
+      <div class="form-group">
+        <input type="text" id="signup-name" placeholder=" " required>
+        <label class="input-label" for="signup-name">Full Name</label>
+      </div>
+      <div class="form-group">
+        <input type="email" id="signup-email" placeholder=" " required>
+        <label class="input-label" for="signup-email">Email Address</label>
+      </div>
+      <div class="form-group">
+        <input type="password" id="signup-password" placeholder=" " required>
+        <label class="input-label" for="signup-password">Password</label>
+      </div>
+      <div class="form-group">
+        <input type="password" id="signup-cpassword" placeholder=" " required>
+        <label class="input-label" for="signup-cpassword">Confirm Password</label>
+      </div>
+      <div class="form-group">
+        <input type="tel" id="signup-mobile" placeholder=" " required>
+        <label class="input-label" for="signup-mobile">Mobile Number</label>
+      </div>
+      <button id="signup-btn">
+        <span id="signup-text">Create Account</span>
+      </button>
+      <button class="toggle" id="switch-to-login">Back to Login</button>
+    </div>
+
+    <p id="auth-msg"></p>
+  </div>
+
+  <script type="module">
+    // Firebase v12 Modular SDK Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPMlHzrEOLXOWZldw6fkk5nWf1m0g45L8",
+      authDomain: "studentportal-bc1ec.firebaseapp.com",
+      projectId: "studentportal-bc1ec",
+      storageBucket: "studentportal-bc1ec.firebasestorage.app",
+      messagingSenderId: "516315325736",
+      appId: "1:516315325736:web:21a4418f69f3f6019fdc1d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM Elements
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const formTitle = document.getElementById('form-title');
+    const authMsg = document.getElementById('auth-msg');
+
+    const switchToSignup = document.getElementById('switch-to-signup');
+    const switchToLogin = document.getElementById('switch-to-login');
+    const loginBtn = document.getElementById('login-btn');
+    const signupBtn = document.getElementById('signup-btn');
+    const loginText = document.getElementById('login-text');
+    const signupText = document.getElementById('signup-text');
+
+    let isInitialized = false;
+
+    // Hide loading overlay
+    function hideLoadingOverlay() {
+      loadingOverlay.classList.add('hidden');
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+      }, 300);
+    }
+
+    // Auto redirect if already logged in - FIXED
+    onAuthStateChanged(auth, (user) => {
+      console.log('Auth state changed in login page:', user ? 'User found' : 'No user');
+      
+      if (isInitialized) return; // Prevent multiple executions
+      isInitialized = true;
+      
+      if (user) {
+        // User is authenticated - redirect to dashboard
+        console.log('Redirecting to dashboard...');
+        setTimeout(() => {
+          window.location.href = 'studentdash.html';
+        }, 500); // Small delay to prevent flash
+      } else {
+        // No user - show login form
+        console.log('Showing login form');
+        hideLoadingOverlay();
+      }
+    });
+
+    // Form Toggle
+    switchToSignup.addEventListener('click', () => {
+      loginForm.classList.add('hidden');
+      signupForm.classList.remove('hidden');
+      formTitle.textContent = 'Join the Portal';
+      authMsg.textContent = '';
+      authMsg.className = '';
+    });
+
+    switchToLogin.addEventListener('click', () => {
+      signupForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+      formTitle.textContent = 'Student Portal';
+      authMsg.textContent = '';
+      authMsg.className = '';
+    });
+
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Initialize particles after a delay
+    setTimeout(createParticles, 1000);
+
+    // Enhanced Login - FIXED
+    loginBtn.addEventListener('click', async () => {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!email || !password) {
+        showMessage('Please fill all fields', 'error');
+        return;
+      }
+
+      loginText.innerHTML = '<span class="loading"></span>Entering Portal...';
+      loginBtn.disabled = true;
+
+      try {
+        console.log('Attempting login for:', email);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        console.log('Login successful, updating last login...');
+        // Update last login timestamp
+        await updateDoc(doc(db, 'students', user.uid), {
+          lastLogin: serverTimestamp()
+        });
+
+        console.log('Redirecting to dashboard...');
+        // Redirect to student profile/dashboard
+        setTimeout(() => {
+          window.location.href = 'studentdash.html';
+        }, 1000);
+      } catch (err) {
+        console.error('Login error:', err);
+        showMessage(err.message, 'error');
+        loginText.textContent = 'Enter Portal';
+        loginBtn.disabled = false;
+      }
+    });
+
+    // Enhanced Signup - FIXED
+    signupBtn.addEventListener('click', async () => {
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const cpassword = document.getElementById('signup-cpassword').value;
+      const mobile = document.getElementById('signup-mobile').value.trim();
+
+      // Validation
+      if (!name || !email || !password || !cpassword || !mobile) {
+        showMessage('Please fill all fields', 'error');
+        return;
+      }
+
+      if (password !== cpassword) {
+        showMessage('Passwords do not match!', 'error');
+        return;
+      }
+
+      if (password.length < 6) {
+        showMessage('Password must be at least 6 characters', 'error');
+        return;
+      }
+
+      if (!/^\d{10}$/.test(mobile.replace(/\s/g, ''))) {
+        showMessage('Please enter a valid 10-digit mobile number', 'error');
+        return;
+      }
+
+      signupText.innerHTML = '<span class="loading"></span>Creating Account...';
+      signupBtn.disabled = true;
+
+      try {
+        console.log('Creating account for:', email);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        console.log('Account created, saving profile...');
+        // Create student profile in Firestore
+        await setDoc(doc(db, 'students', user.uid), {
+          name: name,
+          email: email,
+          mobile: mobile,
+          grade: '',
+          photoURL: '',
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp()
+        });
+
+        showMessage('Account created successfully! Redirecting to your profile...', 'success');
+
+        setTimeout(() => {
+          window.location.href = 'studentdash.html';
+        }, 1500);
+
+      } catch (err) {
+        console.error('Signup error:', err);
+        showMessage(err.message, 'error');
+        signupText.textContent = 'Create Account';
+        signupBtn.disabled = false;
+      }
+    });
+
+    // Message handler
+    function showMessage(message, type) {
+      authMsg.textContent = message;
+      authMsg.className = type;
+      
+      if (type === 'success') {
+        authMsg.style.animation = 'pulse 0.6s ease-in-out';
+      }
+    }
+
+    // Add input validation styling
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('blur', function() {
+          if (this.value.trim() === '') {
+            this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+          }
+        });
+
+        input.addEventListener('input', function() {
+          if (this.value.trim() !== '') {
+            this.style.borderColor = 'rgba(0, 212, 255, 0.3)';
+          }
+        });
+      });
+
+      // Animate form elements on load
+      document.querySelectorAll('.form-group').forEach((group, index) => {
+        group.style.animationDelay = `${index * 0.1}s`;
+      });
+    });
+
+    // Add keyboard support
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const activeForm = document.querySelector('.form-section:not(.hidden)');
+        const btn = activeForm.querySelector('button:not(.toggle)');
+        if (btn && !btn.disabled) {
+          btn.click();
+        }
+      }
+    });
+
+    // Add dynamic background color shift
+    let hue = 200;
+    setInterval(() => {
+      hue = (hue + 0.5) % 360;
+      const saturation = 70 + Math.sin(Date.now() * 0.001) * 10;
+      document.querySelector('.bg-grid').style.backgroundImage = 
+        `linear-gradient(hsl(${hue}, ${saturation}%, 10%) 1px, transparent 1px),
+         linear-gradient(90deg, hsl(${hue}, ${saturation}%, 10%) 1px, transparent 1px)`;
+    }, 3000);
+  </script>
+</body>
+</html>

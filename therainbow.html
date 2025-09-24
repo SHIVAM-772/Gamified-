@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Rainbow – Interactive Learning</title>
+<style>
+/* ---------- GENERAL STYLING ---------- */
+body{
+  margin:0;
+  font-family:'Segoe UI', sans-serif;
+  background:linear-gradient(135deg,#89f7fe,#66a6ff);
+  color:#333;
+}
+header{
+  text-align:center;
+  padding:20px;
+  background:linear-gradient(to right,red,orange,yellow,green,blue,indigo,violet);
+  color:white;
+  text-shadow:1px 1px 4px rgba(0,0,0,0.4);
+}
+header h1{margin:0;font-size:2rem;}
+section{padding:20px;max-width:1000px;margin:auto;}
+h2{color:#4b79ff;}
+button{
+  padding:10px 18px;
+  background:#4b79ff;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  margin-top:10px;
+}
+button:hover{background:#345bdb;}
+
+/* ---------- POEM BOX ---------- */
+.poem{
+  background:#fff;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  text-align:center;
+  animation:fadeIn 1s ease;
+}
+.poem p{margin:10px 0;font-size:1.1rem;font-style:italic;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ---------- GAME AREA ---------- */
+#gameArea{
+  position:relative;
+  width:100%;
+  height:250px;
+  background:linear-gradient(to top,#b0f4e6 70%,#5da9e9 70%);
+  border:2px solid #4b79ff;
+  border-radius:12px;
+  overflow:hidden;
+  margin-top:20px;
+}
+#basket{
+  position:absolute;
+  bottom:10px;
+  left:45%;
+  width:80px;
+  height:40px;
+  background:#ff6f61;
+  border-radius:20px;
+}
+.drop{
+  position:absolute;
+  top:-40px;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff,#f00,#ff0,#0f0,#00f,#4b0082,#8f00ff);
+  box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+#scoreBoard{margin-top:10px;font-weight:bold;}
+
+/* ---------- QUIZ ---------- */
+.quiz{
+  background:#fff;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  margin-top:20px;
+}
+.quiz p{margin-bottom:8px;}
+.quiz input[type=radio]{margin-right:6px;}
+.result{font-weight:bold;margin-top:10px;text-align:center;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌈 The Rainbow</h1>
+  <p>Interactive Poem • Game • Quiz</p>
+</header>
+
+<section>
+  <h2>📖 Read the Poem</h2>
+  <div class="poem">
+    <p>Boats sail on the rivers,</p>
+    <p>And ships sail on the seas;</p>
+    <p>But clouds that sail across the sky</p>
+    <p>Are prettier far than these.</p>
+    <br>
+    <p>There are bridges on the rivers,</p>
+    <p>As pretty as you please;</p>
+    <p>But the bow that bridges heaven,</p>
+    <p>And overtops the trees,</p>
+    <p>And builds a road from earth to sky,</p>
+    <p>Is prettier far than these.</p>
+  </div>
+</section>
+
+<section>
+  <h2>🎮 Catch the Rainbow Game</h2>
+  <p>Move the basket with your <strong>LEFT/RIGHT ARROWS</strong> or by tapping the buttons to catch falling rainbow drops.</p>
+  <div id="gameArea">
+    <div id="basket"></div>
+  </div>
+  <button onclick="moveLeft()">⬅️ Left</button>
+  <button onclick="moveRight()">➡️ Right</button>
+  <div id="scoreBoard">Score: 0</div>
+</section>
+
+<section>
+  <h2>❓ Quick Quiz</h2>
+  <div class="quiz">
+    <p>1. What natural object is compared to bridges?</p>
+    <label><input type="radio" name="q1" value="a"> Rivers</label><br>
+    <label><input type="radio" name="q1" value="b"> Rainbow</label><br>
+    <label><input type="radio" name="q1" value="c"> Clouds</label><br><br>
+
+    <p>2. Which is described as “prettier far than these”?</p>
+    <label><input type="radio" name="q2" value="a"> Ships on seas</label><br>
+    <label><input type="radio" name="q2" value="b"> Rainbow</label><br>
+    <label><input type="radio" name="q2" value="c"> Boats on rivers</label><br>
+
+    <button onclick="checkQuiz()">Check Answers</button>
+    <div class="result" id="quizResult"></div>
+  </div>
+</section>
+
+<footer style="text-align:center;margin:20px;color:#555">
+  © 2025 Class 8 English Interactive Page
+</footer>
+
+<script>
+/* ---------- GAME SCRIPT ---------- */
+const gameArea=document.getElementById('gameArea');
+const basket=document.getElementById('basket');
+const scoreBoard=document.getElementById('scoreBoard');
+let basketX=gameArea.offsetWidth/2-40;
+let score=0;
+
+function moveBasket(){
+  basket.style.left=basketX+"px";
+}
+function moveLeft(){basketX=Math.max(0,basketX-20);moveBasket();}
+function moveRight(){basketX=Math.min(gameArea.offsetWidth-80,basketX+20);moveBasket();}
+
+document.addEventListener('keydown',e=>{
+  if(e.code==='ArrowLeft') moveLeft();
+  if(e.code==='ArrowRight') moveRight();
+});
+
+// Spawn rainbow drops
+function createDrop(){
+  const drop=document.createElement('div');
+  drop.className='drop';
+  drop.style.left=Math.random()*(gameArea.offsetWidth-30)+'px';
+  gameArea.appendChild(drop);
+
+  let topPos=-40;
+  const fall=setInterval(()=>{
+    topPos+=4;
+    drop.style.top=topPos+'px';
+    const dropRect=drop.getBoundingClientRect();
+    const basketRect=basket.getBoundingClientRect();
+    if(
+      dropRect.bottom>=basketRect.top &&
+      dropRect.left<basketRect.right &&
+      dropRect.right>basketRect.left
+    ){
+      score++;
+      scoreBoard.textContent="Score: "+score;
+      drop.remove();
+      clearInterval(fall);
+    }
+    if(topPos>gameArea.offsetHeight){
+      drop.remove();
+      clearInterval(fall);
+    }
+  },20);
+}
+setInterval(createDrop,1200);
+
+/* ---------- QUIZ SCRIPT ---------- */
+function checkQuiz(){
+  const q1=document.querySelector('input[name="q1"]:checked');
+  const q2=document.querySelector('input[name="q2"]:checked');
+  let correct=0;
+  if(q1 && q1.value==="b") correct++;
+  if(q2 && q2.value==="b") correct++;
+  document.getElementById('quizResult').textContent =
+    "You got "+correct+" / 2 correct!";
+}
+</script>
+</body>
+</html>

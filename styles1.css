@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Challenge - Gamified Learning</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-grid"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="game-container">
+    <div class="game-header">
+      <h2>Math Challenge</h2>
+      <div class="score-display">Score: <span id="score">0</span> / 10</div>
+    </div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <p class="message success">Complete 10 math problems to earn +50 XP!</p>
+    
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <button id="nextBtn" class="btn btn-primary">Next Question</button>
+    <div id="result" class="message"></div>
+  </div>
+
+  <script>
+    let score = 0;
+    let currentQuestion = 0;
+    const totalQuestions = 10;
+    const questions = [
+      { q: "2 + 2 = ?", options: ['3', '4', '5', '6'], ans: 1 },
+      { q: "5 × 3 = ?", options: ['15', '10', '20', '25'], ans: 0 },
+      { q: "10 - 4 = ?", options: ['5', '6', '7', '8'], ans: 1 },
+      { q: "12 ÷ 3 = ?", options: ['4', '3', '5', '6'], ans: 0 },
+      { q: "8 + 7 = ?", options: ['14', '15', '16', '17'], ans: 1 },
+      { q: "9 × 2 = ?", options: ['18', '16', '20', '22'], ans: 0 },
+      { q: "20 - 5 = ?", options: ['15', '14', '16', '17'], ans: 0 },
+      { q: "6 ÷ 2 = ?", options: ['2', '3', '4', '1'], ans: 1 },
+      { q: "4 + 5 = ?", options: ['8', '9', '10', '11'], ans: 1 },
+      { q: "7 × 4 = ?", options: ['28', '24', '32', '35'], ans: 0 }
+    ];
+
+    function loadQuestion() {
+      if (currentQuestion < totalQuestions) {
+        const q = questions[currentQuestion];
+        document.getElementById('question').textContent = q.q;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        q.options.forEach((opt, idx) => {
+          const div = document.createElement('div');
+          div.className = 'option';
+          div.textContent = opt;
+          div.onclick = () => checkAnswer(idx === q.ans, div);
+          optionsDiv.appendChild(div);
+        });
+        
+        // Update progress bar
+        const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+      } else {
+        document.getElementById('question').innerHTML = `
+          <div style="text-align: center; padding: 2rem;">
+            <h3>🎉 Challenge Complete!</h3>
+            <p>Your final score: <strong>${score}/${totalQuestions}</strong></p>
+            <p>You earned <strong>50 XP</strong>! Great job!</p>
+          </div>
+        `;
+        document.getElementById('options').innerHTML = '';
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('progressFill').style.width = '100%';
+      }
+    }
+
+    function checkAnswer(correct, clickedOption) {
+      // Disable all options
+      document.querySelectorAll('.option').forEach(opt => {
+        opt.style.pointerEvents = 'none';
+        if (opt.textContent === questions[currentQuestion].options[questions[currentQuestion].ans]) {
+          opt.classList.add('correct');
+        } else if (opt === clickedOption && !correct) {
+          opt.classList.add('incorrect');
+        }
+      });
+
+      if (correct) {
+        score++;
+        document.getElementById('score').textContent = score;
+        showMessage('Correct! +5 XP', 'success');
+      } else {
+        showMessage('Try again! Keep going!', 'warning');
+      }
+      
+      currentQuestion++;
+      document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function showMessage(text, type) {
+      const result = document.getElementById('result');
+      result.textContent = text;
+      result.className = `message ${type} show`;
+      setTimeout(() => result.classList.remove('show'), 3000);
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+      document.getElementById('nextBtn').style.display = 'none';
+      document.querySelectorAll('.option').forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+        opt.style.pointerEvents = 'auto';
+      });
+      loadQuestion();
+    };
+
+    // Initialize particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 20; // Reduced for game pages
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        const size = Math.random() * 2 + 2;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 18 + 's';
+        particle.style.animationDuration = (Math.random() * 12 + 12) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Load first question
+    document.addEventListener('DOMContentLoaded', () => {
+      createParticles();
+      loadQuestion();
+    });
+  </script>
+</body>
+</html>

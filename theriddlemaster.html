@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Riddle Master - Interactive</title>
+<style>
+  body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(to right, #fceabb, #f8b500);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    align-items: center;
+  }
+
+  .container {
+    background: rgba(255,255,255,0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    max-width: 700px;
+    width: 100%;
+    animation: fadeIn 1.5s ease;
+  }
+
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+
+  .line {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: transform 0.3s, color 0.3s;
+  }
+
+  .line:hover {
+    color: #16a085;
+    transform: scale(1.05);
+  }
+
+  .controls {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  button {
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    border: none;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background-color: #2980b9;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+
+  .riddle {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #f0f3f4;
+    text-align: center;
+  }
+
+  .answer {
+    display: none;
+    margin-top: 10px;
+    color: #e74c3c;
+    font-weight: bold;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>The Riddle Master</h1>
+  
+  <div id="poem">
+    <div class="line" onclick="showMeaning(this)">He asked a riddle, mysterious and sly,</div>
+    <div class="line" onclick="showMeaning(this)">To those who dared to give it a try.</div>
+    <div class="line" onclick="showMeaning(this)">“I speak without a mouth, hear without ears,”</div>
+    <div class="line" onclick="showMeaning(this)">“I have nobody, but I come alive with wind,”</div>
+    <div class="line" onclick="showMeaning(this)">Who can solve me? Can you guess my name?”</div>
+  </div>
+
+  <div class="controls">
+    <button onclick="revealRiddle()">🧩 Show Riddle Quiz</button>
+  </div>
+
+  <div class="riddle" id="riddleDiv">
+    <p>Riddle: I speak without a mouth and hear without ears. What am I?</p>
+    <input type="text" id="riddleAnswer" placeholder="Your answer">
+    <button onclick="checkAnswer()">Submit</button>
+    <div class="answer" id="answerDiv">Correct! It is an Echo. 🎉</div>
+  </div>
+
+</div>
+
+<script>
+  // Show meaning on line click
+  function showMeaning(line) {
+    alert("This line is mysterious. Try to think about riddles or metaphors!");
+  }
+
+  // Reveal riddle quiz
+  function revealRiddle() {
+    document.getElementById('riddleDiv').style.display = 'block';
+  }
+
+  // Check riddle answer
+  function checkAnswer() {
+    const ans = document.getElementById('riddleAnswer').value.trim().toLowerCase();
+    if(ans === 'echo') {
+      document.getElementById('answerDiv').style.display = 'block';
+    } else {
+      alert('Try again!');
+    }
+  }
+</script>
+
+</body>
+</html>

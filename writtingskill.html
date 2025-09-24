@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 English Writing Skills</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f6d365, #fda085);
+    margin: 0;
+    padding: 20px;
+    color: #222;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #111;
+  }
+  .skills {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    gap: 15px;
+  }
+  .skill-card {
+    background: rgba(255,255,255,0.9);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .skill-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .skill-content {
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #888;
+    color: #111;
+  }
+  .skill-content p {
+    margin: 6px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Class 9 English Writing Skills</h1>
+
+<div class="skills">
+
+  <div class="skill-card" onclick="toggleSkill(this)">
+    <h2>Letter Writing</h2>
+    <div class="skill-content">
+      <p><strong>Formal Letter:</strong> Used for official purposes. Example structure:</p>
+      <p>Sender's Address<br>Date<br>Receiver's Address<br>Subject<br>Salutation<br>Body<br>Closing</p>
+      <p><strong>Informal Letter:</strong> Used to write to friends/family. Example: Start with "Dear [Name]", end with "Yours lovingly".</p>
+    </div>
+  </div>
+
+  <div class="skill-card" onclick="toggleSkill(this)">
+    <h2>Message Writing</h2>
+    <div class="skill-content">
+      <p>Messages are short notes conveying information.</p>
+      <p>Example: "Meet me at the library at 5 PM. Don't be late. - Riya"</p>
+      <p>Tips: Keep it concise, clear, and informative.</p>
+    </div>
+  </div>
+
+  <div class="skill-card" onclick="toggleSkill(this)">
+    <h2>Essay Writing</h2>
+    <div class="skill-content">
+      <p>Essays are structured pieces of writing on a topic.</p>
+      <p>Structure: Introduction, Body, Conclusion.</p>
+      <p>Example Topic: "Importance of Education"</p>
+    </div>
+  </div>
+
+  <div class="skill-card" onclick="toggleSkill(this)">
+    <h2>Story Writing</h2>
+    <div class="skill-content">
+      <p>Story writing requires creativity and structure.</p>
+      <p>Structure: Beginning, Middle, End</p>
+      <p>Example: Moral story or personal experience story.</p>
+    </div>
+  </div>
+
+  <div class="skill-card" onclick="toggleSkill(this)">
+    <h2>Notice Writing</h2>
+    <div class="skill-content">
+      <p>Used to inform people about events or instructions.</p>
+      <p>Example Structure: Heading, Date, Time, Place, Purpose</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleSkill(card) {
+  const content = card.querySelector('.skill-content');
+  content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+
+</body>
+</html>

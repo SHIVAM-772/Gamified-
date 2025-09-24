@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamified Learning - Smart Education</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #2a2a2a;
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --text-muted: #666666;
+      --accent-primary: #ffffff;
+      --accent-secondary: #cccccc;
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --success: #10b981;
+      --error: #ef4444;
+      --shadow-light: rgba(255, 255, 255, 0.1);
+      --shadow-dark: rgba(0, 0, 0, 0.3);
+      --quest-bg: rgba(255, 255, 255, 0.05);
+      --badge-color: #ffd700;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Theme Variations */
+    body.theme-low {
+      --bg-primary: #e0f7fa;
+      --bg-secondary: #b2ebf2;
+      --bg-tertiary: #80deea;
+      --text-primary: #006064;
+      --text-secondary: #00838f;
+      --accent-primary: #00bcd4;
+      --accent-secondary: #0097a7;
+      --glass-bg: rgba(255, 255, 255, 0.6);
+      --glass-border: rgba(0, 188, 212, 0.3);
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+    }
+
+    body.theme-mid {
+      --bg-primary: #212121;
+      --bg-secondary: #424242;
+      --bg-tertiary: #616161;
+      --text-primary: #ffffff;
+      --text-secondary: #bdbdbd;
+      --accent-primary: #ff5252;
+      --accent-secondary: #ff1744;
+      --glass-bg: rgba(33, 33, 33, 0.7);
+      --glass-border: rgba(255, 82, 82, 0.3);
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+    }
+
+    body.theme-high {
+      --bg-primary: #f5f5f5;
+      --bg-secondary: #eeeeee;
+      --bg-tertiary: #e0e0e0;
+      --text-primary: #212121;
+      --text-secondary: #757575;
+      --accent-primary: #3f51b5;
+      --accent-secondary: #303f9f;
+      --glass-bg: rgba(245, 245, 245, 0.8);
+      --glass-border: rgba(63, 81, 181, 0.3);
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    .loading-text {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    /* Animated Background Grid */
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridMove 25s linear infinite;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(20px, 20px) scale(1.02); }
+      100% { transform: translate(40px, 40px) scale(1); }
+    }
+
+    /* Floating Particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      animation: float 18s linear infinite;
+      opacity: 0.4;
+      box-shadow: 0 0 8px var(--accent-primary);
+    }
+
+    .particle::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      opacity: 0.2;
+      animation: pulse 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.4;
+      }
+      90% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(-100px) translateX(150px) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.2; }
+      100% { transform: scale(1.8); opacity: 0.05; }
+    }
+
+    /* Corner Images for Themes - FIXED */
+    .corner-image {
+      position: fixed;
+      width: 150px;
+      height: auto;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.5s ease;
+      display: none;
+    }
+
+    .corner-image.active {
+      opacity: 0.8;
+      display: block;
+      animation: fadeInCorner 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeInCorner {
+      from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+      }
+      to {
+        opacity: 0.8;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .corner-top-left {
+      top: 20px;
+      left: 20px;
+    }
+
+    .corner-top-right {
+      top: 20px;
+      right: 20px;
+      transform: scaleX(-1);
+    }
+
+    .corner-bottom-left {
+      bottom: 20px;
+      left: 20px;
+    }
+
+    .corner-bottom-right {
+      bottom: 20px;
+      right: 20px;
+      transform: scaleX(-1);
+    }
+
+    body.theme-mid .corner-image.active, 
+    body.theme-high .corner-image.active {
+      filter: drop-shadow(0 4px 8px var(--shadow-dark));
+    }
+
+    /* Hero Float Animation */
+    @keyframes heroFloat {
+      0% { transform: translateY(0) scaleX(-1); }
+      50% { transform: translateY(-10px) scaleX(-1); }
+      100% { transform: translateY(0) scaleX(-1); }
+    }
+
+    body.theme-mid .corner-top-right.active,
+    body.theme-mid .corner-bottom-right.active {
+      animation: heroFloat 5s ease-in-out infinite;
+    }
+
+    /* Main Container */
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 3rem 2.5rem;
+      animation: slideUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Header */
+    h2 {
+      text-align: center;
+      font-size: 2.75rem;
+      font-weight: 800;
+      margin-bottom: 2.5rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      letter-spacing: -0.02em;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 2px;
+      animation: underlineGlow 4s ease-in-out infinite;
+    }
+
+    @keyframes underlineGlow {
+      0%, 100% { 
+        width: 80px; 
+        opacity: 0.7;
+        box-shadow: 0 0 5px var(--accent-primary);
+      }
+      50% { 
+        width: 120px; 
+        opacity: 1;
+        box-shadow: 0 0 15px var(--accent-primary);
+      }
+    }
+
+    /* Gamified Sections */
+    .section {
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 
+        0 25px 50px -12px var(--shadow-dark),
+        0 0 0 1px var(--glass-border),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.7s ease-out forwards;
+    }
+
+    .section:nth-child(1) { animation-delay: 0.2s; }
+    .section:nth-child(2) { animation-delay: 0.4s; }
+    .section:nth-child(3) { animation-delay: 0.6s; }
+    .section:nth-child(4) { animation-delay: 0.8s; }
+
+    .section h3 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section h3 svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--accent-secondary);
+    }
+
+    /* --- MODIFICATION: Updated Quest List CSS --- */
+    .quest-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .quest-card {
+      background: var(--quest-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      /* These properties are for the new 'a' tag cards */
+      text-decoration: none; 
+      color: var(--text-primary); 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between;
+    }
+
+    .quest-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      border-color: var(--accent-primary);
+    }
+
+    .quest-card h4 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .quest-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      flex-grow: 1; /* Pushes the button down */
+      margin-bottom: 1rem;
+    }
+
+    .play-btn {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+        color: var(--bg-primary, #0a0a0a);
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-align: center;
+        transition: transform 0.2s ease;
+        font-size: 0.9rem;
+    }
+    /* --- END OF MODIFICATION --- */
+    
+
+    /* Achievements */
+    .achievement-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .badge {
+      width: 80px;
+      height: 80px;
+      background: var(--badge-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--bg-primary);
+      opacity: 0.5;
+      transition: all 0.3s ease;
+    }
+
+    .badge.unlocked {
+      opacity: 1;
+      box-shadow: 0 0 15px var(--badge-color);
+      animation: badgeUnlock 1s ease-out;
+    }
+
+    @keyframes badgeUnlock {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    /* Study Modules */
+    .module-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .module-card {
+      background: var(--quest-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .module-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      border-color: var(--accent-primary);
+    }
+
+    .module-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Syllabus Viewer */
+    .syllabus-content {
+      background: var(--quest-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    /* Back Button */
+    .back-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--text-muted) 0%, var(--text-secondary) 100%);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 2rem;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 
+        0 20px 30px -10px rgba(179, 179, 179, 0.2),
+        0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Message */
+    #message {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      min-height: 20px;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    #message.show {
+      opacity: 1;
+      transform: translateY(0);
+      animation: messagePulse 0.6s ease-out;
+    }
+
+    #message.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    #message.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    @keyframes messagePulse {
+      0% { transform: scale(0.95); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        margin: 1rem;
+        padding: 2rem 1.5rem;
+      }
+      
+      h2 {
+        font-size: 2.25rem;
+      }
+      
+      .corner-image {
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      h2 {
+        font-size: 1.875rem;
+      }
+      
+      .corner-image {
+        width: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading Gamified Learning...</div>
+  </div>
+
+  <div class="bg-grid"></div>
+  <div class="particles" id="particles"></div>
+
+  <img src="doraemon-top-left.png" class="corner-image corner-top-left theme-low-img" alt="Doraemon">
+  <img src="doraemon-top-right.png" class="corner-image corner-top-right theme-low-img" alt="Doraemon">
+  <img src="doraemon-bottom-left.png" class="corner-image corner-bottom-left theme-low-img" alt="Doraemon">
+  <img src="doraemon-bottom-right.png" class="corner-image corner-bottom-right theme-low-img" alt="Doraemon">
+
+  <img src="ironman-top-left.png" class="corner-image corner-top-left theme-mid-img" alt="Iron Man">
+  <img src="spiderman-top-right.png" class="corner-image corner-top-right theme-mid-img" alt="Spider Man">
+  <img src="batman-bottom-left.png" class="corner-image corner-bottom-left theme-mid-img" alt="Batman">
+  <img src="superman-bottom-right.png" class="corner-image corner-bottom-right theme-mid-img" alt="Superman">
+
+  <div class="container">
+    <button class="back-btn" id="backBtn">Profile page</button>
+    
+    <h2>Gamified Learning Hub</h2>
+    
+    <div class="section" id="daily-quests">
+      <h3>
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2h-2V9zm0 4h2v6h-2v-6z"/>
+        </svg>
+        Daily Quests
+      </h3>
+      <div class="quest-list" id="quest-list-container">
+        </div>
+    </div>
+    <div class="section" id="achievements">
+      <h3>
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/>
+        </svg>
+        Achievements
+      </h3>
+      <div class="achievement-grid">
+        <div class="badge" title="Math Master">🏆</div>
+        <div class="badge" title="Science Whiz">🔬</div>
+        <div class="badge" title="Reading Star">📚</div>
+        <div class="badge" title="Daily Streak">🔥</div>
+      </div>
+    </div>
+    
+    <div class="section" id="study-modules">
+      <h3>
+        <svg viewBox="0 0 24 24">
+          <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/>
+        </svg>
+        Study Modules
+      </h3>
+      <div class="module-list">
+        <div class="module-card">
+          <div class="module-icon">🧮</div>
+          <h4>Mathematics</h4>
+          <p>Interactive lessons and practice</p>
+        </div>
+        <div class="module-card">
+          <div class="module-icon">🧪</div>
+          <h4>Science</h4>
+          <p>Experiments and theories</p>
+        </div>
+        <div class="module-card">
+          <div class="module-icon">🌍</div>
+          <h4>Geography</h4>
+          <p>Maps and world facts</p>
+        </div>
+        <div class="module-card">
+          <div class="module-icon">📖</div>
+          <h4>Language Arts</h4>
+          <p>Reading and writing skills</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section hidden" id="syllabus-viewer">
+      <h3>
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+        </svg>
+        Syllabus Overview
+      </h3>
+      <div class="syllabus-content">
+        <p>Loading syllabus...</p>
+      </div>
+    </div>
+    
+    <p id="message"></p>
+  </div>
+
+  <script type="module">
+    // Firebase v12 Modular SDK Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPMlHzrEOLXOWZldw6fkk5nWf1m0g45L8",
+      authDomain: "studentportal-bc1ec.firebaseapp.com",
+      projectId: "studentportal-bc1ec",
+      storageBucket: "studentportal-bc1ec.firebasestorage.app",
+      messagingSenderId: "516315325736",
+      appId: "1:516315325736:web:21a4418f69f3f6019fdc1d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM Elements
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const backBtn = document.getElementById('backBtn');
+    const message = document.getElementById('message');
+    const syllabusViewer = document.getElementById('syllabus-viewer');
+    const questListContainer = document.getElementById('quest-list-container'); // Get the correct container
+
+    // FIXED: Select images by theme class
+    const cartoonImages = document.querySelectorAll('.theme-low-img');
+    const heroImages = document.querySelectorAll('.theme-mid-img');
+
+    let currentUser = null;
+    let isInitialized = false;
+
+    // --- FINAL CHANGE: Dynamic quest generation logic ---
+    const gameTemplates = [
+        { title: 'Maths Quiz', description: 'Fun challenges with numbers and sums.' },
+        { title: 'Science Explorer', description: 'Learn about the world around you.' },
+        { title: 'Go Ahead', description: 'A fun challenge to test your knowledge.' }
+    ];
+
+    function generateQuestsForGrade(grade) {
+        if (!grade || grade < 1 || grade > 12) return [];
+        return gameTemplates.map((template, index) => {
+            const gameNumber = index + 1;
+            return {
+                title: template.title,
+                description: template.description,
+                file: `c${grade}m${gameNumber}.html`
+            };
+        });
+    }
+
+    function renderQuests(grade) {
+        questListContainer.innerHTML = '';
+        const quests = generateQuestsForGrade(grade);
+
+        if (quests.length === 0) {
+            questListContainer.innerHTML = `<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">Please set your grade on the dashboard to see your daily quests!</p>`;
+            return;
+        }
+
+        quests.forEach(quest => {
+            const questCard = document.createElement('a');
+            questCard.href = quest.file;
+            questCard.className = 'quest-card'; // Use quest styling
+            
+            questCard.innerHTML = `
+                <div>
+                    <h4>${quest.title}</h4>
+                    <p>${quest.description}</p>
+                </div>
+                <span class="play-btn">Play Now</span>
+            `;
+            questListContainer.appendChild(questCard);
+        });
+    }
+    // --- END OF CHANGE ---
+
+    // Hide loading overlay
+    function hideLoadingOverlay() {
+      loadingOverlay.classList.add('hidden');
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+      }, 300);
+    }
+
+    function hideAllImages() {
+      [cartoonImages, heroImages].forEach(imageSet => {
+        imageSet.forEach(img => img.classList.remove('active'));
+      });
+    }
+
+    function showThemeImages(themeClass) {
+      hideAllImages();
+      if (themeClass === 'theme-low') {
+        cartoonImages.forEach(img => img.classList.add('active'));
+      } else if (themeClass === 'theme-mid') {
+        heroImages.forEach(img => img.classList.add('active'));
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (isInitialized) return;
+      isInitialized = true;
+      
+      if (user) {
+        currentUser = user;
+        await loadThemeAndContent();
+        hideLoadingOverlay();
+      } else {
+        setTimeout(() => { window.location.href = 'student.html'; }, 1000);
+        hideLoadingOverlay();
+      }
+    });
+
+    async function loadThemeAndContent() {
+      if (!currentUser) return;
+      
+      try {
+        const docRef = doc(db, 'students', currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const grade = parseInt(data.grade) || 0;
+          
+          // --- FINAL CHANGE: Call the quest renderer here ---
+          renderQuests(grade);
+          
+          if (grade >= 1 && grade <= 4) {
+            document.body.classList.add('theme-low');
+            showThemeImages('theme-low');
+          } else if (grade >= 5 && grade <= 9) {
+            document.body.classList.add('theme-mid');
+            showThemeImages('theme-mid');
+          } else if (grade >= 10 && grade <= 12) {
+            document.body.classList.add('theme-high');
+            syllabusViewer.classList.remove('hidden');
+            document.querySelector('.syllabus-content').innerHTML = `
+              <ul style="line-height: 1.8;">
+                <li><strong>Physics:</strong> Mechanics, Thermodynamics, Electromagnetism</li>
+                <li><strong>Chemistry:</strong> Organic Chemistry, Chemical Reactions, Periodic Table</li>
+                <li><strong>Biology:</strong> Human Anatomy, Genetics, Ecology</li>
+                <li><strong>Math:</strong> Calculus, Algebra, Geometry</li>
+              </ul>
+            `;
+            document.querySelectorAll('.section').forEach(section => {
+              section.style.borderStyle = 'dashed';
+              section.style.borderWidth = '2px';
+              section.style.borderColor = 'var(--accent-primary)';
+            });
+          } else {
+            document.body.classList.add('theme-low');
+            showThemeImages('theme-low');
+          }
+          
+          showMessage(`Welcome to Grade ${grade} Learning!`, 'success');
+        } else {
+          showMessage('Please set your grade in profile', 'error');
+          document.body.classList.add('theme-low');
+          showThemeImages('theme-low');
+        }
+      } catch (err) {
+        console.error('Error loading theme:', err);
+        showMessage('Error loading content', 'error');
+        document.body.classList.add('theme-low');
+        showThemeImages('theme-low');
+      }
+    }
+
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'studentdash.html';
+    });
+
+    function showMessage(text, type) {
+      console.log('Message:', text);
+      message.textContent = text;
+      message.className = type;
+      message.classList.add('show');
+      
+      setTimeout(() => {
+        message.classList.remove('show');
+      }, 4000);
+    }
+
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 40;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        const size = Math.random() * 2 + 2;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 18 + 's';
+        particle.style.animationDuration = (Math.random() * 12 + 12) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(createParticles, 1000);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      cartoonImages.forEach((img) => {
+        img.addEventListener('error', () => {
+          console.error(`Failed to load cartoon image:`, img.src);
+        });
+      });
+      
+      heroImages.forEach((img) => {
+        img.addEventListener('error', () => {
+          console.error(`Failed to load hero image:`, img.src);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

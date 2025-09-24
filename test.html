@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fluid Wave Animation</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Shader material for fluid waves
+    const vertexShader = `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `;
+
+    const fragmentShader = `
+      varying vec2 vUv;
+      uniform float time;
+      uniform vec2 resolution;
+      uniform vec2 mouse;
+      uniform float rippleStrength;
+      uniform vec2 rippleOrigin;
+
+      void main() {
+        vec2 uv = vUv;
+        // Calculate distance from mouse ripple origin
+        float dist = distance(uv * resolution / resolution.y, rippleOrigin * resolution / resolution.y);
+        // Create ripple effect with smooth decay
+        float wave = sin(dist * 20.0 - time * 5.0) * exp(-dist * 2.0) * rippleStrength;
+        // Base color with wave distortion
+        vec3 color = vec3(0.1, 0.3, 0.5) + wave * 0.2;
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `;
+
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0.0 },
+        resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        mouse: { value: new THREE.Vector2(0.5, 0.5) },
+        rippleStrength: { value: 0.0 },
+        rippleOrigin: { value: new THREE.Vector2(0.5, 0.5) }
+      },
+      vertexShader,
+      fragmentShader
+    });
+
+    // Plane geometry to cover canvas
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    // Mouse interaction
+    let mouse = new THREE.Vector2(0.5, 0.5);
+    let rippleStrength = 0.0;
+    let rippleTarget = 0.0;
+    document.addEventListener('mousemove', (event) => {
+      mouse.x = event.clientX / window.innerWidth;
+      mouse.y = 1.0 - event.clientY / window.innerHeight; // Flip Y for WebGL
+      rippleTarget = 1.0; // Trigger ripple
+      material.uniforms.rippleOrigin.value.set(mouse.x, mouse.y);
+    });
+
+    // Animation loop
+    let time = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      time += 0.016; // ~60fps
+      // Smooth ripple decay
+      rippleStrength += (rippleTarget - rippleStrength) * 0.1;
+      if (rippleStrength < 0.01) rippleStrength = 0;
+      rippleTarget *= 0.95; // Dampen trigger
+      material.uniforms.time.value = time;
+      material.uniforms.mouse.value = mouse;
+      material.uniforms.rippleStrength.value = rippleStrength;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      material.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
