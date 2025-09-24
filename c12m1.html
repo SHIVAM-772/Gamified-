@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class 12 Math: Calculus Quest</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #e0f7fa, #bbdefb);
+      font-family: 'Arial', sans-serif;
+    }
+    .game-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    #timer {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+  <h1 class="text-4xl font-bold text-gray-800 mb-8">Class 12 Math: Calculus Quest</h1>
+
+  <div id="game-selection" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame()">
+    <h2 class="text-2xl font-semibold text-blue-600">Calculus Quest</h2>
+    <p class="text-gray-600 mt-2">Conquer calculus to complete the quest!</p>
+  </div>
+
+  <div id="game-area" class="hidden bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+    <h2 id="game-title" class="text-3xl font-bold text-gray-800 mb-4">Calculus Quest</h2>
+    <div id="question" class="text-lg text-gray-700 mb-4"></div>
+    <input id="answer-input" type="text" placeholder="Enter your answer" class="w-full p-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button onclick="submitAnswer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Submit Answer</button>
+    <p id="feedback" class="mt-4 text-lg"></p>
+    <div id="timer" class="text-xl text-red-600 mt-4">Time: 60s</div>
+    <button onclick="nextQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-green-700">Next Question</button>
+    <button onclick="endGame()" class="bg-red-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-red-700">End Game</button>
+  </div>
+
+  <script>
+    let timerInterval;
+    let timeLeft = 60;
+    let currentQuestion = 0;
+    const questions = [
+      // Original Questions
+      { question: 'Find ∫(2x + 3) dx from x=1 to x=3.', answer: '14' },
+      { question: 'Determine the x-coordinate of the point of inflection for f(x) = x³ - 3x² + 2.', answer: '1' },
+      { question: 'Find the derivative of y = sin(x²) with respect to x.', answer: '2x cos(x²)' },
+      // Limits, Continuity, Differentiability
+      { question: 'Evaluate the limit: lim x→0 (sin(x)/x).', answer: '1' },
+      { question: 'Is the function f(x) = |x| differentiable at x=0? (Yes/No)', answer: 'No' },
+      { question: 'Evaluate the limit: lim x→∞ (1 + 1/x)^x.', answer: 'e' },
+      { question: 'Find k if f(x) = {kx+1 for x≤5; 3x-5 for x>5} is continuous at x=5.', answer: '9/5' },
+      { question: 'Evaluate the limit: lim x→0 (e^x - 1)/x.', answer: '1' },
+      { question: 'The function f(x) = tan(x) is discontinuous at x = ? (smallest positive value in radians)', answer: 'π/2' },
+      { question: 'What is the derivative of an even function? (Even/Odd)', answer: 'Odd' },
+      { question: 'Evaluate the limit using L\'Hopital\'s Rule: lim x→1 (x²-1)/(x-1).', answer: '2' },
+      // Methods of Differentiation
+      { question: 'Find the derivative of y = x log(x).', answer: '1 + log(x)' },
+      { question: 'Find the derivative of y = e^x / x.', answer: '(xe^x - e^x)/x²' },
+      { question: 'If x = at², y = 2at, find dy/dx.', answer: '1/t' },
+      { question: 'Find the derivative of y = sin⁻¹(x).', answer: '1/√(1-x²)' },
+      { question: 'Find the derivative of y = x^x.', answer: 'x^x(1+log(x))' },
+      { question: 'If x² + y² = 25, find dy/dx at the point (3,4).', answer: '-3/4' },
+      { question: 'Find the derivative of y = log(sin(x)).', answer: 'cot(x)' },
+      { question: 'Find the second derivative of y = x³.', answer: '6x' },
+      // Applications of Derivatives
+      { question: 'Find the slope of the tangent to the curve y = x² at x=1.', answer: '2' },
+      { question: 'Find the rate of change of the area of a circle w.r.t its radius r when r=3cm.', answer: '6π' },
+      { question: 'What is the absolute maximum value of f(x) = sin(x) in the interval [0, 2π]?', answer: '1' },
+      { question: 'For f(x) = x²-4x+6, is the function increasing or decreasing at x=3?', answer: 'Increasing' },
+      { question: 'Find the value of \'c\' for Rolle\'s Theorem for f(x) = x²-1 on the interval [-1,1].', answer: '0' },
+      { question: 'Find the equation of the normal to the curve y=x at (1,1). (Use format ax+by=c)', answer: 'x+y=2' },
+      { question: 'Find the local minimum value of the function f(x) = x³ - 3x.', answer: '-2' },
+      { question: 'A spherical balloon is being inflated. Its radius is increasing at 1 cm/s. At what rate is its volume increasing when r=3 cm?', answer: '36π' },
+      // Integration
+      { question: 'Find the integral of tan(x) dx.', answer: 'log|sec(x)|' },
+      { question: 'Find the integral of 1/(1+x²) dx.', answer: 'tan⁻¹(x)' },
+      { question: 'Find the integral of log(x) dx.', answer: 'xlog(x) - x' },
+      { question: 'Evaluate ∫ e^x (sin(x) + cos(x)) dx.', answer: 'e^x sin(x)' },
+      { question: 'Evaluate the definite integral ∫ from 0 to π/2 of sin(x) dx.', answer: '1' },
+      { question: 'Using properties of definite integrals, evaluate ∫ from -1 to 1 of x³ dx.', answer: '0' },
+      { question: 'Using properties, evaluate ∫ from 0 to π/2 of (sin(x)/(sin(x)+cos(x))) dx.', answer: 'π/4' },
+      { question: 'Find the integral of 1/√(a²-x²) dx.', answer: 'sin⁻¹(x/a)' },
+      // Applications of Integrals & Differential Equations
+      { question: 'Find the area bounded by the curve y=x², the x-axis, and the lines x=0 to x=1.', answer: '1/3' },
+      { question: 'What is the order of the differential equation (d²y/dx²)³ + dy/dx = 0?', answer: '2' },
+      { question: 'What is the degree of the differential equation (d²y/dx²)³ + dy/dx = 0?', answer: '3' },
+      { question: 'Find the general solution of the differential equation dy/dx = y/x.', answer: 'y=kx' },
+      { question: 'Find the integrating factor of dy/dx + y tan(x) = sec(x).', answer: 'sec(x)' },
+      { question: 'Find the area of the region bounded by the ellipse x²/16 + y²/9 = 1.', answer: '12π' },
+      { question: 'Find the particular solution of dy/dx = 2x, given the condition y(0)=1.', answer: 'y=x²+1' },
+      { question: 'Find the area enclosed by the circle x² + y² = 4.', answer: '4π' }
+    ];
+
+    function startGame() {
+      currentQuestion = 0;
+      timeLeft = 60;
+      document.getElementById('game-selection').classList.add('hidden');
+      document.getElementById('game-area').classList.remove('hidden');
+      loadQuestion();
+      startTimer();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < questions.length) {
+        document.getElementById('question').textContent = questions[currentQuestion].question;
+        document.getElementById('answer-input').value = '';
+        document.getElementById('feedback').textContent = '';
+      } else {
+        endGame('You have completed the Calculus Quest!');
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          endGame('Time is up!');
+        }
+      }, 1000);
+    }
+
+    function submitAnswer() {
+      const userAnswer = document.getElementById('answer-input').value.trim().replace(/\s+/g, '').toLowerCase();
+      const correctAnswer = questions[currentQuestion].answer.replace(/\s+/g, '').toLowerCase();
+      
+      let isCorrect = (userAnswer === correctAnswer);
+      
+      if (!isCorrect && !isNaN(parseFloat(userAnswer)) && !isNaN(parseFloat(correctAnswer))) {
+         // Allow tolerance for numerical answers
+         isCorrect = Math.abs(parseFloat(userAnswer) - parseFloat(correctAnswer)) <= 0.1;
+      }
+      
+      if (isCorrect) {
+          document.getElementById('feedback').textContent = 'Correct!';
+          document.getElementById('feedback').style.color = 'green';
+      } else {
+          document.getElementById('feedback').textContent = `Incorrect. The correct answer is ${questions[currentQuestion].answer}.`;
+          document.getElementById('feedback').style.color = 'red';
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      timeLeft = 60; // Reset timer for the next question
+      loadQuestion();
+      startTimer();
+    }
+
+    function endGame(message = 'Game Over!') {
+      clearInterval(timerInterval);
+      document.getElementById('game-area').classList.add('hidden');
+      document.getElementById('game-selection').classList.remove('hidden');
+      alert(`${message} You attempted ${currentQuestion} questions.`);
+    }
+
+    document.getElementById('answer-input').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            submitAnswer();
+        }
+    });
+  </script>
+</body>
+</html>

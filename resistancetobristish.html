@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resistance to British Rule in India</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg,#fef9f9,#d0f0fd);
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
+  h1 { text-align:center; color:#1b262c; margin-bottom: 20px; }
+  .cards { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+  .card {
+    background: #ffffffcc;
+    border-radius: 12px;
+    padding: 16px;
+    width: 250px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .card:hover { transform: scale(1.05); box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+  .card h3 { margin: 0 0 8px 0; color:#ff6f61; }
+  .card p { display:none; margin:0; color:#333; }
+  video { max-width: 100%; margin-top: 20px; border-radius: 10px; }
+  .timeline { margin-top: 30px; border-left: 4px solid #ff6f61; padding-left: 20px; }
+  .timeline-event { margin-bottom: 20px; }
+  .timeline-event h4 { margin:0; color:#1b262c; }
+  .timeline-event p { margin:4px 0 0 0; }
+  .quiz { margin-top: 20px; text-align:center; }
+  .quiz button {
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 6px;
+    border: none;
+    background-color: #1b262c;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .quiz button:hover { background-color: #3282b8; }
+</style>
+</head>
+<body>
+
+<h1>Resistance to British Rule in India</h1>
+
+<!-- Resistance Cards -->
+<div class="cards">
+  <div class="card" onclick="toggleText(this)">
+    <h3>Revolt of 1857</h3>
+    <p>Also known as the First War of Independence, it was the major uprising against the British East India Company.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Tribal Uprisings</h3>
+    <p>Tribes in Chota Nagpur, Munda and Santhal regions resisted exploitation by British revenue policies.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Peasant Movements</h3>
+    <p>Farmers revolted due to high taxes and zamindari exploitation in different parts of India.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Reformist & Revolutionary Movements</h3>
+    <p>Freedom movements emerged through moderate reforms and revolutionary groups seeking independence.</p>
+  </div>
+</div>
+
+<!-- Timeline -->
+<div class="timeline">
+  <div class="timeline-event">
+    <h4>1857 - Revolt of 1857</h4>
+    <p>Major uprising against the East India Company.</p>
+  </div>
+  <div class="timeline-event">
+    <h4>1860-1890 - Tribal & Peasant Movements</h4>
+    <p>Santhal, Munda, and other tribal uprisings.</p>
+  </div>
+  <div class="timeline-event">
+    <h4>1900s - Freedom Struggle Movements</h4>
+    <p>Growth of revolutionary groups and early national movements.</p>
+  </div>
+</div>
+
+<!-- Embedded Video -->
+<video controls>
+  <source src="resistance_video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<!-- Quiz -->
+<div class="quiz">
+  <h3>Quiz: Test Your Knowledge</h3>
+  <p>Which revolt is known as the First War of Independence?</p>
+  <button onclick="checkAnswer(this,'wrong')">Peasant Movements</button>
+  <button onclick="checkAnswer(this,'correct')">Revolt of 1857</button>
+  <button onclick="checkAnswer(this,'wrong')">Tribal Uprisings</button>
+</div>
+
+<script>
+  function toggleText(card) {
+    const p = card.querySelector('p');
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function checkAnswer(btn, result) {
+    if(result==='correct'){
+      alert('Correct! 🎉');
+    } else {
+      alert('Oops! Try again. ❌');
+    }
+  }
+</script>
+
+</body>
+</html>

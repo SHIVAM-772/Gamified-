@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Games for Class 11</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #e0f7fa, #bbdefb);
+      font-family: 'Arial', sans-serif;
+    }
+    .game-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    #timer {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+  <h1 class="text-4xl font-bold text-gray-800 mb-8">Math Games for Class 11</h1>
+
+  <div id="game-selection" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="game-card bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame('trigonometry')">
+      <h2 class="text-2xl font-semibold text-blue-600">Trigonometry Treasure Hunt</h2>
+      <p class="text-gray-600 mt-2">Solve trig problems to find the hidden treasure!</p>
+    </div>
+    <div class="game-card bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame('algebra')">
+      <h2 class="text-2xl font-semibold text-blue-600">Algebra Equation Relay</h2>
+      <p class="text-gray-600 mt-2">Race to solve quadratic equations and more!</p>
+    </div>
+  </div>
+
+  <div id="game-area" class="hidden bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+    <h2 id="game-title" class="text-3xl font-bold text-gray-800 mb-4"></h2>
+    <div id="question" class="text-lg text-gray-700 mb-4"></div>
+    <input id="answer-input" type="text" placeholder="Enter your answer" class="w-full p-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button onclick="submitAnswer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Submit Answer</button>
+    <p id="feedback" class="mt-4 text-lg"></p>
+    <div id="timer" class="text-xl text-red-600 mt-4">Time: 60s</div>
+    <button onclick="nextQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-green-700">Next Question</button>
+    <button onclick="endGame()" class="bg-red-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-red-700">End Game</button>
+  </div>
+
+  <script>
+    let currentGame = '';
+    let timerInterval;
+    let timeLeft = 60;
+    let currentQuestion = 0;
+    const questions = {
+      trigonometry: [
+        { question: 'If sin θ = 3/5 and θ is in quadrant I, find cos(2θ).', answer: '7/25' },
+        { question: 'What is the value of 2sin(15°)cos(15°)?', answer: '1/2' },
+        { question: 'Convert 240° to radians.', answer: '4π/3' },
+        { question: 'What is the value of sin(75°)? (Use format (√a+b)/(c√d))', answer: '(√3+1)/(2√2)' },
+        { question: 'Find the principal value in radians of sin⁻¹(-1/2).', answer: '-π/6' },
+        { question: 'If cos(x) = -1/2 and x is in Q3, what is tan(x)?', answer: '√3' },
+        { question: 'Find the smallest positive solution in radians for 2cos(x) - 1 = 0.', answer: 'π/3' },
+        { question: 'Simplify the expression: cos(A)cos(B) - sin(A)sin(B).', answer: 'cos(A+B)' },
+        { question: 'What is the period of the function f(x) = tan(2x)?', answer: 'π/2' },
+        { question: 'What is the value of tan(45°) + cos(60°)?', answer: '1.5' }
+      ],
+      algebra: [
+        { question: 'Solve x² - 5x + 6 = 0 and find the sum of roots.', answer: '5' },
+        { question: 'For z = 1 + i, compute |z³|.', answer: '2√2' },
+        { question: 'Find the 10th term of the A.P.: 2, 7, 12, ...', answer: '47' },
+        { question: 'What is the value of i¹⁰¹?', answer: 'i' },
+        { question: 'Find the sum of the first 8 terms of the G.P.: 3, 6, 12, ...', answer: '765' },
+        { question: 'Calculate the value of P(5, 2) (Permutations).', answer: '20' },
+        { question: 'Find the modulus of the complex number z = 3 - 4i.', answer: '5' },
+        { question: 'Solve the inequality for x: 3x - 5 < 7.', answer: 'x < 4' },
+        { question: 'Find the coefficient of x² in the expansion of (1+x)⁴.', answer: '6' },
+        { question: 'For 2x² - 8x + 3 = 0, what is the product of the roots?', answer: '3/2' }
+      ]
+    };
+
+    function startGame(game) {
+      currentGame = game;
+      currentQuestion = 0;
+      timeLeft = 60;
+      document.getElementById('game-selection').classList.add('hidden');
+      document.getElementById('game-area').classList.remove('hidden');
+      document.getElementById('game-title').textContent = game === 'trigonometry' ? 'Trigonometry Treasure Hunt' : 'Algebra Equation Relay';
+      loadQuestion();
+      startTimer();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < questions[currentGame].length) {
+        document.getElementById('question').textContent = questions[currentGame][currentQuestion].question;
+        document.getElementById('answer-input').value = '';
+        document.getElementById('feedback').textContent = '';
+      } else {
+        endGame('You have answered all questions!');
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          endGame('Time is up!');
+        }
+      }, 1000);
+    }
+
+    function submitAnswer() {
+      const userAnswer = document.getElementById('answer-input').value.trim().replace(/\s/g, '');
+      const correctAnswer = questions[currentGame][currentQuestion].answer.replace(/\s/g, '');
+      if (userAnswer === correctAnswer) {
+          document.getElementById('feedback').textContent = 'Correct!';
+          document.getElementById('feedback').style.color = 'green';
+      } else {
+          document.getElementById('feedback').textContent = `Incorrect. The correct answer is ${questions[currentGame][currentQuestion].answer}.`;
+          document.getElementById('feedback').style.color = 'red';
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      loadQuestion();
+    }
+
+    function endGame(message) {
+      clearInterval(timerInterval);
+      document.getElementById('game-area').classList.add('hidden');
+      document.getElementById('game-selection').classList.remove('hidden');
+      alert(`${message} You attempted ${currentQuestion} questions.`);
+    }
+  </script>
+</body>
+</html>

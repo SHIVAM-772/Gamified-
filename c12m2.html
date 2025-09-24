@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class 12 Physics: Electromagnetism Circuit Breaker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #e0f7fa, #bbdefb);
+      font-family: 'Arial', sans-serif;
+    }
+    .game-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    #timer {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+  <h1 class="text-4xl font-bold text-gray-800 mb-8">Class 12 Physics: Electromagnetism Circuit Breaker</h1>
+
+  <div id="game-selection" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame()">
+    <h2 class="text-2xl font-semibold text-blue-600">Electromagnetism Circuit Breaker</h2>
+    <p class="text-gray-600 mt-2">Fix circuits with physics!</p>
+  </div>
+
+  <div id="game-area" class="hidden bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+    <h2 id="game-title" class="text-3xl font-bold text-gray-800 mb-4">Electromagnetism Circuit Breaker</h2>
+    <div id="question" class="text-lg text-gray-700 mb-4"></div>
+    <input id="answer-input" type="text" placeholder="Enter your answer" class="w-full p-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button onclick="submitAnswer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Submit Answer</button>
+    <p id="feedback" class="mt-4 text-lg"></p>
+    <div id="timer" class="text-xl text-red-600 mt-4">Time: 60s</div>
+    <button onclick="nextQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-green-700">Next Question</button>
+    <button onclick="endGame()" class="bg-red-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-red-700">End Game</button>
+  </div>
+
+  <script>
+    let timerInterval;
+    let timeLeft = 60;
+    let currentQuestion = 0;
+    const questions = [
+      // Original Questions
+      { question: 'Calculate the equivalent capacitance of two 4μF capacitors in series. (ans in μF)', answer: '2' },
+      { question: 'Find the induced EMF in a coil of 100 turns if magnetic flux changes by 0.01 Wb in 0.1 s. (ans in V)', answer: '10' },
+      { question: 'What is the electric field at a point 0.2 m from a 2μC charge? (k=9×10⁹ Nm²/C²) (ans in N/C)', answer: '450000' },
+      // Electrostatics
+      { question: 'According to Gauss\'s law, the electric flux through a closed surface depends only on the what?', answer: 'Enclosed charge' },
+      { question: 'How much work is done moving a 2C charge through a potential difference of 10V? (ans in J)', answer: '20' },
+      { question: 'What is the SI unit of capacitance?', answer: 'Farad' },
+      { question: 'Two capacitors of 2F and 4F are connected in parallel. What is their equivalent capacitance? (ans in F)', answer: '6' },
+      { question: 'What is the net electric charge of an electric dipole?', answer: '0' },
+      { question: 'What is the electric field inside a charged hollow spherical conductor?', answer: '0' },
+      { question: 'What happens to the capacitance of a parallel plate capacitor when a dielectric slab is inserted? (Increases/Decreases)', answer: 'Increases' },
+      { question: 'What is the shape of an equipotential surface for a point charge?', answer: 'Spherical' },
+      // Current Electricity
+      { question: 'A resistor has a voltage of 10V across it and a current of 2A. What is its resistance? (ans in Ω)', answer: '5' },
+      { question: 'Kirchhoff\'s junction rule is a statement of the conservation of what?', answer: 'Charge' },
+      { question: 'Kirchhoff\'s loop rule is a statement of the conservation of what?', answer: 'Energy' },
+      { question: 'What is the SI unit of resistivity?', answer: 'Ohm-meter' },
+      { question: 'For a balanced Wheatstone bridge, what is the current through the galvanometer?', answer: '0' },
+      { question: 'The drift velocity of electrons is (directly/inversely) proportional to the electric current.', answer: 'Directly' },
+      { question: 'A 100W bulb is connected to a 200V source. What is the current drawn by it? (ans in A)', answer: '0.5' },
+      // Magnetic Effects of Current and Magnetism
+      { question: 'What is the force on a charge moving parallel to a magnetic field?', answer: '0' },
+      { question: 'Ampere\'s circuital law in magnetism is analogous to which law in electrostatics?', answer: 'Gauss\'s law' },
+      { question: 'A 2m long wire carrying 5A is perpendicular to a 0.1T magnetic field. What is the force on the wire? (ans in N)', answer: '1' },
+      { question: 'Do magnetic field lines form closed or open loops?', answer: 'Closed' },
+      { question: 'The magnetic field inside a long current-carrying solenoid is (uniform/non-uniform).', answer: 'Uniform' },
+      { question: 'A current loop is in a magnetic field. At what angle (in degrees) between the magnetic moment and field is the torque maximum?', answer: '90' },
+      { question: 'What is the angle of dip at the Earth\'s magnetic poles? (in degrees)', answer: '90' },
+      { question: 'The Biot-Savart law is used to calculate what physical quantity?', answer: 'Magnetic field' },
+      // Electromagnetic Induction and Alternating Currents
+      { question: 'Lenz\'s law is a consequence of the law of conservation of what?', answer: 'Energy' },
+      { question: 'What is the SI unit of inductance?', answer: 'Henry' },
+      { question: 'What is the reactance of an inductor in a pure DC circuit?', answer: '0' },
+      { question: 'What is the reactance of a capacitor in a pure DC circuit?', answer: 'Infinity' },
+      { question: 'At resonance in an LCR circuit, what is the relationship between inductive ($X_L$) and capacitive ($X_C$) reactance?', answer: 'X_L = X_C' },
+      { question: 'What is the power factor of a purely resistive AC circuit?', answer: '1' },
+      { question: 'A transformer works on the principle of what phenomenon?', answer: 'Mutual induction' }
+    ];
+
+    function startGame() {
+      currentQuestion = 0;
+      timeLeft = 60;
+      document.getElementById('game-selection').classList.add('hidden');
+      document.getElementById('game-area').classList.remove('hidden');
+      loadQuestion();
+      startTimer();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < questions.length) {
+        document.getElementById('question').textContent = questions[currentQuestion].question;
+        document.getElementById('answer-input').value = '';
+        document.getElementById('feedback').textContent = '';
+      } else {
+        endGame('You have completed the challenge!');
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          endGame('Time is up!');
+        }
+      }, 1000);
+    }
+
+    function submitAnswer() {
+      const userAnswer = document.getElementById('answer-input').value.trim();
+      const correctAnswer = questions[currentQuestion].answer;
+      
+      let isCorrect = false;
+      if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+        isCorrect = true;
+      } else if (!isNaN(parseFloat(userAnswer)) && !isNaN(parseFloat(correctAnswer))) {
+        // Allow a small tolerance for numerical answers
+        isCorrect = Math.abs(parseFloat(userAnswer) - parseFloat(correctAnswer)) <= 0.1;
+      }
+
+      if (isCorrect) {
+          document.getElementById('feedback').textContent = 'Correct!';
+          document.getElementById('feedback').style.color = 'green';
+      } else {
+          document.getElementById('feedback').textContent = `Incorrect. The correct answer is ${correctAnswer}.`;
+          document.getElementById('feedback').style.color = 'red';
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      timeLeft = 60;
+      loadQuestion();
+      startTimer();
+    }
+
+    function endGame(message = 'Game Over!') {
+      clearInterval(timerInterval);
+      document.getElementById('game-area').classList.add('hidden');
+      document.getElementById('game-selection').classList.remove('hidden');
+      alert(`${message} You attempted ${currentQuestion} questions.`);
+    }
+
+    document.getElementById('answer-input').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            submitAnswer();
+        }
+    });
+  </script>
+</body>
+</html>

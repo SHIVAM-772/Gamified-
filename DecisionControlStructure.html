@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Control Structure</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    padding: 20px;
+  }
+  h1 { text-align: center; color: #333; }
+  .unit { background: #d9edf7; padding: 15px; margin: 15px 0; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+  .unit:hover { background: #bce8f1; }
+  .content { display: none; padding: 10px; background: #fff; border-radius: 6px; margin-top: 10px; }
+  code { background: #eee; padding: 2px 4px; border-radius: 4px; }
+  button { padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; background: #337ab7; color: white; margin-top: 8px; }
+  button:hover { background: #286090; }
+  .quiz { margin-top: 10px; padding: 10px; background: #fcf8e3; border-radius: 6px; }
+</style>
+</head>
+<body>
+
+<h1>Class 8 Computer - Decision Control Structure</h1>
+
+<div class="unit" onclick="toggleContent('ifUnit')">
+  <h2>Unit 1: If Statement</h2>
+  <div class="content" id="ifUnit">
+    <p>The <code>if</code> statement executes a block of code only if a condition is true.</p>
+    <pre>
+if (condition) {
+  // code executes if condition is true
+}
+    </pre>
+    <div class="quiz">
+      <p>Quiz: Is this true? <code>if(5 > 3)</code> will execute the block. ✅/❌</p>
+      <button onclick="alert('Correct! Yes, 5 > 3 is true.')">Answer</button>
+    </div>
+  </div>
+</div>
+
+<div class="unit" onclick="toggleContent('ifElseUnit')">
+  <h2>Unit 2: If-Else Statement</h2>
+  <div class="content" id="ifElseUnit">
+    <p>The <code>if-else</code> statement provides an alternative block if the condition is false.</p>
+    <pre>
+if (condition) {
+  // executes if true
+} else {
+  // executes if false
+}
+    </pre>
+    <div class="quiz">
+      <p>Quiz: What will print? <code>if(2 > 5){console.log("Yes")} else {console.log("No")}</code></p>
+      <button onclick="alert('Correct! Output: No')">Answer</button>
+    </div>
+  </div>
+</div>
+
+<div class="unit" onclick="toggleContent('nestedUnit')">
+  <h2>Unit 3: Nested If Statement</h2>
+  <div class="content" id="nestedUnit">
+    <p>Nested <code>if</code> allows multiple conditions inside another <code>if</code>.</p>
+    <pre>
+if (age >= 18) {
+  if (hasVoterID) {
+    console.log("Eligible to vote");
+  }
+}
+    </pre>
+  </div>
+</div>
+
+<div class="unit" onclick="toggleContent('switchUnit')">
+  <h2>Unit 4: Switch Statement</h2>
+  <div class="content" id="switchUnit">
+    <p>The <code>switch</code> statement selects one block to execute among many based on a variable.</p>
+    <pre>
+let day = 3;
+switch(day){
+  case 1: console.log("Monday"); break;
+  case 2: console.log("Tuesday"); break;
+  case 3: console.log("Wednesday"); break;
+  default: console.log("Other day");
+}
+    </pre>
+  </div>
+</div>
+
+<script>
+function toggleContent(id){
+  const content = document.getElementById(id);
+  content.style.display = (content.style.display === "block") ? "none" : "block";
+}
+</script>
+
+</body>
+</html>

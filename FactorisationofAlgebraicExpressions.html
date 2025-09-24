@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factorisation Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f5dc;
+    text-align: center;
+    padding: 50px;
+  }
+  h1 {
+    color: #333;
+  }
+  .question {
+    font-size: 24px;
+    margin: 20px 0;
+  }
+  .options button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background: #32cd32;
+    color: white;
+    transition: 0.3s;
+  }
+  .options button:hover {
+    background: #228b22;
+  }
+  #result {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Factorisation Game</h1>
+
+<div class="question" id="question"></div>
+<div class="options" id="options"></div>
+<div id="result"></div>
+
+<script>
+const questions = [
+  {
+    question: "Factorise: x² + 5x",
+    options: ["x(x + 5)", "(x + 5)²", "x² + 5", "x(x - 5)"],
+    answer: "x(x + 5)"
+  },
+  {
+    question: "Factorise: x² - 9",
+    options: ["(x + 3)(x - 3)", "x² - 3", "(x - 9)(x + 1)", "x² + 9"],
+    answer: "(x + 3)(x - 3)"
+  },
+  {
+    question: "Factorise: x² + 7x + 12",
+    options: ["(x + 3)(x + 4)", "(x + 6)(x + 2)", "(x + 1)(x + 12)", "(x + 2)(x + 6)"],
+    answer: "(x + 3)(x + 4)"
+  },
+  {
+    question: "Factorise: 2x² + 8x",
+    options: ["2x(x + 4)", "2(x + 4)²", "x(2x + 8)", "2x² + 8"],
+    answer: "2x(x + 4)"
+  }
+];
+
+let current = 0;
+let score = 0;
+
+function showQuestion() {
+  if(current < questions.length) {
+    const q = questions[current];
+    document.getElementById('question').textContent = q.question;
+    const optionsDiv = document.getElementById('options');
+    optionsDiv.innerHTML = '';
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.textContent = opt;
+      btn.onclick = () => checkAnswer(opt);
+      optionsDiv.appendChild(btn);
+    });
+    document.getElementById('result').textContent = '';
+  } else {
+    document.getElementById('question').textContent = 'Game Over!';
+    document.getElementById('options').innerHTML = '';
+    document.getElementById('result').textContent = `Your score: ${score} / ${questions.length}`;
+  }
+}
+
+function checkAnswer(selected) {
+  const q = questions[current];
+  if(selected === q.answer) {
+    document.getElementById('result').textContent = "✅ Correct!";
+    document.getElementById('result').style.color = 'green';
+    score++;
+  } else {
+    document.getElementById('result').textContent = `❌ Wrong! Correct Answer: ${q.answer}`;
+    document.getElementById('result').style.color = 'red';
+  }
+  current++;
+  setTimeout(showQuestion, 1500);
+}
+
+showQuestion();
+</script>
+
+</body>
+</html>

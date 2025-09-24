@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exponents & Powers Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #e6f7ff;
+    padding: 50px;
+  }
+  h1 {
+    color: #333;
+  }
+  .question {
+    font-size: 24px;
+    margin: 20px 0;
+  }
+  input[type="number"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 100px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    margin-right: 10px;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #4caf50;
+    color: white;
+    border: none;
+    transition: 0.3s;
+  }
+  button:hover {
+    background: #388e3c;
+  }
+  #result {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Exponents & Powers Game</h1>
+
+<div class="question" id="question"></div>
+<input type="number" id="answer" placeholder="Your Answer">
+<button onclick="checkAnswer()">Submit</button>
+
+<div id="result"></div>
+
+<script>
+  const questions = [
+    {base: 2, exponent: 3},   // 2^3 = 8
+    {base: 5, exponent: 2},   // 5^2 = 25
+    {base: 3, exponent: 4},   // 3^4 = 81
+    {base: 7, exponent: 2},   // 7^2 = 49
+    {base: 10, exponent: 3}   // 10^3 = 1000
+  ];
+
+  let current = 0;
+  let score = 0;
+
+  function showQuestion() {
+    if(current < questions.length) {
+      const q = questions[current];
+      document.getElementById('question').textContent = `Calculate: ${q.base} ^ ${q.exponent}`;
+      document.getElementById('answer').value = '';
+      document.getElementById('result').textContent = '';
+    } else {
+      document.getElementById('question').textContent = 'Game Over!';
+      document.getElementById('result').textContent = `Your score: ${score} / ${questions.length}`;
+    }
+  }
+
+  function checkAnswer() {
+    const userAns = Number(document.getElementById('answer').value);
+    const q = questions[current];
+    const correctAns = Math.pow(q.base, q.exponent);
+
+    if(userAns === correctAns) {
+      document.getElementById('result').textContent = "✅ Correct!";
+      document.getElementById('result').style.color = 'green';
+      score++;
+    } else {
+      document.getElementById('result').textContent = `❌ Wrong! Correct Answer: ${correctAns}`;
+      document.getElementById('result').style.color = 'red';
+    }
+    current++;
+    setTimeout(showQuestion, 1500);
+  }
+
+  showQuestion();
+</script>
+
+</body>
+</html>

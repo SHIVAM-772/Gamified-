@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Direct & Inverse Proportion</title>
+<style>
+body{
+    font-family:Arial;
+    background:#eef2f3;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+}
+.box{
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    width:320px;
+    text-align:center;
+}
+label{display:block;margin-top:15px;color:#555;text-align:left;}
+input,select{
+    width:95%;
+    padding:8px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+button{
+    margin-top:20px;
+    padding:10px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+button:hover{background:#1e4ecb;}
+.result{
+    margin-top:20px;
+    padding:10px;
+    background:#f0f4ff;
+    border-radius:5px;
+    color:#333;
+}
+</style>
+</head>
+<body>
+<div class="box">
+    <h1>Proportion Calculator</h1>
+    <label>Choose Type:</label>
+    <select id="ptype">
+        <option value="direct">Direct</option>
+        <option value="inverse">Inverse</option>
+    </select>
+
+    <label>Known x₁:</label>
+    <input id="x1" type="number" step="any" required>
+
+    <label>Known y₁:</label>
+    <input id="y1" type="number" step="any" required>
+
+    <label>New x₂:</label>
+    <input id="x2" type="number" step="any" required>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+function round(num){ return Math.round(num*10000)/10000; }
+
+function calculate(){
+    const type = document.getElementById('ptype').value;
+    const x1 = parseFloat(document.getElementById('x1').value);
+    const y1 = parseFloat(document.getElementById('y1').value);
+    const x2 = parseFloat(document.getElementById('x2').value);
+    const resultBox = document.getElementById('result');
+
+    if(isNaN(x1)||isNaN(y1)||isNaN(x2)){
+        resultBox.textContent = "⚠️ Please enter valid numbers.";
+        return;
+    }
+
+    let y2, k;
+    if(type === "direct"){
+        k = y1 / x1;
+        y2 = k * x2;
+        resultBox.textContent = `Direct proportion ⇒ y₂ = ${round(y2)} (k = ${round(k)})`;
+    } else {
+        k = x1 * y1;
+        y2 = k / x2;
+        resultBox.textContent = `Inverse proportion ⇒ y₂ = ${round(y2)} (k = ${round(k)})`;
+    }
+}
+</script>
+</body>
+</html>

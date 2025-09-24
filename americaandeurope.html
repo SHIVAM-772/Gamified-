@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nationalist Movements & Revolutions</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg,#f0f8ff,#ffe4e1);
+    margin:0; padding:20px; color:#333;
+  }
+  h1 { text-align:center; color:#1a1a2e; margin-bottom:20px; }
+  .cards { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+  .card {
+    background: #ffffffcc;
+    border-radius: 12px; padding:16px;
+    width:250px; box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    cursor:pointer; transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .card:hover { transform: scale(1.05); box-shadow:0 6px 18px rgba(0,0,0,0.2); }
+  .card h3 { margin:0 0 8px 0; color:#ff4500; }
+  .card p { display:none; margin:0; color:#333; }
+  .timeline { margin-top:30px; border-left:4px solid #ff4500; padding-left:20px; }
+  .timeline-event { margin-bottom:20px; }
+  .timeline-event h4 { margin:0; color:#1a1a2e; }
+  .timeline-event p { margin:4px 0 0 0; }
+  video { max-width:100%; margin-top:20px; border-radius:10px; }
+  .quiz { margin-top:20px; text-align:center; }
+  .quiz button {
+    padding:8px 12px; margin:5px;
+    border-radius:6px; border:none;
+    background-color:#1a1a2e; color:#fff; cursor:pointer; transition:0.2s;
+  }
+  .quiz button:hover { background-color:#ff4500; }
+</style>
+</head>
+<body>
+
+<h1>Nationalist Movements & Revolutions in America & Europe</h1>
+
+<!-- Topic Cards -->
+<div class="cards">
+  <div class="card" onclick="toggleText(this)">
+    <h3>American Revolution</h3>
+    <p>1775-1783, colonies fought against British rule; resulted in the independence of the USA.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>French Revolution</h3>
+    <p>1789-1799, led to overthrow of monarchy, rise of Napoleon, and modern democratic ideals.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Italian Unification</h3>
+    <p>19th century movement to unify separate states into the Kingdom of Italy under leaders like Garibaldi and Cavour.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>German Unification</h3>
+    <p>Led by Otto von Bismarck in 1871, uniting German states into the German Empire.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>1848 Revolutions</h3>
+    <p>Wave of liberal and nationalist revolutions across Europe demanding democracy and national unification.</p>
+  </div>
+</div>
+
+<!-- Timeline -->
+<div class="timeline">
+  <div class="timeline-event">
+    <h4>1775 - American Revolution Begins</h4>
+    <p>Fought against British colonial rule.</p>
+  </div>
+  <div class="timeline-event">
+    <h4>1789 - French Revolution</h4>
+    <p>Storming of Bastille marked the start.</p>
+  </div>
+  <div class="timeline-event">
+    <h4>1848 - Revolutions in Europe</h4>
+    <p>Demanded liberal reforms and national independence.</p>
+  </div>
+  <div class="timeline-event">
+    <h4>1861-1871 - Italian & German Unification</h4>
+    <p>Key leaders: Garibaldi, Cavour, Bismarck.</p>
+  </div>
+</div>
+
+<!-- Embedded Video -->
+<video controls>
+  <source src="revolutions_video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<!-- Quiz -->
+<div class="quiz">
+  <h3>Quiz: Test Your Knowledge</h3>
+  <p>Who led the unification of Germany?</p>
+  <button onclick="checkAnswer(this,'correct')">Otto von Bismarck</button>
+  <button onclick="checkAnswer(this,'wrong')">Garibaldi</button>
+  <button onclick="checkAnswer(this,'wrong')">Napoleon</button>
+</div>
+
+<script>
+  function toggleText(card) {
+    const p = card.querySelector('p');
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function checkAnswer(btn,result) {
+    if(result==='correct'){
+      alert('Correct! 🎉');
+    } else {
+      alert('Oops! Try again. ❌');
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eco Explorer Mission - Class 4 Science</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --bg-primary: #212121;
+      --bg-secondary: #424242;
+      --bg-tertiary: #616161;
+      --text-primary: #ffffff;
+      --text-secondary: #bdbdbd;
+      --accent-primary: #ff5252;
+      --accent-secondary: #ff1744;
+      --glass-bg: rgba(33, 33, 33, 0.7);
+      --glass-border: rgba(255, 82, 82, 0.3);
+      --success: #10b981;
+      --error: #ef4444;
+      --quest-bg: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    .game-container {
+      max-width: 800px;
+      width: 100%;
+      padding: 2rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #progress {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+    }
+
+    #mission {
+      font-size: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .option-btn {
+      padding: 1rem;
+      background: var(--quest-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .option-btn:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent-primary);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #feedback {
+      font-size: 1.1rem;
+      margin: 1rem 0;
+      min-height: 24px;
+    }
+
+    #feedback.success {
+      color: var(--success);
+    }
+
+    #feedback.error {
+      color: var(--error);
+    }
+
+    .back-btn {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s ease;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 1.5rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      #mission {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Eco Explorer Mission</h1>
+    <p id="progress">Mission 1 | Eco Badges: 0</p>
+    <p id="mission">Loading mission...</p>
+    <div class="options" id="options"></div>
+    <p id="feedback"></p>
+    <button class="back-btn" id="backBtn">Back to Hub</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPMlHzrEOLXOWZldw6fkk5nWf1m0g45L8",
+      authDomain: "studentportal-bc1ec.firebaseapp.com",
+      projectId: "studentportal-bc1ec",
+      storageBucket: "studentportal-bc1ec.firebasestorage.app",
+      messagingSenderId: "516315325736",
+      appId: "1:516315325736:web:21a4418f69f3f6019fdc1d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const progress = document.getElementById('progress');
+    const missionElement = document.getElementById('mission');
+    const optionsElement = document.getElementById('options');
+    const feedbackElement = document.getElementById('feedback');
+    const backBtn = document.getElementById('backBtn');
+
+    let currentUser = null;
+    let mission = 1;
+    let badges = 0;
+    let currentMission = null;
+
+    const missions = [
+      // Original Missions
+      { question: "Which animal lives in a forest?", answer: "Tiger", options: ["Tiger", "Shark", "Penguin", "Crocodile"] },
+      { question: "What is the main source of energy for Earth?", answer: "Sun", options: ["Moon", "Sun", "Wind", "Water"] },
+      { question: "Which is a solid state of matter?", answer: "Ice", options: ["Water", "Steam", "Ice", "Air"] },
+      { question: "What do plants need to make food?", answer: "Sunlight", options: ["Darkness", "Sunlight", "Soil", "Rain"] },
+      { question: "Which is part of a food chain?", answer: "Grass", options: ["Rock", "Grass", "Cloud", "Sand"] },
+      // New Missions
+      { question: "What part of the plant absorbs water and nutrients?", answer: "Roots", options: ["Leaves", "Stem", "Flower", "Roots"] },
+      { question: "The process by which plants make their own food is called?", answer: "Photosynthesis", options: ["Respiration", "Photosynthesis", "Digestion", "Evaporation"] },
+      { question: "Which gas do plants release during photosynthesis?", answer: "Oxygen", options: ["Carbon Dioxide", "Nitrogen", "Oxygen", "Hydrogen"] },
+      { question: "What is the green substance in leaves that helps make food?", answer: "Chlorophyll", options: ["Chlorine", "Chlorophyll", "Stomata", "Pollen"] },
+      { question: "Which part of a plant turns into a fruit?", answer: "Flower", options: ["Root", "Leaf", "Stem", "Flower"] },
+      { question: "Which of these animals is a herbivore (eats only plants)?", answer: "Cow", options: ["Lion", "Cow", "Wolf", "Snake"] },
+      { question: "An animal that eats both plants and animals is called an...", answer: "Omnivore", options: ["Omnivore", "Carnivore", "Herbivore", "Producer"] },
+      { question: "Where do fish breathe from?", answer: "Gills", options: ["Lungs", "Nose", "Skin", "Gills"] },
+      { question: "Which animal changes its color to blend in with its surroundings?", answer: "Chameleon", options: ["Elephant", "Chameleon", "Giraffe", "Zebra"] },
+      { question: "What is the natural home of an animal called?", answer: "Habitat", options: ["House", "Nest", "Habitat", "Cave"] },
+      { question: "Which of these is NOT an insect?", answer: "Spider", options: ["Ant", "Butterfly", "Spider", "Bee"] },
+      { question: "A tadpole grows up to become a...", answer: "Frog", options: ["Fish", "Snake", "Lizard", "Frog"] },
+      { question: "Which organ pumps blood to all parts of our body?", answer: "Heart", options: ["Lungs", "Brain", "Heart", "Stomach"] },
+      { question: "Which organ helps us to think and controls our body?", answer: "Brain", options: ["Heart", "Liver", "Kidney", "Brain"] },
+      { question: "We use our lungs for...", answer: "Breathing", options: ["Seeing", "Breathing", "Digesting", "Thinking"] },
+      { question: "Which nutrient helps in building our body and muscles?", answer: "Protein", options: ["Carbohydrate", "Fat", "Protein", "Vitamin"] },
+      { question: "How many sense organs do humans have?", answer: "Five", options: ["Three", "Four", "Five", "Six"] },
+      { question: "What do you call the change of water into water vapor?", answer: "Evaporation", options: ["Condensation", "Freezing", "Melting", "Evaporation"] },
+      { question: "Which of these is a liquid at room temperature?", answer: "Milk", options: ["Wood", "Ice", "Milk", "Stone"] },
+      { question: "What happens to water when you put it in a freezer?", answer: "It becomes ice", options: ["It evaporates", "It becomes ice", "It boils", "It disappears"] },
+      { question: "Which material allows light to pass through it completely?", answer: "Glass", options: ["Wood", "Metal", "Glass", "Cardboard"] },
+      { question: "What is the process of a liquid turning into a solid called?", answer: "Freezing", options: ["Melting", "Boiling", "Freezing", "Condensation"] },
+      { question: "Pushing a wall is an example of applying...", answer: "Force", options: ["Energy", "Force", "Friction", "Gravity"] },
+      { question: "Which force pulls everything towards the center of the Earth?", answer: "Gravity", options: ["Magnetism", "Friction", "Gravity", "Tension"] },
+      { question: "What type of energy do we get from the sun?", answer: "Solar energy", options: ["Wind energy", "Solar energy", "Water energy", "Nuclear energy"] },
+      { question: "Which of these is a man-made source of light?", answer: "Bulb", options: ["Sun", "Star", "Firefly", "Bulb"] },
+      { question: "A stretched rubber band has what kind of energy stored in it?", answer: "Potential energy", options: ["Kinetic energy", "Sound energy", "Light energy", "Potential energy"] },
+      { question: "Which of these is a natural resource essential for life?", answer: "Water", options: ["Plastic", "Glass", "Water", "Steel"] },
+      { question: "What is the blanket of air surrounding the Earth called?", answer: "Atmosphere", options: ["Hydrosphere", "Atmosphere", "Lithosphere", "Biosphere"] },
+      { question: "The movement of the Earth around the Sun is called...", answer: "Revolution", options: ["Rotation", "Revolution", "Orbiting", "Spinning"] },
+      { question: "How long does the Earth take to complete one rotation on its axis?", answer: "24 hours", options: ["365 days", "12 hours", "24 hours", "30 days"] },
+      { question: "Which planet is known as the 'Red Planet'?", answer: "Mars", options: ["Venus", "Mars", "Jupiter", "Saturn"] },
+      { question: "What is the closest star to our planet Earth?", answer: "The Sun", options: ["The Moon", "Alpha Centauri", "The Sun", "Mars"] },
+      { question: "Throwing waste into rivers causes...", answer: "Water pollution", options: ["Air pollution", "Land pollution", "Water pollution", "Noise pollution"] },
+      { question: "The 3 R's to save the environment are Reduce, Reuse, and...", answer: "Recycle", options: ["Repeat", "Return", "Recycle", "Rebuild"] },
+      { question: "What causes day and night on Earth?", answer: "Earth's rotation", options: ["Earth's revolution", "The Moon's orbit", "Earth's rotation", "The Sun's position"] },
+      { question: "Which of these is a renewable source of energy?", answer: "Wind", options: ["Coal", "Petrol", "Wind", "Natural Gas"] },
+      { question: "What are clouds in the sky made of?", answer: "Tiny water droplets", options: ["Smoke", "Cotton", "Tiny water droplets", "Dust"] },
+      { question: "The Moon gets its light from the...", answer: "Sun", options: ["Earth", "Stars", "Sun", "Itself"] }
+    ];
+
+    function loadMission() {
+      currentMission = missions[Math.floor(Math.random() * missions.length)];
+      missionElement.textContent = currentMission.question;
+      optionsElement.innerHTML = '';
+      currentMission.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = option;
+        btn.addEventListener('click', () => checkAnswer(option));
+        optionsElement.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      if (selected === currentMission.answer) {
+        badges += 1;
+        feedbackElement.textContent = "Correct! +1 Eco Badge!";
+        feedbackElement.className = 'success';
+        if (badges >= mission * 5) {
+          mission++;
+          feedbackElement.textContent += ` You've reached Mission ${mission}!`;
+        }
+        progress.textContent = `Mission ${mission} | Eco Badges: ${badges}`;
+        saveProgress();
+        setTimeout(loadMission, 1000);
+      } else {
+        feedbackElement.textContent = `Not quite! Think about the science concept.`;
+        feedbackElement.className = 'error';
+      }
+      setTimeout(() => {
+        feedbackElement.textContent = '';
+        feedbackElement.className = '';
+      }, 2000);
+    }
+
+    async function saveProgress() {
+      if (currentUser) {
+        await setDoc(doc(db, 'students', currentUser.uid, 'games', 'ecoExplorer'), {
+          mission: mission,
+          badges: badges,
+          lastPlayed: new Date()
+        }, { merge: true });
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        const docRef = doc(db, 'students', user.uid, 'games', 'ecoExplorer');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          mission = data.mission || 1;
+          badges = data.badges || 0;
+          progress.textContent = `Mission ${mission} | Eco Badges: ${badges}`;
+        }
+        loadMission();
+      } else {
+        window.location.href = 'student.html';
+      }
+    });
+
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'study.html';
+    });
+
+    document.addEventListener('DOMContentLoaded', loadMission);
+  </script>
+</body>
+</html>

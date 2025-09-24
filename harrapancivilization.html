@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 9 History - Harappan Civilization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f5f5;
+        }
+        header {
+            background-color: #FF8C00;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        section {
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #aaa;
+        }
+        h2 {
+            color: #FF8C00;
+        }
+        .quiz {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #ffe5b4;
+            border-radius: 8px;
+        }
+        .quiz button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #FF8C00;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .quiz button:hover {
+            background-color: #e67300;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Class 9 History - Odisha Board</h1>
+</header>
+
+<section>
+    <h2>The Story of the First Cities: Harappan Civilization</h2>
+    <p>
+        The Harappan Civilization (also called Indus Valley Civilization) was one of the earliest urban civilizations in the world, flourishing around 2600–1900 BCE in present-day Pakistan and northwest India.
+    </p>
+    <h3>Discovery of Harappan Sites:</h3>
+    <ul>
+        <li>Excavations at Harappa and Mohenjo-Daro revealed planned cities.</li>
+        <li>Advanced drainage systems and brick-built houses were found.</li>
+    </ul>
+    <h3>Town Planning and Architecture:</h3>
+    <ul>
+        <li>Well-planned streets in grid patterns.</li>
+        <li>Public baths, granaries, and marketplaces.</li>
+        <li>Standardized weights and measures for trade.</li>
+    </ul>
+    <h3>Economy and Society:</h3>
+    <ul>
+        <li>Agriculture based on wheat, barley, and cotton.</li>
+        <li>Trade with Mesopotamia and nearby regions.</li>
+        <li>Artisans, traders, and laborers formed social structure.</li>
+    </ul>
+    <h3>Decline:</h3>
+    <ul>
+        <li>Possibly due to climate change, river shifts, or invasions.</li>
+        <li>Gradual abandonment of cities around 1900 BCE.</li>
+    </ul>
+
+    <div class="quiz">
+        <p><strong>Quiz:</strong> Name one major city of the Harappan Civilization?</p>
+        <button onclick="checkAnswer('harappan', 'harappa')">Harappa</button>
+        <button onclick="checkAnswer('harappan', 'mohenjo-daro')">Mohenjo-Daro</button>
+        <button onclick="checkAnswer('harappan', 'pataliputra')">Pataliputra</button>
+        <div class="result" id="harappanResult"></div>
+    </div>
+</section>
+
+<script>
+    function checkAnswer(topic, answer) {
+        const correctAnswers = ['harappa', 'mohenjo-daro'];
+        const resultDiv = document.getElementById(topic + 'Result');
+        if(correctAnswers.includes(answer.toLowerCase())) {
+            resultDiv.innerHTML = '✅ Correct!';
+            resultDiv.style.color = 'green';
+        } else {
+            resultDiv.innerHTML = '❌ Incorrect. Try again!';
+            resultDiv.style.color = 'red';
+        }
+    }
+</script>
+
+</body>
+</html>

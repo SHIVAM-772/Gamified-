@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ali Made Impossible Possible – Interactive Learning</title>
+<style>
+/* ---------- GENERAL STYLING ---------- */
+body{
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background:#cce3ff;
+  color:#333;
+}
+header{
+  background:linear-gradient(135deg,#4b79ff,#6dd5fa);
+  padding:20px;
+  text-align:center;
+  color:#fff;
+}
+header h1{margin:0;font-size:2rem;}
+section{padding:20px;max-width:1000px;margin:auto;}
+h2{color:#4b79ff;}
+button{
+  padding:10px 18px;
+  background:#4b79ff;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  margin-top:10px;
+}
+button:hover{background:#345bdb;}
+
+/* ---------- STORY BOX ---------- */
+.story{
+  background:#fff;
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  max-height:300px;
+  overflow:auto;
+  animation:fadeIn 1s ease;
+}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* ---------- GAME AREA ---------- */
+#gameArea{
+  position:relative;
+  width:100%;
+  height:250px;
+  margin-top:20px;
+  background:linear-gradient(to top,#87ceeb 70%,#6ab04c 70%);
+  border:2px solid #4b79ff;
+  overflow:hidden;
+  border-radius:10px;
+}
+#ali{
+  position:absolute;
+  bottom:70px;
+  left:50px;
+  width:50px;
+  height:50px;
+  background:url('https://i.ibb.co/3mnL0Hf/ali.png') no-repeat center/cover;
+}
+.obstacle{
+  position:absolute;
+  bottom:70px;
+  right:-60px;
+  width:40px;
+  height:40px;
+  background:#ff4b5c;
+  border-radius:8px;
+  animation:move 3s linear infinite;
+}
+@keyframes move{0%{right:-60px;}100%{right:100%;}}
+.jump{
+  animation:jump 0.6s ease;
+}
+@keyframes jump{
+  0%{bottom:70px;}
+  50%{bottom:160px;}
+  100%{bottom:70px;}
+}
+#scoreBoard{margin-top:10px;font-weight:bold;}
+
+/* ---------- QUIZ ---------- */
+.quiz{
+  background:#fff;
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+.quiz p{margin-bottom:8px;}
+.quiz input[type=radio]{margin-right:6px;}
+.result{font-weight:bold;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ali Made Impossible Possible</h1>
+  <p>Interactive Story • Game • Quiz</p>
+</header>
+
+<section>
+  <h2>📖 Read the Story</h2>
+  <div class="story">
+    <p>Ali was a young boy with big dreams. Everyone around him believed that some tasks were too hard to achieve,
+       but Ali never gave up. With courage, clever thinking and persistent effort,
+       he overcame obstacles that others thought impossible. His determination inspired
+       everyone to believe that nothing is truly impossible if you work hard and stay hopeful.</p>
+    <p>(Add the full story text from your textbook here for students to read.)</p>
+  </div>
+</section>
+
+<section>
+  <h2>🎮 Ali’s Impossible Jump – Mini Game</h2>
+  <p>Press the <strong>SPACEBAR</strong> or tap “Jump” to help Ali jump over obstacles and score points.</p>
+  <div id="gameArea">
+    <div id="ali"></div>
+    <div class="obstacle"></div>
+  </div>
+  <button onclick="jump()">Jump</button>
+  <div id="scoreBoard">Score: 0</div>
+</section>
+
+<section>
+  <h2>❓ Quick Quiz</h2>
+  <div class="quiz">
+    <p>1. What quality helped Ali achieve the impossible?</p>
+    <label><input type="radio" name="q1" value="a"> Laziness</label><br>
+    <label><input type="radio" name="q1" value="b"> Determination</label><br>
+    <label><input type="radio" name="q1" value="c"> Magic</label><br><br>
+
+    <p>2. The story teaches us to…</p>
+    <label><input type="radio" name="q2" value="a"> Give up quickly</label><br>
+    <label><input type="radio" name="q2" value="b"> Believe in hard work</label><br>
+    <label><input type="radio" name="q2" value="c"> Be afraid of failure</label><br>
+
+    <button onclick="checkQuiz()">Check Answers</button>
+    <div class="result" id="quizResult"></div>
+  </div>
+</section>
+
+<footer style="text-align:center;margin:20px;color:#555">
+  © 2025 Class 8 English Interactive Page
+</footer>
+
+<script>
+/* ---------- GAME SCRIPT ---------- */
+const ali = document.getElementById('ali');
+const obstacle = document.querySelector('.obstacle');
+const scoreBoard = document.getElementById('scoreBoard');
+let score=0;
+let gameOver=false;
+
+function jump(){
+  if(ali.classList!="jump"){
+    ali.classList.add('jump');
+    setTimeout(()=> ali.classList.remove('jump'),600);
+  }
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){ jump(); }
+});
+
+setInterval(()=>{
+  if(gameOver) return;
+  let aliBottom = parseInt(window.getComputedStyle(ali).getPropertyValue("bottom"));
+  let obsLeft = parseInt(window.getComputedStyle(obstacle).getPropertyValue("left"));
+
+  // collision detection
+  if(obsLeft<90 && obsLeft>40 && aliBottom<=100){
+    obstacle.style.animationPlayState="paused";
+    gameOver=true;
+    scoreBoard.textContent="Game Over! Final Score: "+score;
+  }
+  if(obsLeft<0){
+    score++;
+    scoreBoard.textContent="Score: "+score;
+  }
+},50);
+
+/* ---------- QUIZ SCRIPT ---------- */
+function checkQuiz(){
+  const q1=document.querySelector('input[name="q1"]:checked');
+  const q2=document.querySelector('input[name="q2"]:checked');
+  let correct=0;
+  if(q1 && q1.value==="b") correct++;
+  if(q2 && q2.value==="b") correct++;
+  document.getElementById('quizResult').textContent =
+     "You got "+correct+" / 2 correct!";
+}
+</script>
+</body>
+</html>

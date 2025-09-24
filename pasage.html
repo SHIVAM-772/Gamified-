@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 English - Odisha Board</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 20px;
+    color: #333;
+  }
+  h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+  }
+  .story, .quiz {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 800px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #2980b9;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #1f618d;
+  }
+  .content {
+    display: none;
+    margin-top: 15px;
+    line-height: 1.6;
+  }
+  .quiz-question {
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Class 9 English - Odisha Board</h1>
+
+<div class="story">
+  <h2>The Bond of Love</h2>
+  <button onclick="toggleContent('bond')">Show / Hide Story</button>
+  <div class="content" id="bond">
+    <p>
+      "The Bond of Love" is a heartwarming story that emphasizes the importance of family relationships, trust, and understanding.
+      It tells the story of how family members support each other in difficult times, showing the emotional bond and care that
+      make relationships strong and meaningful.
+    </p>
+  </div>
+</div>
+
+<div class="story">
+  <h2>Missile Man of India</h2>
+  <button onclick="toggleContent('missile')">Show / Hide Story</button>
+  <div class="content" id="missile">
+    <p>
+      "Missile Man of India" is about Dr. A.P.J. Abdul Kalam, who contributed immensely to India's missile development program.
+      The story highlights his journey from a small town to becoming the President of India, inspiring young minds to dream
+      big, work hard, and serve the nation with dedication and honesty.
+    </p>
+  </div>
+</div>
+
+<!-- Quiz Section -->
+<div class="quiz">
+  <h2>Quiz Time!</h2>
+  
+  <div class="quiz-question">
+    <p>1. In "The Bond of Love", what is the main theme of the story?</p>
+    <input type="radio" name="q1" value="a"> a) Adventure<br>
+    <input type="radio" name="q1" value="b"> b) Family bond<br>
+    <input type="radio" name="q1" value="c"> c) Sports competition<br>
+  </div>
+  
+  <div class="quiz-question">
+    <p>2. Who is the "Missile Man of India"?</p>
+    <input type="radio" name="q2" value="a"> a) Vikram Sarabhai<br>
+    <input type="radio" name="q2" value="b"> b) A.P.J. Abdul Kalam<br>
+    <input type="radio" name="q2" value="c"> c) Homi Bhabha<br>
+  </div>
+  
+  <button onclick="checkQuiz()">Submit Answers</button>
+  <p id="result" style="text-align:center; font-weight:bold; margin-top:10px;"></p>
+</div>
+
+<script>
+function toggleContent(id) {
+  const element = document.getElementById(id);
+  if (element.style.display === "block") {
+    element.style.display = "none";
+  } else {
+    element.style.display = "block";
+  }
+}
+
+function checkQuiz() {
+  let score = 0;
+  const q1 = document.querySelector('input[name="q1"]:checked');
+  const q2 = document.querySelector('input[name="q2"]:checked');
+  
+  if (q1 && q1.value === "b") score++;
+  if (q2 && q2.value === "b") score++;
+  
+  document.getElementById('result').textContent = "Your Score: " + score + " / 2";
+}
+</script>
+
+</body>
+</html>

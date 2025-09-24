@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Compare Quantities</title>
+<style>
+body{
+    font-family:Arial;
+    background:#eef2f3;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+}
+.box{
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    width:320px;
+    text-align:center;
+}
+label{display:block;margin-top:15px;color:#555;text-align:left;}
+input{
+    width:95%;
+    padding:8px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+button{
+    margin-top:20px;
+    padding:10px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+button:hover{background:#1e4ecb;}
+.result{
+    margin-top:20px;
+    padding:10px;
+    background:#f0f4ff;
+    border-radius:5px;
+    color:#333;
+}
+</style>
+</head>
+<body>
+<div class="box">
+    <h1>Compare Quantities</h1>
+    <label>Quantity 1:</label>
+    <input id="q1" type="number" step="any" required>
+
+    <label>Quantity 2:</label>
+    <input id="q2" type="number" step="any" required>
+
+    <button onclick="compare()">Compare</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+function compare(){
+    const q1 = parseFloat(document.getElementById('q1').value);
+    const q2 = parseFloat(document.getElementById('q2').value);
+    const resultBox = document.getElementById('result');
+
+    if(isNaN(q1) || isNaN(q2)){
+        resultBox.textContent = "⚠️ Please enter valid numbers.";
+        return;
+    }
+
+    if(q1 > q2){
+        resultBox.textContent = "Quantity 1 is greater than Quantity 2";
+    } else if(q1 < q2){
+        resultBox.textContent = "Quantity 2 is greater than Quantity 1";
+    } else {
+        resultBox.textContent = "Both quantities are equal";
+    }
+}
+</script>
+</body>
+</html>

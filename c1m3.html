@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sound Hunt Adventure</title>
+<style>
+  :root {
+    --bg: #f5f8ff;
+    --card: #ffffff;
+    --accent: #4f46e5;
+    --muted: #6b7280;
+    --text-dark: #0f172a;
+    --border-color: #c7d2fe;
+  }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 16px 0;
+  }
+  .wrap {
+    width: 100%;
+    max-width: 960px;
+    background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    padding: 24px;
+    margin: 0 16px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  h1 {
+    font-size: 22px;
+    margin: 0;
+    color: var(--text-dark);
+  }
+  .controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  button {
+    background: var(--accent);
+    color: white;
+    border: 0;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  button:hover {
+    background: #4338ca;
+  }
+  button.secondary {
+    background: #e6e9ff;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  button.secondary:hover {
+    background: #dbeafe;
+  }
+  .info {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .game {
+    display: flex;
+    gap: 24px;
+  }
+  canvas {
+    background: transparent;
+    border-radius: 12px;
+    border: 2px dashed rgba(79, 70, 229, 0.1);
+    flex: 1;
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .side {
+    flex: 0 0 260px; /* Fixed width sidebar on large screens */
+  }
+  .panel {
+    background: var(--card);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(2, 6, 23, 0.04);
+    margin-bottom: 16px;
+  }
+  .target {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 6px;
+    color: var(--text-dark);
+  }
+  .count {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .hint {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-dark);
+    line-height: 1.4;
+  }
+  .basket {
+    height: 120px;
+    border-radius: 10px;
+    border: 2px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .small {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* Responsive stacking for smaller screens */
+  @media (max-width: 800px) {
+    body {
+      padding: 0;
+    }
+    .wrap {
+      margin: 0;
+      border-radius: 0;
+      min-height: 100vh;
+      box-shadow: none;
+    }
+    .game {
+      flex-direction: column;
+    }
+    .side {
+      flex-basis: auto; /* Allow sidebar to be natural height */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .wrap {
+      padding: 16px;
+    }
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    h1 {
+      font-size: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap" role="application" aria-label="Sound Hunt Adventure game">
+    <header>
+      <h1>🔍 Sound Hunt Adventure</h1>
+      <div class="controls">
+        <button id="startBtn">Start Level</button>
+        <button id="replayBtn" class="secondary">Replay Prompt</button>
+        <div class="info small" id="levelInfo">Click Start</div>
+      </div>
+    </header>
+
+    <div class="game">
+      <canvas id="gameCanvas" width="640" height="480" aria-label="Game area where items appear"></canvas>
+
+      <div class="side">
+        <div class="panel">
+          <div class="target" id="targetText">Target: -</div>
+          <div class="count" id="progressText">0 / 0</div>
+          <div class="hint" id="hintText">Welcome! Click 'Start Level' to begin.</div>
+        </div>
+
+        <div class="panel basket" id="basket" aria-label="Basket item count">
+          <div style="font-size:28px">🧺</div>
+          <div class="small" id="basketCount">Items in basket: 0</div>
+        </div>
+
+        <div class="panel">
+          <div class="small">How to play:</div>
+          <ul style="margin:6px 0 0 18px;padding:0;color:var(--muted);font-size:13px;line-height:1.5;">
+            <li>Listen for the target sound.</li>
+            <li>Drag matching pictures to the basket area on the game board.</li>
+            <li>A wrong drop replays the sound hint.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="small">Prototype: uses browser speech synthesis.</div>
+      <div class="small">Tip: works with mouse & touch.</div>
+    </footer>
+  </div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const startBtn = document.getElementById('startBtn');
+const replayBtn = document.getElementById('replayBtn');
+const targetText = document.getElementById('targetText');
+const progressText = document.getElementById('progressText');
+const hintText = document.getElementById('hintText');
+const basketCountEl = document.getElementById('basketCount');
+const levelInfo = document.getElementById('levelInfo');
+
+let items = [];
+let dragging = null;
+let offset = { x: 0, y: 0 };
+let targetSound = null;
+let targetCount = 0;
+let collectedCount = 0;
+let levelNumber = 0;
+let voices = []; // To hold available speech synthesis voices
+
+const tilePool = [
+    { emoji: '🍎', label: 'Apple', sound: 'a' },
+    { emoji: '⚽', label: 'Ball', sound: 'b' },
+    { emoji: '🐱', label: 'Cat', sound: 'k' }, // using 'k' for /k/ sound
+    { emoji: '🚗', label: 'Car', sound: 'k' },
+    { emoji: '🦆', label: 'Duck', sound: 'd' },
+    { emoji: '🐶', label: 'Dog', sound: 'd' },
+    { emoji: '🍌', label: 'Banana', sound: 'b' },
+    { emoji: '🦋', label: 'Butterfly', sound: 'b' },
+    { emoji: '🐝', label: 'Bee', sound: 'b' },
+    { emoji: '🎩', label: 'Hat', sound: 'h' },
+    { emoji: '🍪', label: 'Cookie', sound: 'k' },
+    { emoji: '🖊️', label: 'Pen', sound: 'p' },
+    { emoji: '🌙', label: 'Moon', sound: 'm' },
+    { emoji: '🍇', label: 'Grapes', sound: 'g' },
+    { emoji: '🐘', label: 'Elephant', sound: 'e' },
+];
+
+// --- ROBUST SPEECH SYNTHESIS SETUP ---
+
+// Function to load and store available voices
+function loadVoices() {
+    voices = window.speechSynthesis.getVoices();
+}
+
+// Function to speak text safely
+function speak(text, opts = {}) {
+    if (!('speechSynthesis' in window)) {
+        console.warn("Speech Synthesis not supported.");
+        return;
+    }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = opts.rate ?? 1;
+    u.pitch = opts.pitch ?? 1.1;
+    u.volume = 1;
+
+    // Safely select a voice if available
+    if (voices.length > 0) {
+        let selectedVoice = voices.find(v => v.lang === 'en-US' && /female/i.test(v.name)) ||
+                            voices.find(v => v.lang === 'en-US') ||
+                            voices.find(v => v.default);
+        if (selectedVoice) {
+            u.voice = selectedVoice;
+        }
+    }
+    
+    window.speechSynthesis.speak(u);
+}
+
+// Load voices when they become available
+if ('speechSynthesis' in window) {
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+}
+
+// --- GAME LOGIC ---
+
+function startLevel() {
+    levelNumber++;
+    collectedCount = 0;
+    const possible = ['b', 'k', 'd', 'p', 'm', 'g', 'h'];
+    targetSound = possible[Math.floor(Math.random() * possible.length)];
+    targetCount = Math.floor(Math.random() * 3) + 2; // 2 to 4 items
+    
+    levelInfo.textContent = `Level ${levelNumber}`;
+    targetText.textContent = `Find ${targetCount} things starting with /${targetSound}/`;
+    progressText.textContent = `${collectedCount} / ${targetCount}`;
+    basketCountEl.textContent = `Items in basket: ${collectedCount}`;
+    hintText.textContent = `Listen, then drag pictures to the basket area on the game board.`;
+
+    const correctTiles = shuffle(tilePool.filter(t => t.sound === targetSound));
+    const distractors = shuffle(tilePool.filter(t => t.sound !== targetSound));
+    items = [];
+    for (let i = 0; i < targetCount && i < correctTiles.length; i++) {
+        items.push(makeTile(correctTiles[i]));
+    }
+    const extras = 7;
+    for (let i = 0; i < extras; i++) {
+        const pool = Math.random() < 0.45 ? correctTiles : distractors;
+        if (!pool || pool.length === 0) continue;
+        items.push(makeTile(pool[i % pool.length]));
+    }
+    items = shuffle(items);
+    layoutItems();
+    draw();
+    setTimeout(() => speakPrompt(), 350);
+}
+
+function speakPrompt(rate = 1) {
+    const example = tilePool.find(t => t.sound === targetSound)?.label || '';
+    const prompt = `Find ${targetCount} things that start with the '${targetSound}' sound... like in ${example}.`;
+    speak(prompt, { rate });
+}
+
+function makeTile(def) {
+    return {
+        id: Math.random().toString(36).slice(2, 9),
+        emoji: def.emoji, label: def.label, sound: def.sound,
+        x: 0, y: 0, w: 68, h: 68, placedInBasket: false,
+    };
+}
+
+function layoutItems() {
+    const cols = 4;
+    const marginX = 24;
+    const marginY = 24;
+    const boxW = (canvas.width - marginX * 2) / cols;
+    const boxH = 95;
+    items.forEach((it, i) => {
+        const r = Math.floor(i / cols);
+        const c = i % cols;
+        it.x = marginX + c * boxW + Math.random() * 10;
+        it.y = marginY + r * boxH + Math.random() * 10;
+        it.placedInBasket = false;
+    });
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#f8fbff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const bx = 440, by = 330, bw = 180, bh = 120;
+    ctx.save();
+    ctx.fillStyle = "rgba(199,210,254,0.15)";
+    roundRect(ctx, bx, by, bw, bh, 12);
+    ctx.fill();
+    ctx.strokeStyle = "#c7d2fe";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 6]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = "28px system-ui";
+    ctx.fillStyle = "#1f2937";
+    ctx.textAlign = "center";
+    ctx.fillText("🧺", bx + bw / 2, by + 50);
+    ctx.font = "14px system-ui";
+    ctx.fillText("Drag Here", bx + bw / 2, by + 80);
+    ctx.restore();
+
+    items.forEach(it => {
+        if (it.placedInBasket) return;
+        ctx.save();
+        ctx.shadowColor = "rgba(2,6,23,0.08)";
+        ctx.shadowBlur = 12;
+        ctx.shadowOffsetY = 4;
+        ctx.fillStyle = "#fff";
+        roundRect(ctx, it.x - 4, it.y - 4, it.w + 8, it.h + 24, 10);
+        ctx.fill();
+        ctx.shadowColor = "transparent";
+        ctx.font = "42px serif";
+        ctx.textAlign = "center";
+        ctx.fillText(it.emoji, it.x + it.w / 2, it.y + 44);
+        ctx.font = "12px system-ui";
+        ctx.fillStyle = "#374151";
+        ctx.fillText(it.label, it.x + it.w / 2, it.y + it.h + 12);
+        ctx.restore();
+    });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
+function getEventPos(evt) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+    const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+    return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+}
+
+function hitTest(x, y) {
+    for (let i = items.length - 1; i >= 0; i--) {
+        const it = items[i];
+        if (it.placedInBasket) continue;
+        if (x >= it.x && x <= it.x + it.w && y >= it.y && y <= it.y + it.h) {
+            return it;
+        }
+    }
+    return null;
+}
+
+function handleStart(e) {
+    const p = getEventPos(e);
+    const it = hitTest(p.x, p.y);
+    if (it) {
+        dragging = it;
+        offset.x = p.x - it.x;
+        offset.y = p.y - it.y;
+        if (e.cancelable) e.preventDefault();
+    }
+}
+
+function handleMove(e) {
+    if (!dragging) return;
+    const p = getEventPos(e);
+    dragging.x = p.x - offset.x;
+    dragging.y = p.y - offset.y;
+    draw();
+    if (e.cancelable) e.preventDefault();
+}
+
+function handleEnd() {
+    if (!dragging) return;
+    handleDrop(dragging, dragging.x + dragging.w / 2, dragging.y + dragging.h / 2);
+    dragging = null;
+}
+
+canvas.addEventListener('mousedown', handleStart);
+canvas.addEventListener('mousemove', handleMove);
+canvas.addEventListener('mouseup', handleEnd);
+canvas.addEventListener('mouseleave', handleEnd);
+canvas.addEventListener('touchstart', handleStart, { passive: false });
+canvas.addEventListener('touchmove', handleMove, { passive: false });
+canvas.addEventListener('touchend', handleEnd);
+
+canvas.addEventListener('click', (e) => {
+    if (dragging) return;
+    const p = getEventPos(e);
+    const it = hitTest(p.x, p.y);
+    if (it) { speak(it.label); }
+});
+
+function handleDrop(it, x, y) {
+    const bx = 440, by = 330, bw = 180, bh = 120;
+    if (x >= bx && x <= bx + bw && y >= by && y <= by + bh) {
+        if (it.sound === targetSound) {
+            it.placedInBasket = true;
+            collectedCount++;
+            basketCountEl.textContent = `Items in basket: ${collectedCount}`;
+            progressText.textContent = `${collectedCount} / ${targetCount}`;
+            speak(`Good! ${it.label} starts with ${targetSound}.`);
+            draw();
+            if (collectedCount >= targetCount) {
+                setTimeout(() => {
+                    speak(`Hooray! You found all ${targetCount} things. Well done! Starting next level.`);
+                    setTimeout(() => startLevel(), 2500);
+                }, 400);
+            }
+        } else {
+            hintText.textContent = `Oops! '${it.label}' does not start with /${targetSound}/. Listen again.`;
+            speakPrompt(0.75);
+            it.x += (Math.random() > 0.5 ? -24 : 24);
+            it.y += (Math.random() > 0.5 ? -12 : 12);
+            draw();
+        }
+    } else {
+        draw();
+    }
+}
+
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+replayBtn.addEventListener('click', () => speakPrompt(1));
+startBtn.addEventListener('click', () => startLevel());
+
+draw(); // Initial draw of the empty state
+
+</script>
+</body>
+</html>

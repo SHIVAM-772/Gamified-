@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mongoose Poem - Class 8 English</title>
+<style>
+  body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    align-items: center;
+  }
+
+  .poem-container {
+    background: rgba(255,255,255,0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    max-width: 700px;
+    width: 100%;
+    animation: fadeIn 1.5s ease;
+  }
+
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+
+  .line {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: transform 0.3s, color 0.3s;
+  }
+
+  .line:hover {
+    color: #e74c3c;
+    transform: scale(1.05);
+  }
+
+  .controls {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  button {
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    border: none;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background-color: #2980b9;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+</style>
+</head>
+<body>
+
+<div class="poem-container">
+  <h1>Mongoose</h1>
+  
+  <div id="poem">
+    <div class="line">A mongoose runs across the field,</div>
+    <div class="line">In search of prey, quick and skilled.</div>
+    <div class="line">It fights the snake with fearless might,</div>
+    <div class="line">Protecting all from deadly bite.</div>
+    <div class="line">Agile, clever, and so small,</div>
+    <div class="line">Yet its courage outshines all.</div>
+    <div class="line">Nature’s hero, fierce and free,</div>
+    <div class="line">A marvel of agility.</div>
+  </div>
+  
+  <div class="controls">
+    <button onclick="playAudio()">🔊 Play Audio</button>
+    <button onclick="highlightLines()">✨ Highlight Lines</button>
+  </div>
+
+  <!-- Hidden audio -->
+  <audio id="audio">
+    <source src="mongoose-poem.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+</div>
+
+<script>
+  // Play audio
+  function playAudio() {
+    const audio = document.getElementById('audio');
+    audio.play();
+  }
+
+  // Highlight lines one by one
+  function highlightLines() {
+    const lines = document.querySelectorAll('.line');
+    let i = 0;
+    lines.forEach(line => line.style.color = '#2c3e50'); // reset
+    const interval = setInterval(()=>{
+      if(i > 0) lines[i-1].style.color = '#2c3e50';
+      if(i < lines.length) {
+        lines[i].style.color = '#e74c3c';
+        i++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 800);
+  }
+</script>
+
+</body>
+</html>

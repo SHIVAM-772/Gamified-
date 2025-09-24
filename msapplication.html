@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 Computer - MS Office Applications</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:20px;
+    background: linear-gradient(120deg,#f6d365,#fda085);
+    color:#333;
+}
+h1 {
+    text-align:center;
+    color:#fff;
+    text-shadow: 1px 1px 4px #000;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+.unit-list {
+    list-style:none;
+    padding:0;
+}
+.unit-list li {
+    background: rgba(255,255,255,0.8);
+    margin:10px 0;
+    padding:12px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+}
+.unit-list li:hover {
+    background: rgba(255,255,255,1);
+    transform: scale(1.02);
+}
+.details {
+    margin-top:10px;
+    padding:10px 15px;
+    border-left:4px solid #ff7f50;
+    background: rgba(255,255,255,0.9);
+    display:none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Class 9 Computer - MS Office Applications</h1>
+
+    <ul class="unit-list">
+        <li data-detail="MS Word is a word processing application used to create, edit, and format documents. Key features include text formatting, inserting images, tables, and using templates.">
+            MS Word
+            <div class="details"></div>
+        </li>
+        <li data-detail="MS Excel is a spreadsheet application that helps in organizing data, performing calculations, and creating charts. Functions, formulas, and pivot tables are commonly used.">
+            MS Excel
+            <div class="details"></div>
+        </li>
+        <li data-detail="MS PowerPoint is used to create presentations. Features include slide layouts, animations, transitions, inserting media, and using templates.">
+            MS PowerPoint
+            <div class="details"></div>
+        </li>
+        <li data-detail="MS Access is a database management system that allows storing, managing, and retrieving data using tables, queries, forms, and reports.">
+            MS Access
+            <div class="details"></div>
+        </li>
+        <li data-detail="MS Outlook is an email client used for sending, receiving emails, scheduling appointments, and managing contacts.">
+            MS Outlook
+            <div class="details"></div>
+        </li>
+    </ul>
+</div>
+
+<script>
+document.querySelectorAll('.unit-list li').forEach(li=>{
+    li.addEventListener('click', ()=>{
+        const detailDiv = li.querySelector('.details');
+        if(detailDiv.style.display==='block'){
+            detailDiv.style.display='none';
+        } else {
+            // Close others
+            document.querySelectorAll('.details').forEach(d=>d.style.display='none');
+            detailDiv.textContent = li.dataset.detail;
+            detailDiv.style.display='block';
+        }
+    });
+});
+</script>
+</body>
+</html>

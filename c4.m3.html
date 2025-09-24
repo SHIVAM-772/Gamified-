@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Warrior Challenge - Class 4</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --bg-primary: #212121;
+      --bg-secondary: #424242;
+      --bg-tertiary: #616161;
+      --text-primary: #ffffff;
+      --text-secondary: #bdbdbd;
+      --accent-primary: #ff5252;
+      --accent-secondary: #ff1744;
+      --glass-bg: rgba(33, 33, 33, 0.7);
+      --glass-border: rgba(255, 82, 82, 0.3);
+      --success: #10b981;
+      --error: #ef4444;
+      --quest-bg: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    .game-container {
+      max-width: 800px;
+      width: 100%;
+      padding: 2rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #progress {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+    }
+
+    #story {
+      font-size: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .option-btn {
+      padding: 1rem;
+      background: var(--quest-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .option-btn:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent-primary);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #feedback {
+      font-size: 1.1rem;
+      margin: 1rem 0;
+      min-height: 24px;
+    }
+
+    #feedback.success {
+      color: var(--success);
+    }
+
+    #feedback.error {
+      color: var(--error);
+    }
+
+    .back-btn {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.2s ease;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 1.5rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      #story {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Word Warrior Challenge</h1>
+    <p id="progress">Chapter 1 | Hero Tokens: 0</p>
+    <p id="story">Loading story...</p>
+    <div class="options" id="options"></div>
+    <p id="feedback"></p>
+    <button class="back-btn" id="backBtn">Back to Hub</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPMlHzrEOLXOWZldw6fkk5nWf1m0g45L8",
+      authDomain: "studentportal-bc1ec.firebaseapp.com",
+      projectId: "studentportal-bc1ec",
+      storageBucket: "studentportal-bc1ec.firebasestorage.app",
+      messagingSenderId: "516315325736",
+      appId: "1:516315325736:web:21a4418f69f3f6019fdc1d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const progress = document.getElementById('progress');
+    const storyElement = document.getElementById('story');
+    const optionsElement = document.getElementById('options');
+    const feedbackElement = document.getElementById('feedback');
+    const backBtn = document.getElementById('backBtn');
+
+    let currentUser = null;
+    let chapter = 1;
+    let tokens = 0;
+    let currentChallenge = null;
+
+    const challenges = [
+      // Original Challenges
+      { question: "Choose the correct spelling:", answer: "Adventure", options: ["Adventur", "Adventure", "Advencher", "Advanture"] },
+      { question: "What is a synonym for 'brave'?", answer: "Courageous", options: ["Sad", "Courageous", "Tired", "Quiet"] },
+      { question: "Fill in: The hero ___ to save the city.", answer: "ran", options: ["run", "ran", "runs", "running"] },
+      { question: "What is the opposite of 'big'?", answer: "Small", options: ["Large", "Small", "Tall", "Wide"] },
+      { question: "Complete the sentence: The ___ flew high.", answer: "hero", options: ["hero", "car", "tree", "cloud"] },
+      // New Spelling Challenges
+      { question: "Choose the correct spelling:", answer: "Beautiful", options: ["Beutiful", "Beautiful", "Beautifull", "Beutifull"] },
+      { question: "Choose the correct spelling:", answer: "Friend", options: ["Freind", "Freand", "Friend", "Frend"] },
+      { question: "Choose the correct spelling:", answer: "Because", options: ["Because", "Becoz", "Becuse", "Becaus"] },
+      { question: "Choose the correct spelling:", answer: "Library", options: ["Libary", "Librery", "Library", "Libray"] },
+      { question: "Choose the correct spelling:", answer: "Listen", options: ["Listen", "Lisen", "Listan", "Lissen"] },
+      { question: "Choose the correct spelling:", answer: "Surprise", options: ["Suprise", "Surprize", "Surprice", "Surprise"] },
+      { question: "Choose the correct spelling:", answer: "Tomorrow", options: ["Tommorrow", "Tomorow", "Tomorrow", "Tommorow"] },
+      { question: "Choose the correct spelling:", answer: "Island", options: ["Isand", "Iland", "Island", "Islend"] },
+      { question: "Choose the correct spelling:", answer: "Quiet", options: ["Quite", "Quiet", "Quiete", "Quet"] },
+      { question: "Choose the correct spelling:", answer: "Believe", options: ["Beleive", "Believe", "Beleave", "Belive"] },
+      // New Synonym Challenges
+      { question: "What is a synonym for 'happy'?", answer: "Joyful", options: ["Sad", "Angry", "Joyful", "Tired"] },
+      { question: "What is a synonym for 'quick'?", answer: "Fast", options: ["Slow", "Fast", "Big", "Quiet"] },
+      { question: "What is a synonym for 'scared'?", answer: "Afraid", options: ["Brave", "Happy", "Afraid", "Calm"] },
+      { question: "What is a synonym for 'kind'?", answer: "Nice", options: ["Mean", "Rude", "Nice", "Loud"] },
+      { question: "What is a synonym for 'look'?", answer: "See", options: ["Hear", "See", "Smell", "Touch"] },
+      { question: "What is a synonym for 'small'?", answer: "Tiny", options: ["Huge", "Large", "Giant", "Tiny"] },
+      { question: "What is a synonym for 'start'?", answer: "Begin", options: ["End", "Finish", "Stop", "Begin"] },
+      { question: "What is a synonym for 'tired'?", answer: "Sleepy", options: ["Energetic", "Awake", "Sleepy", "Excited"] },
+      { question: "What is a synonym for 'neat'?", answer: "Tidy", options: ["Messy", "Dirty", "Tidy", "Untidy"] },
+      { question: "What is a synonym for 'shout'?", answer: "Yell", options: ["Whisper", "Speak", "Yell", "Mumble"] },
+      // New Antonym Challenges
+      { question: "What is the opposite of 'hot'?", answer: "Cold", options: ["Warm", "Hot", "Cold", "Sunny"] },
+      { question: "What is the opposite of 'happy'?", answer: "Sad", options: ["Joyful", "Glad", "Happy", "Sad"] },
+      { question: "What is the opposite of 'fast'?", answer: "Slow", options: ["Quick", "Rapid", "Slow", "Speedy"] },
+      { question: "What is the opposite of 'empty'?", answer: "Full", options: ["Bare", "Vacant", "Full", "Clear"] },
+      { question: "What is the opposite of 'day'?", answer: "Night", options: ["Morning", "Day", "Night", "Evening"] },
+      { question: "What is the opposite of 'clean'?", answer: "Dirty", options: ["Tidy", "Neat", "Clean", "Dirty"] },
+      { question: "What is the opposite of 'easy'?", answer: "Difficult", options: ["Simple", "Light", "Difficult", "Clear"] },
+      { question: "What is the opposite of 'strong'?", answer: "Weak", options: ["Powerful", "Mighty", "Weak", "Sturdy"] },
+      { question: "What is the opposite of 'laugh'?", answer: "Cry", options: ["Smile", "Giggle", "Cry", "Chuckle"] },
+      { question: "What is the opposite of 'above'?", answer: "Below", options: ["Over", "On", "Above", "Below"] },
+      // New Grammar Challenges
+      { question: "Fill in: The cat is hiding ___ the table.", answer: "under", options: ["on", "in", "under", "above"] },
+      { question: "Fill in: I eat ___ apple a day.", answer: "an", options: ["a", "an", "the", "some"] },
+      { question: "Fill in: Yesterday, we ___ to the park.", answer: "went", options: ["go", "went", "goes", "going"] },
+      { question: "Fill in: She ___ a beautiful song now.", answer: "is singing", options: ["sings", "sang", "is singing", "sung"] },
+      { question: "Fill in: The dogs ___ loudly.", answer: "are barking", options: ["is barking", "bark", "are barking", "barks"] },
+      { question: "Fill in: My book is ___ the bag.", answer: "in", options: ["at", "on", "in", "under"] },
+      { question: "Fill in: He is ___ than his brother.", answer: "taller", options: ["tall", "taller", "tallest", "more tall"] },
+      { question: "Fill in: Can you give ___ your pen?", answer: "me", options: ["I", "my", "me", "mine"] },
+      { question: "Fill in: They ___ their homework every day.", answer: "do", options: ["does", "do", "did", "done"] },
+      { question: "Fill in: Look! The sun ___.", answer: "is rising", options: ["rise", "rose", "is rising", "rises"] },
+      // New Vocabulary Challenges
+      { question: "A person who flies a plane is called a ___.", answer: "pilot", options: ["doctor", "teacher", "pilot", "chef"] },
+      { question: "We use our ___ to see the world.", answer: "eyes", options: ["ears", "nose", "eyes", "hands"] },
+      { question: "A lion lives in a ___.", answer: "den", options: ["nest", "den", "stable", "web"] },
+      { question: "To find a new word, you can look in a ___.", answer: "dictionary", options: ["storybook", "map", "dictionary", "atlas"] },
+      { question: "The season opposite of summer is ___.", answer: "winter", options: ["spring", "autumn", "winter", "rainy"] }
+    ];
+
+    function loadChallenge() {
+      currentChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+      storyElement.textContent = currentChallenge.question;
+      optionsElement.innerHTML = '';
+      currentChallenge.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = option;
+        btn.addEventListener('click', () => checkAnswer(option));
+        optionsElement.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      if (selected === currentChallenge.answer) {
+        tokens += 1;
+        feedbackElement.textContent = "Correct! +1 Hero Token!";
+        feedbackElement.className = 'success';
+      if (tokens >= chapter * 5) {
+          chapter++;
+          feedbackElement.textContent += ` You've reached Chapter ${chapter}!`;
+        }
+        progress.textContent = `Chapter ${chapter} | Hero Tokens: ${tokens}`;
+        saveProgress();
+        setTimeout(loadChallenge, 1000);
+      } else {
+        feedbackElement.textContent = `Not quite, try another one!`;
+        feedbackElement.className = 'error';
+      }
+      setTimeout(() => {
+        feedbackElement.textContent = '';
+        feedbackElement.className = '';
+      }, 2000);
+    }
+
+    async function saveProgress() {
+      if (currentUser) {
+        await setDoc(doc(db, 'students', currentUser.uid, 'games', 'wordWarrior'), {
+          chapter: chapter,
+          tokens: tokens,
+          lastPlayed: new Date()
+        }, { merge: true });
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        const docRef = doc(db, 'students', currentUser.uid, 'games', 'wordWarrior');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          chapter = data.chapter || 1;
+          tokens = data.tokens || 0;
+          progress.textContent = `Chapter ${chapter} | Hero Tokens: ${tokens}`;
+        }
+        loadChallenge();
+      } else {
+        window.location.href = 'student.html';
+      }
+    });
+
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'study.html';
+    });
+
+    document.addEventListener('DOMContentLoaded', loadChallenge);
+  </script>
+</body>
+</html>

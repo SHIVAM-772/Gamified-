@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer - Class 8</title>
+<style>
+  /* 🌈 Animated Background */
+  @keyframes bgAnimate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  body {
+    margin:0;
+    font-family:Arial, sans-serif;
+    background: linear-gradient(-45deg,#4facfe,#00f2fe,#43e97b,#38f9d7);
+    background-size: 400% 400%;
+    animation: bgAnimate 15s ease infinite;
+    color:#0f172a;
+    padding:20px;
+  }
+
+  .container { max-width:1000px; margin:0 auto; }
+
+  header { text-align:center; margin-bottom:20px; }
+  header h1 { color:#fff; font-size:2rem; text-shadow:1px 1px 4px rgba(0,0,0,0.4); }
+  header p { color:#e6e6e6; font-size:1rem; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:18px; }
+
+  .card {
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(6px);
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 6px 18px rgba(2,6,23,0.25);
+    transition:0.4s;
+    cursor:pointer;
+  }
+  .card:hover { transform:translateY(-6px) scale(1.03); box-shadow:0 12px 28px rgba(0,0,0,0.35); }
+  .card h2 { margin:0 0 10px 0; color:#fff; }
+  
+  .units-list { list-style:none; padding:0; margin:0; display:none; animation:fadeIn 0.4s ease; }
+  .units-list li {
+    padding:8px 10px;
+    margin:6px 0;
+    background:rgba(255,255,255,0.8);
+    border-radius:8px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  }
+  .units-list li a {
+    text-decoration:none;
+    color:#000;
+    font-weight:600;
+  }
+  .units-list li:hover { background:rgba(255,255,255,1); }
+
+  @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+  footer { text-align:center; margin-top:30px; color:#fff; font-size:0.9rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Computer - Class 8</h1>
+    <p>Chapter: Operating System and Graphical User Interface</p>
+  </header>
+
+  <main>
+    <section class="grid">
+      <article class="card">
+        <h2>Operating System</h2>
+        <ul class="units-list">
+          <li><a href="os_unit1.html" target="_blank">Unit 1: Introduction to OS</a></li>
+          <li><a href="os_unit2.html" target="_blank">Unit 2: Types of OS</a></li>
+          <li><a href="os_unit3.html" target="_blank">Unit 3: Functions of OS</a></li>
+          <li><a href="os_unit4.html" target="_blank">Unit 4: File Management</a></li>
+          <li><a href="os_unit5.html" target="_blank">Unit 5: Process Management</a></li>
+          <li><a href="os_unit6.html" target="_blank">Unit 6: Security & Maintenance</a></li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Graphical User Interface (GUI)</h2>
+        <ul class="units-list">
+          <li><a href="gui_unit1.html" target="_blank">Unit 1: Introduction to GUI</a></li>
+          <li><a href="gui_unit2.html" target="_blank">Unit 2: Desktop & Icons</a></li>
+          <li><a href="gui_unit3.html" target="_blank">Unit 3: Menus & Windows</a></li>
+          <li><a href="gui_unit4.html" target="_blank">Unit 4: Taskbar & Start Menu</a></li>
+          <li><a href="gui_unit5.html" target="_blank">Unit 5: Dialog Boxes & Controls</a></li>
+          <li><a href="gui_unit6.html" target="_blank">Unit 6: GUI Examples</a></li>
+        </ul>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Interactive Computer Learning Portal</p>
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      const ul = card.querySelector('.units-list');
+      if(ul.style.display === 'block'){
+        ul.style.display = 'none';
+      } else {
+        // Hide other cards
+        document.querySelectorAll('.units-list').forEach(list => list.style.display = 'none');
+        ul.style.display = 'block';
+      }
+    });
+  });
+</script>
+</body>
+</html>

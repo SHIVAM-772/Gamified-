@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 Computer - Internet & Cyber Safety</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:20px;
+    background: linear-gradient(120deg,#a1c4fd,#c2e9fb);
+    color:#333;
+}
+h1 {
+    text-align:center;
+    color:#fff;
+    text-shadow: 1px 1px 4px #000;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+.unit-list {
+    list-style:none;
+    padding:0;
+}
+.unit-list li {
+    background: rgba(255,255,255,0.85);
+    margin:10px 0;
+    padding:12px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+}
+.unit-list li:hover {
+    background: rgba(255,255,255,1);
+    transform: scale(1.02);
+}
+.details {
+    margin-top:10px;
+    padding:10px 15px;
+    border-left:4px solid #1e90ff;
+    background: rgba(255,255,255,0.95);
+    display:none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Class 9 Computer - Internet & Cyber Safety</h1>
+
+    <ul class="unit-list">
+        <li data-detail="Internet Basics covers understanding the internet, web browsers, search engines, URLs, and basic navigation on websites.">
+            Internet Basics
+            <div class="details"></div>
+        </li>
+        <li data-detail="Cyber Safety teaches safe practices online, such as protecting passwords, avoiding phishing, secure communication, and ethical internet use.">
+            Cyber Safety
+            <div class="details"></div>
+        </li>
+        <li data-detail="Email Basics include sending, receiving, attaching files, and email etiquette.">
+            Email Basics
+            <div class="details"></div>
+        </li>
+        <li data-detail="Social Media Safety focuses on privacy settings, responsible sharing, and recognizing online threats.">
+            Social Media Safety
+            <div class="details"></div>
+        </li>
+        <li data-detail="Online Security and Protection covers antivirus, firewall, safe downloads, and software updates.">
+            Online Security & Protection
+            <div class="details"></div>
+        </li>
+    </ul>
+</div>
+
+<script>
+document.querySelectorAll('.unit-list li').forEach(li=>{
+    li.addEventListener('click', ()=>{
+        const detailDiv = li.querySelector('.details');
+        if(detailDiv.style.display==='block'){
+            detailDiv.style.display='none';
+        } else {
+            // Close others
+            document.querySelectorAll('.details').forEach(d=>d.style.display='none');
+            detailDiv.textContent = li.dataset.detail;
+            detailDiv.style.display='block';
+        }
+    });
+});
+</script>
+</body>
+</html>

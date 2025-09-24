@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phonic Story Creator - Build & Read Game for Kids</title>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Oriya:wght@400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #e8f5e9;
+      --bg-secondary: #c8e6c9;
+      --text-primary: #1b5e20;
+      --text-secondary: #388e3c;
+      --accent-primary: #4caf50;
+      --accent-secondary: #43a047;
+      --success: #4caf50;
+      --error: #f44336;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --border: rgba(76, 175, 80, 0.3);
+    }
+
+    [lang="hi"] {
+      font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+    }
+
+    [lang="or"] {
+      font-family: 'Noto Sans Oriya', 'Inter', sans-serif;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, #a5d6a7 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      position: relative;
+      touch-action: manipulation;
+    }
+
+    /* Header & Language Switcher */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .language-switcher {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 25px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .language-switcher:hover {
+      background: var(--accent-primary);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* Main Game Container */
+    .game-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      background: var(--card-bg);
+      border-radius: 25px;
+      padding: 4px;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
+    }
+
+    .progress-fill {
+      height: 20px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 20px;
+      transition: width 0.5s ease;
+      text-align: center;
+      color: white;
+      font-weight: 600;
+      line-height: 20px;
+    }
+
+    /* Game Title */
+    .game-title {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .instruction {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Audio Controls */
+    .audio-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .audio-btn {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 50px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .audio-btn:hover {
+      background: var(--accent-primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+
+    .audio-btn.active {
+      background: #ff9800; /* Orange color when speaking */
+      color: white;
+      border-color: #ff9800;
+    }
+
+    /* Game Area */
+    .game-area {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
+      min-height: 400px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Story Display */
+    .story-display {
+      font-size: 1.8rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      color: var(--text-primary);
+      padding: 1rem;
+      border-radius: 15px;
+      background: rgba(232, 245, 233, 0.5);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+      white-space: pre-wrap;
+      width: 100%;
+    }
+
+    .blank {
+      display: inline-block;
+      min-width: 80px;
+      padding: 4px 8px;
+      background: #eeeeee;
+      border-radius: 8px;
+      border: 2px dashed var(--border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .blank.active-blank {
+        background: #c8e6c9;
+        border-style: solid;
+        transform: scale(1.05);
+    }
+
+    .blank.filled {
+      background: linear-gradient(135deg, var(--success), #388e3c);
+      color: white;
+      border-style: solid;
+    }
+
+    .option-card.wrong {
+      background: linear-gradient(135deg, var(--error), #d32f2f);
+      color: white;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    /* Options Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+
+    .option-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 15px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .option-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .option-letter {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+    }
+
+    .option-word {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Feedback Message */
+    .feedback {
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      margin: 1rem 0;
+      min-height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feedback.success {
+      background: linear-gradient(135deg, var(--success), #388e3c);
+      color: white;
+    }
+
+    .feedback.error {
+      background: linear-gradient(135deg, var(--error), #d32f2f);
+      color: white;
+    }
+
+    /* Next Button */
+    .next-btn {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none; /* Hidden by default */
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .next-btn.show {
+      display: block;
+    }
+
+    .next-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+    }
+
+    /* Game Over Screen */
+    .game-over {
+      text-align: center;
+      padding: 3rem;
+      background: var(--card-bg);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
+      display: none;
+      margin: 2rem 0;
+    }
+
+    .game-over.show {
+      display: block;
+    }
+
+    .score-display {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+      margin: 1rem 0;
+    }
+
+    .restart-btn {
+      background: linear-gradient(135deg, var(--success), #388e3c);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .restart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .game-title { font-size: 2rem; }
+      .instruction { font-size: 1rem; }
+      .story-display { font-size: 1.5rem; padding: 0.5rem; }
+      .blank { min-width: 60px; }
+      .options-grid { grid-template-columns: repeat(2, 1fr); }
+      .option-letter { font-size: 2rem; }
+      .option-word { font-size: 0.9rem; }
+    }
+
+    @media (max-width: 480px) {
+      .header { padding: 0.5rem 1rem; flex-direction: column; gap: 1rem; }
+      .game-title { font-size: 1.8rem; }
+      .story-display { font-size: 1.3rem; }
+      .blank { min-width: 50px; }
+      .options-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">📖 Phonic Story Creator</div>
+    <select class="language-switcher" id="languageSelect">
+      <option value="en">🇺🇸 English</option>
+      <option value="hi">🇮🇳 हिंदी</option>
+      <option value="or">🇮🇳 ଓଡ଼ିଆ</option>
+    </select>
+  </div>
+
+  <div class="game-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill">0%</div>
+    </div>
+
+    <h1 class="game-title" data-translate="gameTitle">Phonic Story Creator</h1>
+    
+    <div class="instruction" data-translate="instruction">
+      Listen to the story and tap the correct word to fill in the blank!
+    </div>
+
+    <div class="audio-controls">
+      <button class="audio-btn" id="playStoryBtn" data-translate="playStory">
+        🔊 Play Story
+      </button>
+      <button class="audio-btn" id="repeatBtn" data-translate="repeat">
+        🔁 Repeat Sound
+      </button>
+    </div>
+
+    <div class="game-area" id="gameArea">
+      <div class="story-display" id="storyDisplay"></div>
+      
+      <div class="options-grid" id="optionsGrid">
+        </div>
+      
+      <div class="feedback" id="feedback"></div>
+      
+      <button class="next-btn" id="nextBtn" data-translate="nextStory">
+        Next Story
+      </button>
+    </div>
+
+    <div class="game-over" id="gameOver">
+      <h2 data-translate="congratulations">🎉 Congratulations!</h2>
+      <div class="score-display" id="finalScore">0/5</div>
+      <p data-translate="completedStories">You built all the stories!</p>
+      <button class="restart-btn" id="restartBtn" data-translate="playAgain">
+        Play Again
+      </button>
+    </div>
+  </div>
+
+<script>
+    // Language Translations
+    const translations = {
+      en: {
+        gameTitle: "Phonic Story Creator",
+        instruction: "Listen to the story and tap the correct word to fill in the blank!",
+        playStory: "🔊 Play Story",
+        repeat: "🔁 Repeat Sound",
+        nextStory: "Next Story",
+        congratulations: "🎉 Congratulations!",
+        completedStories: "You built all the stories!",
+        playAgain: "Play Again",
+        correct: "Great choice!",
+        wrong: "Not quite. Listen to the sound again.",
+        storyComplete: "Story complete! Good job!"
+      },
+      hi: {
+        gameTitle: "फोनिक स्टोरी क्रिएटर",
+        instruction: "कहानी सुनें और खाली स्थान भरने के लिए सही शब्द पर टैप करें!",
+        playStory: "🔊 कहानी चलाएं",
+        repeat: "🔁 ध्वनि दोहराएं",
+        nextStory: "अगली कहानी",
+        congratulations: "🎉 बधाई हो!",
+        completedStories: "आपने सभी कहानियां बनाई!",
+        playAgain: "फिर खेलें",
+        correct: "बढ़िया चुनाव!",
+        wrong: "बिल्कुल नहीं। ध्वनि फिर सुनें।",
+        storyComplete: "कहानी पूरी! अच्छा काम!"
+      },
+      or: {
+        gameTitle: "ଫୋନିକ୍ ଷ୍ଟୋରୀ କ୍ରିଏଟର",
+        instruction: "କାହାଣୀ ଶୁଣନ୍ତୁ ଏବଂ ଖାଲି ସ୍ଥାନ ଭରିବା ପାଇଁ ସଠିକ୍ ଶବ୍ଦରେ ଟ୍ୟାପ୍ କରନ୍ତୁ!",
+        playStory: "🔊 କାହାଣୀ ଚଳାନ୍ତୁ",
+        repeat: "🔁 ଧ୍ୱନି ପୁନରାବୃତ୍ତି",
+        nextStory: "ପରବର୍ତ୍ତୀ କାହାଣୀ",
+        congratulations: "🎉 ଅଭିନନ୍ଦନ!",
+        completedStories: "ଆପଣ ସମସ୍ତ କାହାଣୀଗୁଡ଼ିକ ତିଆରି କରିଲେ!",
+        playAgain: "ଆହୁରି ଖେଳନ୍ତୁ",
+        correct: "ଉତ୍ତମ ପସନ୍ଦ!",
+        wrong: "ବିଲକୁଲ୍ ନୁହେଁ। ଧ୍ୱନି ଆହୁରି ଶୁଣନ୍ତୁ।",
+        storyComplete: "କାହାଣୀ ସମ୍ପୂର୍ଣ୍ଣ! ଭଲ କାମ!"
+      }
+    };
+
+    // Story Data
+    const stories = [
+      { text: "The big [cat] sat on the [mat].", blanks: [{ phonic: 'c', word: 'cat' }, { phonic: 'm', word: 'mat' }] },
+      { text: "A [dog] can run after the [log].", blanks: [{ phonic: 'd', word: 'dog' }, { phonic: 'l', word: 'log' }] },
+      { text: "The red [hen] holds a blue [pen].", blanks: [{ phonic: 'h', word: 'hen' }, { phonic: 'p', word: 'pen' }] },
+      { text: "I saw a [fish] in a round [dish].", blanks: [{ phonic: 'f', word: 'fish' }, { phonic: 'd', word: 'dish' }] },
+      { text: "A small [bug] is on the green [rug].", blanks: [{ phonic: 'b', word: 'bug' }, { phonic: 'r', word: 'rug' }] }
+    ];
+
+    // *** THIS DATA WAS MISSING ***
+    const phonicsData = [
+      { phonic: 'a', word: 'Apple' }, { phonic: 'b', word: 'Ball' },
+      { phonic: 'c', word: 'Cat' }, { phonic: 'd', word: 'Dog' },
+      { phonic: 'e', word: 'Egg' }, { phonic: 'f', word: 'Fish' },
+      { phonic: 'g', word: 'Goat' }, { phonic: 'h', word: 'Hat' },
+      { phonic: 'i', word: 'Igloo' }, { phonic: 'j', word: 'Jam' },
+      { phonic: 'k', word: 'Kite' }, { phonic: 'l', word: 'Lion' },
+      { phonic: 'm', word: 'Moon' }, { phonic: 'n', word: 'Net' },
+      { phonic: 'o', word: 'Octopus' }, { phonic: 'p', word: 'Pig' },
+      { phonic: 'q', word: 'Queen' }, { phonic: 'r', word: 'Rat' },
+      { phonic: 's', word: 'Sun' }, { phonic: 't', word: 'Tap' },
+      { phonic: 'u', word: 'Umbrella' }, { phonic: 'v', word: 'Van' },
+      { phonic: 'w', word: 'Web' }, { phonic: 'x', word: 'Box' },
+      { phonic: 'y', word: 'Yak' }, { phonic: 'z', word: 'Zip' }
+    ];
+
+    // Game State
+    let currentIndex = 0;
+    let score = 0;
+    let currentLanguage = 'en';
+    let isPlaying = false;
+    let currentStory = null;
+    let currentBlankIndex = 0;
+    let voices = [];
+
+    // DOM Elements
+    const playStoryBtn = document.getElementById('playStoryBtn');
+    const repeatBtn = document.getElementById('repeatBtn');
+    const storyDisplay = document.getElementById('storyDisplay');
+    const optionsGrid = document.getElementById('optionsGrid');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+    const gameArea = document.getElementById('gameArea');
+    const gameOver = document.getElementById('gameOver');
+    const finalScore = document.getElementById('finalScore');
+    const restartBtn = document.getElementById('restartBtn');
+    const languageSelect = document.getElementById('languageSelect');
+
+    // Robust Speech Synthesis
+    function loadVoices() {
+      voices = window.speechSynthesis.getVoices();
+    }
+    
+    function speak(text, opts = {}, onEndCallback = null) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = opts.rate ?? 0.9;
+      utterance.pitch = opts.pitch ?? 1.0;
+      utterance.lang = currentLanguage === 'hi' ? 'hi-IN' : currentLanguage === 'or' ? 'or-IN' : 'en-US';
+      
+      if (voices.length > 0) {
+        let selectedVoice = voices.find(v => v.lang === utterance.lang && /female/i.test(v.name)) || voices.find(v => v.lang === utterance.lang);
+        if (selectedVoice) utterance.voice = selectedVoice;
+      }
+
+      utterance.onend = () => {
+        isPlaying = false;
+        playStoryBtn.classList.remove('active');
+        if (onEndCallback) onEndCallback();
+      };
+      
+      isPlaying = true;
+      playStoryBtn.classList.add('active');
+      window.speechSynthesis.speak(utterance);
+    }
+
+    if ('speechSynthesis' in window) {
+      loadVoices();
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+      }
+    }
+
+    // Play story audio
+    function playStory() {
+      if (isPlaying) return;
+      const textToSpeak = currentStory.text.replace(/\[([^\]]+)\]/g, '$1');
+      speak(textToSpeak);
+    }
+
+    // Repeat current blank's phonic
+    function repeatPhonic() {
+      if (isPlaying || currentBlankIndex >= currentStory.blanks.length) return;
+      const currentBlank = currentStory.blanks[currentBlankIndex];
+      speak(currentBlank.phonic, { rate: 0.6, pitch: 0.8 }); // Slower for emphasis
+    }
+
+    // Generate options for current blank
+    function generateOptions() {
+      optionsGrid.innerHTML = '';
+      if (currentBlankIndex >= currentStory.blanks.length) return;
+
+      const currentBlank = currentStory.blanks[currentBlankIndex];
+      const correctOption = { letter: currentBlank.phonic.toUpperCase(), word: currentBlank.word };
+      
+      const distractors = phonicsData
+        .filter(p => p.phonic !== currentBlank.phonic)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3)
+        .map(p => ({ letter: p.phonic.toUpperCase(), word: p.word }));
+
+      const allOptions = [correctOption, ...distractors].sort(() => Math.random() - 0.5);
+      
+      allOptions.forEach(option => {
+        const card = document.createElement('div');
+        card.className = 'option-card';
+        card.innerHTML = `<div class="option-letter">${option.letter}</div><div class="option-word">${option.word}</div>`;
+        card.dataset.word = option.word;
+        card.dataset.correct = option.word.toLowerCase() === currentBlank.word.toLowerCase();
+        card.addEventListener('click', handleOptionTap);
+        optionsGrid.appendChild(card);
+      });
+      
+      highlightCurrentBlank();
+    }
+    
+    function highlightCurrentBlank() {
+        const allBlanks = storyDisplay.querySelectorAll('.blank');
+        allBlanks.forEach((blank, index) => {
+            blank.classList.toggle('active-blank', index === currentBlankIndex);
+        });
+    }
+
+    // Handle option tap
+    function handleOptionTap(e) {
+      if (isPlaying) return;
+      const card = e.currentTarget;
+      const isCorrect = card.dataset.correct === 'true';
+      
+      if (isCorrect) {
+        feedback.textContent = translations[currentLanguage].correct;
+        feedback.className = 'feedback success show';
+        speak(card.dataset.word, {}, () => {
+            const blanks = storyDisplay.querySelectorAll('.blank');
+            blanks[currentBlankIndex].textContent = card.dataset.word;
+            blanks[currentBlankIndex].classList.add('filled');
+            blanks[currentBlankIndex].classList.remove('active-blank');
+            
+            currentBlankIndex++;
+            
+            if (currentBlankIndex >= currentStory.blanks.length) {
+              feedback.textContent = translations[currentLanguage].storyComplete;
+              speak(translations[currentLanguage].storyComplete);
+              optionsGrid.innerHTML = '';
+              nextBtn.classList.add('show');
+            } else {
+              setTimeout(() => {
+                generateOptions();
+                feedback.classList.remove('show');
+              }, 1000);
+            }
+        });
+      } else {
+        card.classList.add('wrong');
+        feedback.textContent = translations[currentLanguage].wrong;
+        feedback.className = 'feedback error show';
+        speak(translations[currentLanguage].wrong);
+        setTimeout(() => {
+          card.classList.remove('wrong');
+          feedback.classList.remove('show');
+        }, 1500);
+      }
+    }
+
+    function updateProgress() {
+      const progress = (currentIndex / stories.length) * 100;
+      progressFill.style.width = progress + '%';
+      progressFill.textContent = `${Math.round(progress)}%`;
+    }
+
+    function nextStory() {
+      score++; // Increment score for completing a story
+      currentIndex++;
+      feedback.classList.remove('show');
+      nextBtn.classList.remove('show');
+      
+      if (currentIndex >= stories.length) {
+        gameArea.style.display = 'none';
+        gameOver.classList.add('show');
+        finalScore.textContent = `${score}/${stories.length}`;
+        speak(translations[currentLanguage].congratulations);
+      } else {
+        loadCurrentStory();
+      }
+    }
+    nextBtn.addEventListener('click', nextStory);
+
+    function loadCurrentStory() {
+      currentStory = stories[currentIndex];
+      currentBlankIndex = 0;
+      
+      let storyHTML = currentStory.text.replace(/\[([^\]]+)\]/g, '<span class="blank"></span>');
+      storyDisplay.innerHTML = storyHTML;
+      
+      generateOptions();
+      updateProgress();
+      playStory();
+    }
+
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        el.textContent = translations[lang][key];
+      });
+      document.title = translations[lang].gameTitle;
+      localStorage.setItem('preferredLanguage', lang);
+    }
+
+    restartBtn.addEventListener('click', () => {
+      currentIndex = 0;
+      score = 0;
+      gameOver.classList.remove('show');
+      gameArea.style.display = 'flex';
+      loadCurrentStory();
+    });
+
+    playStoryBtn.addEventListener('click', playStory);
+    repeatBtn.addEventListener('click', repeatPhonic);
+    languageSelect.addEventListener('change', (e) => {
+      currentLanguage = e.target.value;
+      setLanguage(e.target.value);
+      loadCurrentStory();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+      languageSelect.value = savedLang;
+      setLanguage(savedLang);
+      loadCurrentStory();
+    });
+</script>
+</body>
+</html>

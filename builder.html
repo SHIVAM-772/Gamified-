@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Awesome Shape Builder — Drag, Drop & Touch for Kids</title>
+  <style>
+    :root{
+      --bg:#f6fbff; 
+      --card:#ffffff; 
+      --accent:#3b82f6; 
+      --success:#10b981; 
+      --muted:#6b7280;
+    }
+    
+    *{box-sizing:border-box}
+    
+    body{
+      font-family: Inter, Segoe UI, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial; 
+      margin:0; 
+      background:linear-gradient(180deg,var(--bg),#eef7ff); 
+      color:#0f172a;
+      -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none;
+      -moz-user-select: none; -ms-user-select: none; user-select: none;
+    }
+    
+    .wrap{max-width:1000px;margin:28px auto;padding:18px}
+    header{display:flex;align-items:center;gap:12px}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:6px 0 18px;color:var(--muted)}
+    .game{display:grid;grid-template-columns:320px 1fr;gap:18px}
+    
+    .panel{
+      background:var(--card); 
+      padding:14px; 
+      border-radius:12px; 
+      box-shadow:0 6px 18px rgba(15,23,42,0.06)
+    }
+
+    /* left column palette */
+    .palette h3{margin:0 0 10px;font-size:14px}
+    .shapes{display:flex;flex-wrap:wrap;gap:10px}
+    
+    .shape{
+      width:72px; height:72px; border-radius:10px; display:flex;
+      align-items:center; justify-content:center; cursor:grab;
+      user-select:none; transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 3px solid transparent;
+    }
+    
+    .shape:hover{transform: scale(1.05)}
+    .shape:active{cursor:grabbing}
+
+    /* NEW: Visual highlight for click-to-place */
+    .shape.selected-shape {
+        transform: scale(1.05);
+        border-color: var(--accent);
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    }
+
+    .shape-clone {
+        position: fixed; pointer-events: none; z-index: 1001;
+        opacity: 0.8; transform: scale(0.8);
+    }
+
+    /* actual shapes */
+    .square{background:linear-gradient(180deg,#ffd54a,#ffb300);border-radius:8px}
+    .circle{background:linear-gradient(180deg,#60a5fa,#2563eb);border-radius:999px}
+    .triangle{width:0;height:0;border-left:36px solid transparent;border-right:36px solid transparent;border-bottom:72px solid #f472b6;background:transparent;border-radius:4px}
+    .rectangle{width:90px;height:56px;background:linear-gradient(180deg,#34d399,#10b981);border-radius:8px}
+    .oval{width:90px;height:56px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:50%}
+    .star{background:linear-gradient(180deg,#fb7185,#e11d48);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+    .semicircle{width:80px;height:40px;background:linear-gradient(180deg,#818cf8,#4f46e5);border-radius:80px 80px 0 0; border:0;}
+    .pentagon{width:72px;height:68px;background:linear-gradient(180deg,#f97316,#ea580c);clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%)}
+    .heart{width:72px;height:66px;background:linear-gradient(180deg,#ec4899,#db2777);clip-path:path('M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z')}
+    .hexagon{width:72px;height:72px;background:linear-gradient(180deg,#a855f7,#7e22ce);clip-path:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)}
+    .diamond{width:72px;height:72px;background:linear-gradient(180deg,#22c55e,#16a34a);transform:rotate(45deg);border-radius:8px}
+    .trapezoid{width:90px;height:56px;background:linear-gradient(180deg,#ef4444,#dc2626);clip-path:polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)}
+    .parallelogram{width:90px;height:56px;background:linear-gradient(180deg,#3b82f6,#2563eb);clip-path:polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%)}
+    /* FIXED: Crescent shape now uses clip-path to look correct on any background */
+    .crescent{width:72px;height:72px;background:linear-gradient(180deg,#f59e0b,#d97706);clip-path:path('M50,0 A50,50,0,1,1,50,100 A40,40,0,1,0,50,0 Z');border-radius:0;}
+
+    .controls{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+    #levelSelect{padding:8px;border-radius:8px;border:1px solid #ddd;width:100%;}
+    
+    button{
+      padding:8px 10px; border-radius:8px; border:0; background:var(--accent);
+      color:#fff; font-weight:600; cursor:pointer; transition: all 0.2s ease;
+    }
+    
+    button:hover{transform: translateY(-1px)}
+    button.alt{background:#e6eefc;color:var(--accent);font-weight:700}
+
+    /* right column play area */
+    .stage{min-height:480px;display:flex;flex-direction:column}
+    
+    .targets{
+      flex:1; background:linear-gradient(180deg,#f8fafc,#fff); border-radius:10px;
+      padding:10px; position:relative; overflow:hidden; border:2px dashed rgba(15,23,42,0.04)
+    }
+    
+    .target{
+      position:absolute; opacity:0.12; display:flex; align-items:center;
+      justify-content:center; transition: opacity 0.3s ease;
+    }
+    
+    .target .hint-shape{filter:blur(0.2px)}
+
+    .placed{
+      position:absolute; pointer-events:none; animation:snapIn 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    @keyframes snapIn { from {transform:scale(0.8);opacity:0.5;} to {transform:scale(1);opacity:1;} }
+    .hud{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+    .status{font-weight:700; font-size: 14px;}
+    .score{color:var(--muted)}
+    .note{font-size:13px;color:var(--muted);margin-top:8px}
+
+    .fact{
+      margin-top:12px; padding:10px; background:#e6f7ff; border-radius:8px;
+      color:#1d4ed8; font-style:italic; border-left:4px solid var(--accent);
+      animation: slideUp 0.5s ease;
+    }
+    
+    @keyframes slideUp { from {opacity:0; transform: translateY(10px);} to {opacity:1; transform: translateY(0);} }
+    .confetti{position:fixed;width:10px;height:10px;background:var(--accent);pointer-events:none;z-index:1000;animation:confetti-fall 3s linear forwards}
+    @keyframes confetti-fall { 0% {transform:translateY(-100vh) rotate(0deg);opacity:1;} 100% {transform:translateY(100vh) rotate(720deg);opacity:0;} }
+    .progress-bar{width:100%;height:6px;background:#e5e7eb;border-radius:3px;margin-top:8px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--success));width:0%;transition:width 0.3s ease;border-radius:3px}
+
+    /* responsive */
+    @media (max-width:880px){
+      .game{grid-template-columns:1fr;}
+      .palette{order:2}
+      .stage{min-height: 400px;}
+      .shape {width: 60px; height: 60px;}
+      .triangle {border-left-width: 30px; border-right-width: 30px; border-bottom-width: 60px;}
+      .rectangle, .oval, .trapezoid, .parallelogram {width: 75px; height: 46px;}
+      .semicircle {width: 66px; height: 33px; border-radius: 66px 66px 0 0;}
+      .pentagon {width: 60px; height: 56px;}
+      .heart {width: 60px; height: 55px;}
+      .hexagon, .diamond, .crescent {width: 60px; height: 60px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header><h1>🎨 Awesome Shape Builder</h1></header>
+    <p class="lead">Drag colorful shapes to build amazing objects! Works on desktop and mobile. Voice guidance included! 🗣️</p>
+    <div class="game">
+      <div class="panel palette">
+        <h3>🎭 Shapes Palette</h3>
+        <div class="shapes" id="palette">
+          <div class="shape square" draggable="true" data-shape="square" title="Square"></div>
+          <div class="shape circle" draggable="true" data-shape="circle" title="Circle"></div>
+          <div class="shape triangle" draggable="true" data-shape="triangle" title="Triangle"></div>
+          <div class="shape rectangle" draggable="true" data-shape="rectangle" title="Rectangle"></div>
+          <div class="shape oval" draggable="true" data-shape="oval" title="Oval"></div>
+          <div class="shape star" draggable="true" data-shape="star" title="Star"></div>
+          <div class="shape semicircle" draggable="true" data-shape="semicircle" title="Semicircle"></div>
+          <div class="shape pentagon" draggable="true" data-shape="pentagon" title="Pentagon"></div>
+          <div class="shape heart" draggable="true" data-shape="heart" title="Heart"></div>
+          <div class="shape hexagon" draggable="true" data-shape="hexagon" title="Hexagon"></div>
+          <div class="shape diamond" draggable="true" data-shape="diamond" title="Diamond"></div>
+          <div class="shape trapezoid" draggable="true" data-shape="trapezoid" title="Trapezoid"></div>
+          <div class="shape parallelogram" draggable="true" data-shape="parallelogram" title="Parallelogram"></div>
+          <div class="shape crescent" draggable="true" data-shape="crescent" title="Crescent"></div>
+        </div>
+        <div class="controls">
+          <select id="levelSelect">
+            <option value="house">🏠 Build: House (3 pieces)</option>
+            <option value="rocket">🚀 Build: Rocket (4 pieces)</option>
+            <option value="car">🚗 Build: Car (4 pieces)</option>
+            <option value="tree">🌳 Build: Tree (4 pieces)</option>
+            <option value="fish">🐠 Build: Fish (3 pieces)</option>
+            <option value="icecream">🍦 Build: Ice Cream (2 pieces)</option>
+            <option value="train">🚂 Build: Train (5 pieces)</option>
+            <option value="robot">🤖 Build: Robot (5 pieces)</option>
+            <option value="flower">🌸 Build: Flower (6 pieces)</option>
+            <option value="airplane">✈️ Build: Airplane (4 pieces)</option>
+          </select>
+          <button id="resetBtn" class="alt">🔄 Reset</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="note">💡 Tip: Drag shapes onto the faint outlines!</div>
+      </div>
+      <div class="panel stage">
+        <div class="targets" id="stage" aria-label="Play area"></div>
+        <div class="hud">
+          <div class="status" id="status">Place shapes to complete the object</div>
+          <div class="score" id="score">Completed: 0 / 0</div>
+        </div>
+        <div class="fact" id="fact" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const levels = {
+      house: { name: 'House', pieces: [
+        {id:'square', shape:'square', x:180, y:200, w:160, h:160},
+        {id:'triangle', shape:'triangle', x:180, y:120, w:160, h:80},
+        {id:'rectangle', shape:'rectangle', x:210, y:280, w:50, h:80}
+      ]},
+      rocket: { name:'Rocket', pieces:[
+        {id:'rectangle', shape:'rectangle', x:210, y:150, w:80, h:200},
+        {id:'triangle1', shape:'triangle', x:210, y:80, w:80, h:70},
+        {id:'triangle2', shape:'triangle', x:160, y:280, w:60, h:70},
+        {id:'triangle3', shape:'triangle', x:260, y:280, w:60, h:70}
+      ]},
+      car: { name: 'Car', pieces: [
+        {id:'semicircle', shape:'semicircle', x:190, y:160, w:140, h:70},
+        {id:'rectangle', shape:'rectangle', x:150, y:230, w:220, h:60},
+        {id:'circle1', shape:'circle', x:170, y:290, w:60, h:60},
+        {id:'circle2', shape:'circle', x:290, y:290, w:60, h:60}
+      ]},
+      tree: { name: 'Tree', pieces: [
+        {id:'rectangle', shape:'rectangle', x:230, y:250, w:40, h:150},
+        {id:'triangle1', shape:'triangle', x:170, y:220, w:160, h:80},
+        {id:'triangle2', shape:'triangle', x:180, y:160, w:140, h:70},
+        {id:'triangle3', shape:'triangle', x:190, y:110, w:120, h:60}
+      ]},
+      fish: { name: 'Fish', pieces: [
+        {id:'oval', shape:'oval', x:150, y:200, w:180, h:112},
+        {id:'triangle', shape:'triangle', x:300, y:218, w:80, h:80, transform:'rotate(90deg)'},
+        {id:'circle', shape:'circle', x:180, y:230, w:30, h:30}
+      ]},
+      icecream: { name: 'Ice Cream', pieces: [
+        {id:'triangle', shape:'triangle', x:210, y:200, w:100, h:150},
+        {id:'semicircle', shape:'semicircle', x:190, y:160, w:140, h:70}
+      ]},
+      train: { name: 'Train', pieces: [
+        {id:'rectangle1', shape:'rectangle', x:150, y:200, w:200, h:80},
+        {id:'square', shape:'square', x:100, y:180, w:100, h:100},
+        {id:'circle1', shape:'circle', x:160, y:280, w:60, h:60},
+        {id:'circle2', shape:'circle', x:260, y:280, w:60, h:60},
+        {id:'triangle', shape:'triangle', x:350, y:210, w:60, h:60}
+      ]},
+      robot: { name: 'Robot', pieces: [
+        {id:'rectangle', shape:'rectangle', x:180, y:250, w:120, h:100},
+        {id:'square', shape:'square', x:200, y:180, w:80, h:80},
+        {id:'circle1', shape:'circle', x:210, y:190, w:30, h:30},
+        {id:'circle2', shape:'circle', x:250, y:190, w:30, h:30},
+        {id:'parallelogram', shape:'parallelogram', x:200, y:350, w:80, h:50}
+      ]},
+      flower: { name: 'Flower', pieces: [
+        {id:'circle', shape:'circle', x:230, y:230, w:60, h:60},
+        {id:'petal1', shape:'oval', x:210, y:170, w:50, h:90, transform:'rotate(-30deg)'},
+        {id:'petal2', shape:'oval', x:260, y:190, w:50, h:90, transform:'rotate(30deg)'},
+        {id:'petal3', shape:'oval', x:270, y:240, w:50, h:90, transform:'rotate(90deg)'},
+        {id:'petal4', shape:'oval', x:230, y:270, w:50, h:90, transform:'rotate(150deg)'},
+        {id:'petal5', shape:'oval', x:180, y:250, w:50, h:90, transform:'rotate(210deg)'}
+      ]},
+      airplane: { name: 'Airplane', pieces: [
+        {id:'oval', shape:'oval', x:150, y:200, w:220, h:60},
+        {id:'trapezoid', shape:'trapezoid', x:340, y:185, w:60, h:90, transform:'rotate(90deg)'},
+        {id:'triangle1', shape:'triangle', x:200, y:150, w:80, h:80},
+        {id:'triangle2', shape:'triangle', x:200, y:230, w:80, h:80}
+      ]}
+    };
+
+    const facts = {
+      house: "All houses have a roof to protect from rain and sun, and walls to keep out wind and cold! 🏠",
+      rocket: "A rocket only takes 8 minutes to accelerate to 15,000 miles per hour! 🚀",
+      car: "The first electric car was invented all the way back in 1828! ⚡🚗",
+      tree: "Trees are the longest living organisms on Earth, and never die of old age! 🌳",
+      fish: "Fish have been on the Earth for more than 500 million years, long before the dinosaurs! 🐠",
+      icecream: "The ice cream cone was invented by accident at the 1904 World's Fair! 🍦",
+      train: "The first steam trains could only go as fast as a person could run! 🚂",
+      robot: "The word 'robot' comes from a Czech word meaning 'forced labor'! 🤖",
+      flower: "Some flowers, like the Moonflower, only bloom at night! 🌸",
+      airplane: "The fastest airplane can travel at over 7,000 kilometers per hour! ✈️"
+    };
+
+    const shapeSounds = {
+      square: "Square!", circle: "Circle!", triangle: "Triangle!", rectangle: "Rectangle!",
+      oval: "Oval!", star: "Star!", semicircle: "Semicircle!", pentagon: "Pentagon!", heart: "Heart!",
+      hexagon: "Hexagon!", diamond: "Diamond!", trapezoid: "Trapezoid!", parallelogram: "Parallelogram!", crescent: "Crescent!"
+    };
+
+    const stage = document.getElementById('stage');
+    const levelSelect = document.getElementById('levelSelect');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusEl = document.getElementById('status');
+    const scoreEl = document.getElementById('score');
+    const factEl = document.getElementById('fact');
+    const progressFill = document.getElementById('progressFill');
+    const paletteShapes = document.querySelectorAll('#palette .shape');
+
+    let currentLevel = 'house';
+    let placedCount = 0;
+    let draggedClone = null;
+    let selectedShapeForClick = null;
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.1;
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    function createConfetti() {
+      for (let i = 0; i < 50; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+        c.style.animationDelay = Math.random() * 0.3 + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3000);
+      }
+    }
+
+    function updateScoreAndProgress() {
+      const total = levels[currentLevel].pieces.length;
+      scoreEl.textContent = `Completed: ${placedCount} / ${total}`;
+      const progress = total > 0 ? (placedCount / total) * 100 : 0;
+      progressFill.style.width = progress + '%';
+    }
+
+    function checkComplete() {
+      const total = levels[currentLevel].pieces.length;
+      if (placedCount >= total) {
+        statusEl.textContent = '🎉 Great job! You built the ' + levels[currentLevel].name + '!';
+        factEl.innerHTML = '🌟 Fun Fact: ' + facts[currentLevel];
+        factEl.style.display = 'block';
+        createConfetti();
+        speak('Amazing! You built the ' + levels[currentLevel].name + '! ' + facts[currentLevel]);
+        return true;
+      }
+      return false;
+    }
+
+    function flashStatus(txt, isError = false) {
+      const originalText = 'Build: ' + levels[currentLevel].name + ' 🏗️';
+      statusEl.textContent = txt;
+      statusEl.style.color = isError ? 'crimson' : '';
+      setTimeout(() => {
+        statusEl.style.color = '';
+        if (!checkComplete()) { statusEl.textContent = originalText; }
+      }, 1500);
+    }
+    
+    function handlePlacement(target, shape) {
+        if (!target || target.dataset.done === 'true' || !shape) return;
+        if (target.dataset.shape === shape) {
+            const piece = levels[currentLevel].pieces.find(p => p.id === target.dataset.id);
+            const placed = document.createElement('div');
+            placed.className = 'placed ' + shape;
+            placed.style.left = target.style.left;
+            placed.style.top = target.style.top;
+            placed.style.width = target.style.width;
+            placed.style.height = target.style.height;
+            if (piece.transform) placed.style.transform = piece.transform;
+            stage.appendChild(placed);
+            
+            target.style.opacity = 0.02;
+            target.dataset.done = 'true';
+            placedCount++;
+            
+            updateScoreAndProgress();
+            speak(shapeSounds[shape]);
+            
+            if (placedCount < levels[currentLevel].pieces.length) {
+                statusEl.textContent = '👍 Nice! Keep going...';
+            }
+            checkComplete();
+        } else {
+            flashStatus('❌ That shape does not fit here', true);
+            speak('Oops! Try a different shape.');
+        }
+    }
+
+    function renderLevel(name) {
+      currentLevel = name;
+      stage.innerHTML = '';
+      placedCount = 0;
+      factEl.style.display = 'none';
+      
+      const lvl = levels[name];
+      
+      lvl.pieces.forEach(piece => {
+        const t = document.createElement('div');
+        t.className = 'target';
+        t.style.left = piece.x + 'px'; t.style.top = piece.y + 'px';
+        t.style.width = piece.w + 'px'; t.style.height = piece.h + 'px';
+        if (piece.transform) t.style.transform = piece.transform;
+        t.dataset.shape = piece.shape; t.dataset.id = piece.id;
+        
+        const hint = document.createElement('div');
+        hint.className = 'hint-shape ' + piece.shape;
+        hint.style.width = '100%'; hint.style.height = '100%';
+        t.appendChild(hint);
+        stage.appendChild(t);
+      });
+      
+      updateScoreAndProgress();
+      statusEl.textContent = 'Build: ' + lvl.name + ' 🏗️';
+      speak('Let\'s build a ' + lvl.name + '!');
+    }
+
+    // --- EVENT LISTENERS ---
+    // -- Mouse Drag & Drop --
+    paletteShapes.forEach(el => {
+      el.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', el.dataset.shape);
+        e.dataTransfer.effectAllowed = 'copy';
+      });
+    });
+    stage.addEventListener('dragover', e => e.preventDefault());
+    stage.addEventListener('drop', e => {
+      e.preventDefault();
+      const shape = e.dataTransfer.getData('text/plain');
+      const target = e.target.closest('.target');
+      handlePlacement(target, shape);
+    });
+
+    // -- Mobile Touch Drag & Drop --
+    paletteShapes.forEach(el => {
+        el.addEventListener('touchstart', e => {
+            e.preventDefault();
+            draggedClone = el.cloneNode(true);
+            draggedClone.classList.add('shape-clone');
+            document.body.appendChild(draggedClone);
+            const touch = e.touches[0];
+            draggedClone.style.left = (touch.clientX - draggedClone.offsetWidth / 2) + 'px';
+            draggedClone.style.top = (touch.clientY - draggedClone.offsetHeight / 2) + 'px';
+        }, { passive: false });
+    });
+    document.addEventListener('touchmove', e => {
+        if (draggedClone) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            draggedClone.style.left = (touch.clientX - draggedClone.offsetWidth / 2) + 'px';
+            draggedClone.style.top = (touch.clientY - draggedClone.offsetHeight / 2) + 'px';
+        }
+    }, { passive: false });
+    document.addEventListener('touchend', e => {
+        if (draggedClone) {
+            const touch = e.changedTouches[0];
+            const shapeType = draggedClone.dataset.shape;
+            draggedClone.style.display = 'none';
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.body.removeChild(draggedClone);
+            draggedClone = null;
+            if (elementUnder) {
+                const target = elementUnder.closest('.target');
+                handlePlacement(target, shapeType);
+            }
+        }
+    });
+
+    // -- Controls & Accessibility Click-to-place --
+    levelSelect.addEventListener('change', (e) => renderLevel(e.target.value));
+    resetBtn.addEventListener('click', () => renderLevel(currentLevel));
+    
+    paletteShapes.forEach(el => {
+        el.addEventListener('click', () => {
+            // REFINED: Add/remove highlight class
+            paletteShapes.forEach(s => s.classList.remove('selected-shape'));
+            el.classList.add('selected-shape');
+            
+            selectedShapeForClick = el.dataset.shape;
+            flashStatus(`✋ Now tap a silhouette to place the ${selectedShapeForClick}`);
+        });
+    });
+    stage.addEventListener('click', e => {
+        if (selectedShapeForClick) {
+            const target = e.target.closest('.target');
+            handlePlacement(target, selectedShapeForClick);
+            selectedShapeForClick = null;
+            paletteShapes.forEach(s => s.classList.remove('selected-shape'));
+        }
+    });
+    
+    // --- INITIALIZATION ---
+    renderLevel(currentLevel);
+    setTimeout(() => {
+      speak('Welcome to the Awesome Shape Builder! Choose an object to build.');
+    }, 1000);
+  </script>
+</body>
+</html>

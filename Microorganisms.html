@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microorganisms Game</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(-45deg,#7e6bfb,#1e90ff,#00fa9a,#ff69b4);
+    background-size: 400% 400%;
+    animation: bgAnimate 15s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+    color: #fff;
+  }
+
+  @keyframes bgAnimate {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
+  }
+
+  h1 { margin-bottom: 20px; text-align: center; }
+
+  #gameArea {
+    width: 80%;
+    height: 400px;
+    border: 2px solid #fff;
+    position: relative;
+    background: rgba(0,0,0,0.2);
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  .microorganism {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    position: absolute;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    user-select: none;
+    animation: float 5s infinite;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(20px); }
+    100% { transform: translateY(0px); }
+  }
+
+  #scoreBoard {
+    margin: 10px;
+    font-size: 1.2rem;
+  }
+
+  #videoSection {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  video {
+    max-width: 80%;
+    border: 2px solid #fff;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Microorganisms Interactive Game</h1>
+<div id="scoreBoard">Score: 0</div>
+
+<div id="gameArea"></div>
+
+<div id="videoSection">
+  <h2>Learn about Microorganisms</h2>
+  <video controls>
+    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+    Your browser does not support HTML video.
+  </video>
+</div>
+
+<script>
+  const gameArea = document.getElementById('gameArea');
+  let score = 0;
+  const scoreBoard = document.getElementById('scoreBoard');
+
+  // Create microorganisms
+  const microbeTypes = ['B', 'V', 'F', 'A', 'P']; // Bacteria, Virus, Fungi, Algae, Protozoa
+
+  function createMicroorganism() {
+    const microbe = document.createElement('div');
+    microbe.classList.add('microorganism');
+    microbe.textContent = microbeTypes[Math.floor(Math.random()*microbeTypes.length)];
+
+    // Random position
+    microbe.style.top = Math.random() * (gameArea.clientHeight - 40) + 'px';
+    microbe.style.left = Math.random() * (gameArea.clientWidth - 40) + 'px';
+    microbe.style.backgroundColor = `hsl(${Math.random()*360},70%,50%)`;
+
+    // Click event
+    microbe.addEventListener('click', () => {
+      score++;
+      scoreBoard.textContent = `Score: ${score}`;
+      microbe.remove();
+    });
+
+    gameArea.appendChild(microbe);
+
+    // Animate random movement
+    moveMicrobe(microbe);
+  }
+
+  function moveMicrobe(microbe) {
+    const dx = (Math.random()*4 - 2); // -2 to 2 px per step
+    const dy = (Math.random()*4 - 2);
+    let top = parseFloat(microbe.style.top);
+    let left = parseFloat(microbe.style.left);
+
+    function animate() {
+      top += dy;
+      left += dx;
+      if(top < 0) top = 0;
+      if(top > gameArea.clientHeight-40) top = gameArea.clientHeight-40;
+      if(left < 0) left = 0;
+      if(left > gameArea.clientWidth-40) left = gameArea.clientWidth-40;
+
+      microbe.style.top = top + 'px';
+      microbe.style.left = left + 'px';
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  }
+
+  // Add microorganisms every 1.5 seconds
+  setInterval(createMicroorganism, 1500);
+
+</script>
+
+</body>
+</html>

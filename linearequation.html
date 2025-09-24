@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Equation Solver</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #eef2f3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .container {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        width: 300px;
+        text-align: center;
+    }
+    h1 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+    label {
+        display: block;
+        margin-top: 15px;
+        color: #555;
+        text-align: left;
+    }
+    input {
+        width: 90%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #1e4ecb;
+    }
+    .result {
+        margin-top: 20px;
+        padding: 10px;
+        background: #f0f4ff;
+        border-radius: 5px;
+        color: #333;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Linear Equation Solver</h1>
+    <p>Solve an equation of the form <strong>ax + b = 0</strong></p>
+
+    <form method="POST">
+        <label>Coefficient a:</label>
+        <input type="number" step="any" name="a" value="{{ a }}">
+        <label>Constant b:</label>
+        <input type="number" step="any" name="b" value="{{ b }}">
+        <button type="submit">Solve</button>
+    </form>
+
+    {% if result %}
+        <div class="result">{{ result }}</div>
+    {% endif %}
+</div>
+</body>
+</html>
+"""
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    a = b = ""
+    result = ""
+    if request.method == "POST":
+        try:
+            a = float(request.form["a"])
+            b = float(request.form["b"])
+            if a == 0:
+                if b == 0:
+                    result = "Infinite solutions (0x + 0 = 0)."
+                else:
+                    result = "No solution (0x + b = 0 with b ≠ 0)."
+            else:
+                x = -b / a
+                result = f"Solution: x = {x}"
+        except ValueError:
+            result = "Please enter valid numbers."
+    return render_template_string(HTML_PAGE, result=result, a=a, b=b)
+
+if __name__ == "__main__":
+    app.run(debug=True)

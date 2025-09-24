@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 Science - Chemistry Units</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(-45deg, #ff7e5f, #feb47b, #ff7e5f, #feb47b);
+    background-size: 400% 400%;
+    animation: bgAnimate 15s ease infinite;
+    margin: 0;
+    padding: 20px;
+    color: #fff;
+  }
+
+  @keyframes bgAnimate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 2rem;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+  }
+
+  .unit-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .unit-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+  }
+
+  .unit-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+  }
+
+  .unit-content {
+    display: none;
+    margin-top: 10px;
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 8px;
+    line-height: 1.6;
+  }
+
+  .unit-content a {
+    color: #ffd700;
+    text-decoration: underline;
+  }
+
+  .search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  input[type="search"] {
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    width: 250px;
+  }
+
+  button {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #ff4b2b;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background-color: #e03e1a;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Class 9 Science - Chemistry Units</h1>
+
+  <div class="search-container">
+    <input type="search" id="search" placeholder="Search unit...">
+    <button id="clear">Clear</button>
+  </div>
+
+  <div class="units">
+
+    <div class="unit-card">
+      <div class="unit-title">1. Matter in Our Surroundings</div>
+      <div class="unit-content">
+        <p>This unit explains the states of matter and their properties:</p>
+        <ul>
+          <li>Solid, Liquid, Gas</li>
+          <li>Changes in States of Matter</li>
+          <li>Evaporation, Condensation, Melting, Freezing</li>
+        </ul>
+        <p>Video: <a href="https://www.youtube.com/watch?v=rl8Xd8DWXjI" target="_blank">Matter in Our Surroundings</a></p>
+      </div>
+    </div>
+
+    <div class="unit-card">
+      <div class="unit-title">2. Is Matter Around Us Pure?</div>
+      <div class="unit-content">
+        <p>This unit focuses on mixtures and pure substances:</p>
+        <ul>
+          <li>Types of Mixtures: Homogeneous and Heterogeneous</li>
+          <li>Methods of Separation: Filtration, Distillation, Chromatography</li>
+          <li>Compounds vs Elements</li>
+        </ul>
+        <p>Video: <a href="https://www.youtube.com/watch?v=kB9WQq2eVqI" target="_blank">Pure vs Impure Matter</a></p>
+      </div>
+    </div>
+
+    <div class="unit-card">
+      <div class="unit-title">3. Atoms and Molecules</div>
+      <div class="unit-content">
+        <p>This unit describes the smallest units of matter:</p>
+        <ul>
+          <li>Atoms, Molecules, Ions</li>
+          <li>Law of Conservation of Mass</li>
+          <li>Chemical Formulas</li>
+        </ul>
+        <p>Video: <a href="https://www.youtube.com/watch?v=3rGJXzZcz3I" target="_blank">Atoms and Molecules</a></p>
+      </div>
+    </div>
+
+    <div class="unit-card">
+      <div class="unit-title">4. Structure of the Atom</div>
+      <div class="unit-content">
+        <p>This unit focuses on the internal structure of an atom:</p>
+        <ul>
+          <li>Electron, Proton, Neutron</li>
+          <li>Atomic Number, Mass Number, Isotopes</li>
+          <li>Bohr’s Model of Atom</li>
+        </ul>
+        <p>Video: <a href="https://www.youtube.com/watch?v=zR-4oZcnkdE" target="_blank">Structure of the Atom</a></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Toggle unit content
+  document.querySelectorAll('.unit-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const content = card.querySelector('.unit-content');
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    });
+  });
+
+  // Search functionality
+  const searchInput = document.getElementById('search');
+  const clearBtn = document.getElementById('clear');
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    document.querySelectorAll('.unit-card').forEach(card => {
+      const title = card.querySelector('.unit-title').textContent.toLowerCase();
+      card.style.display = title.includes(query) ? 'block' : 'none';
+    });
+  });
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    document.querySelectorAll('.unit-card').forEach(card => card.style.display = 'block');
+  });
+</script>
+
+</body>
+</html>

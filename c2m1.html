@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rhyme & Repeat Storybook (Prototype)</title>
+  <style>
+    :root{
+      --bg:#fffefc; --card:#ffffff; --accent:#0f62fe; --muted:#6b7280; --ok:#16a34a; --bad:#dc2626;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:linear-gradient(180deg,#f8fafc,#eef2ff); display:flex;align-items:center;justify-content:center;min-height:100vh;padding:18px}
+    .wrap{width:980px;max-width:96vw;background:var(--card);border-radius:14px;box-shadow:0 10px 30px rgba(2,6,23,0.06);overflow:hidden}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #eef2ff}
+    h1{font-size:20px;margin:0;color:#0f172a}
+    .controls{display:flex;gap:12px;align-items:center}
+    button{background:var(--accent);color:white;border:0;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+    button.secondary{background:#eef2ff;color:var(--accent);font-weight:700}
+    main{display:flex;gap:18px;padding:18px}
+    .book{flex:1;padding:14px;border-radius:10px;background:linear-gradient(180deg,#ffffff,#fbfdff);min-height:420px}
+    .meta{width:300px}
+    .panel{background:var(--card);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.03);margin-bottom:12px}
+    .story-line{font-size:20px;line-height:1.4;color:#0f172a;margin-bottom:12px}
+    .word{padding:4px 6px;border-radius:6px;display:inline-block;cursor:pointer}
+    .word.rhymable{background:linear-gradient(90deg,#fffbeb,#fff7ed); border:1px dashed rgba(15,23,42,0.04)}
+    .word.found{background:linear-gradient(90deg,#dcfce7,#bbf7d0); border:1px solid rgba(16,185,129,0.12)}
+    .controls-row{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+    .small{font-size:13px;color:var(--muted)}
+    .feedback{padding:8px;border-radius:8px;margin-top:8px}
+    .feedback.ok{background:rgba(16,185,129,0.08);color:var(--ok)}
+    .feedback.bad{background:rgba(220,38,38,0.06);color:var(--bad)}
+    .quiz-button{display:block;width:100%;text-align:left;padding:10px;border-radius:8px;border:1px solid #eef2ff;background:#fff;margin-top:8px;cursor:pointer}
+    .status{font-weight:700;color:var(--muted);font-size:13px}
+    footer{padding:12px 18px;border-top:1px solid #eef2ff;font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
+
+    /* Mobile Optimization */
+    @media (max-width: 768px) {
+      body {padding: 10px; align-items: flex-start;}
+      .wrap {width: 100%; max-width: none; border-radius: 10px;}
+      header {flex-direction: column; gap: 10px; padding: 12px 16px;}
+      h1 {font-size: 18px; text-align: center;}
+      .controls {flex-wrap: wrap; justify-content: center; gap: 8px;}
+      button {padding: 8px 12px; font-size: 14px;}
+      main {flex-direction: column; gap: 16px; padding: 16px;}
+      .book {min-height: auto; order: 1;}
+      .meta {width: 100%; order: 2;}
+      .story-line {font-size: 18px; line-height: 1.3;}
+      .word {padding: 3px 5px; font-size: 16px;}
+      .controls-row {flex-wrap: wrap; gap: 6px;}
+      .panel {padding: 10px; border-radius: 8px; margin-bottom: 10px;}
+      .quiz-button {padding: 8px; font-size: 14px;}
+      footer {flex-direction: column; gap: 6px; text-align: center; padding: 10px 16px; font-size: 12px;}
+    }
+
+    @media (max-width: 480px) {
+      h1 {font-size: 16px;}
+      button {padding: 6px 10px; font-size: 12px;}
+      .story-line {font-size: 16px;}
+      .word {padding: 2px 4px; font-size: 14px;}
+      .small {font-size: 12px;}
+      .status {font-size: 12px;}
+      .feedback {padding: 6px; font-size: 13px;}
+      .quiz-button {padding: 6px; font-size: 12px;}
+      footer {font-size: 11px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" role="application" aria-label="Rhyme and Repeat Storybook">
+    <header>
+      <h1>📚 Rhyme & Repeat Storybook</h1>
+      <div class="controls">
+        <button id="playBtn">Play Story</button>
+        <button id="pauseBtn" class="secondary">Pause</button>
+        <button id="repeatBtn">Repeat (Speak)</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="book" aria-live="polite">
+        <div class="controls-row">
+          <div class="small">Tap the highlighted words that rhyme. After listening, press <strong>Repeat (Speak)</strong> and say the line to practice.</div>
+        </div>
+
+        <div id="story" class="story-line" aria-label="Story text">
+          <!-- story lines injected by JS -->
+        </div>
+
+        <div id="lineControls" style="display:flex;gap:8px;margin-top:10px">
+          <button id="prevLine" class="secondary">◀ Prev</button>
+          <button id="nextLine" class="secondary">Next ▶</button>
+          <div style="flex:1"></div>
+          <div class="status" id="lineStatus">Line 0 / 0</div>
+        </div>
+
+        <div id="repeatFeedback" style="margin-top:12px"></div>
+      </section>
+
+      <aside class="meta">
+        <div class="panel">
+          <div class="small">Rhyming pairs to find</div>
+          <div id="rhymesList" style="margin-top:8px"></div>
+        </div>
+
+        <div class="panel">
+          <div class="small">Quiz: What sound does 'Cat' start with?</div>
+          <button class="quiz-button" data-answer="k">/k/ (K)</button>
+          <button class="quiz-button" data-answer="b">/b/ (B)</button>
+          <button class="quiz-button" data-answer="c">/s/ (C as /s/)</button>
+          <div id="quizFeedback" style="margin-top:10px"></div>
+        </div>
+
+        <div class="panel">
+          <div class="small">Tips</div>
+          <ul style="margin:8px 0 0 16px;color:var(--muted);font-size:13px">
+            <li>Use Chrome for best speech recognition support.</li>
+            <li>Tap two rhyming words to mark them found.</li>
+            <li>Press Repeat and say the line — the app will try to match your words.</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div>Prototype — Speech Synthesis & Recognition (if supported)</div>
+      <div id="supportInfo" class="small"></div>
+    </footer>
+  </div>
+
+  <script>
+    /* Rhyme & Repeat Storybook Prototype
+     - Plays lines via SpeechSynthesis
+     - Highlights rhymable words; tap two words to mark a rhyme pair found
+     - Uses Web Speech Recognition (if available) to capture child's repeat and do simple similarity check
+     - Quiz with voice feedback
+    */
+
+    const storyLines = [
+      { text: "A for Apple, B for Ball, C for Cat that climbs the wall.", rhymes: [["ball","wall"]] },
+      { text: "Look at Cat, see him sit. Cat says meow and likes a bit.", rhymes: [["sit","bit"]] },
+      { text: "Buzzy Bee and busy Bee, flying by the apple tree.", rhymes: [["bee","tree"]] }
+    ];
+
+    let currentLineIndex = 0;
+    const storyEl = document.getElementById('story');
+    const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const repeatBtn = document.getElementById('repeatBtn');
+    const prevLine = document.getElementById('prevLine');
+    const nextLine = document.getElementById('nextLine');
+    const lineStatus = document.getElementById('lineStatus');
+    const rhymesList = document.getElementById('rhymesList');
+    const repeatFeedback = document.getElementById('repeatFeedback');
+    const supportInfo = document.getElementById('supportInfo');
+    const quizButtons = document.querySelectorAll('.quiz-button');
+    const quizFeedback = document.getElementById('quizFeedback');
+
+    // Speech synthesis helper
+    function speak(text, opts = {}) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = opts.rate ?? 0.95;
+      u.pitch = opts.pitch ?? 1;
+      // pick a voice if available that seems clear
+      const voices = window.speechSynthesis.getVoices();
+      if (voices && voices.length) {
+        // prefer voices with "female" or "english" in name if possible
+        const pick = voices.find(v => /female|english/i.test(v.name)) || voices[0];
+        u.voice = pick;
+      }
+      window.speechSynthesis.speak(u);
+    }
+
+    // small normalization for comparison
+    function norm(s){
+      return s.toLowerCase().replace(/[^a-z\s']/g,'').replace(/\s+/g,' ').trim();
+    }
+
+    // build the current line into clickable words
+    function renderLine(){
+      const lineObj = storyLines[currentLineIndex];
+      const raw = lineObj.text;
+      // split into words but keep punctuation
+      const tokens = raw.split(/(\s+)/);
+      storyEl.innerHTML = '';
+      // prepare set of rhymable words (from rhymes pairs)
+      const rhymable = new Set();
+      for (const pair of (lineObj.rhymes||[])) {
+        pair.forEach(w => rhymable.add(norm(w)));
+      }
+      // create word spans
+      tokens.forEach(tok => {
+        if (tok.trim() === '') {
+          storyEl.appendChild(document.createTextNode(tok));
+        } else {
+          // extract bare word for matching (strip punctuation)
+          const bare = norm(tok);
+          const span = document.createElement('span');
+          span.className = 'word';
+          if (rhymable.has(bare)) span.classList.add('rhymable');
+          span.textContent = tok.replace(/\s+/g,' ');
+          span.dataset.bare = bare;
+          span.addEventListener('click', onWordClick);
+          storyEl.appendChild(span);
+        }
+      });
+      // update rhymes list area
+      renderRhymesList();
+      lineStatus.textContent = `Line ${currentLineIndex+1} / ${storyLines.length}`;
+      repeatFeedback.innerHTML = '';
+    }
+
+    // track clicked rhymable words for selecting pairs
+    let clickedRhymables = [];
+
+    // when word clicked
+    function onWordClick(e){
+      const span = e.currentTarget;
+      const bare = span.dataset.bare;
+      if (!bare) return;
+      if (!span.classList.contains('rhymable')) {
+        // non-rhymable words: read them aloud as help
+        speak(span.textContent);
+        return;
+      }
+      // toggle selection
+      if (span.classList.contains('selected')) {
+        span.classList.remove('selected');
+        clickedRhymables = clickedRhymables.filter(b=>b !== bare);
+      } else {
+        // add to selection
+        span.classList.add('selected');
+        clickedRhymables.push(bare);
+        // if we have two picks, check if they match a rhyme pair
+        if (clickedRhymables.length >= 2) {
+          checkSelectedRhymes();
+        }
+      }
+    }
+
+    // check selected rhymes against known pairs for this line
+    function checkSelectedRhymes(){
+      const pairs = storyLines[currentLineIndex].rhymes || [];
+      // try find any pair where both words are included
+      let found = 0;
+      for (const pair of pairs) {
+        const pnorm = pair.map(norm);
+        if (pnorm.includes(clickedRhymables[0]) && pnorm.includes(clickedRhymables[1])) {
+          found = 1;
+          break;
+        }
+      }
+      if (found) {
+        // mark matching spans as found
+        const spans = storyEl.querySelectorAll('.word');
+        spans.forEach(s => {
+          if (clickedRhymables.includes(s.dataset.bare)) {
+            s.classList.add('found');
+            s.classList.remove('selected');
+          }
+        });
+        clickedRhymables = [];
+        renderRhymesList();
+        speak('Good! Those rhyme.');
+        showTempFeedback('Nice! You found a rhyming pair.', 'ok');
+      } else {
+        // negative feedback
+        // clear selection after a brief flash
+        showTempFeedback('Not a rhyming pair — try again.', 'bad');
+        setTimeout(()=> {
+          const spans = storyEl.querySelectorAll('.word.selected');
+          spans.forEach(s => s.classList.remove('selected'));
+          clickedRhymables = [];
+        }, 700);
+        speak('Try again — those do not rhyme.');
+      }
+    }
+
+    // show rhymes list and progress for current line
+    function renderRhymesList(){
+      const pairs = storyLines[currentLineIndex].rhymes || [];
+      rhymesList.innerHTML = '';
+      pairs.forEach(pair => {
+        const pairNorm = pair.map(norm);
+        // detect if both words found
+        const spans = storyEl.querySelectorAll('.word');
+        let found = 0;
+        spans.forEach(s => {
+          if (pairNorm.includes(s.dataset.bare) && s.classList.contains('found')) found++;
+        });
+        const el = document.createElement('div');
+        el.style.marginBottom = '8px';
+        el.innerHTML = `<strong>${pair[0]}</strong> — <strong>${pair[1]}</strong> ${found >= 2 ? ' ✅' : ''}`;
+        rhymesList.appendChild(el);
+      });
+    }
+
+    // simple temporary visual feedback
+    function showTempFeedback(msg, kind='ok'){
+      repeatFeedback.innerHTML = `<div class="feedback ${kind==='ok' ? 'ok' : 'bad'}">${msg}</div>`;
+      setTimeout(()=> {
+        repeatFeedback.innerHTML = '';
+      }, 1600);
+    }
+
+    // speech recognition (repeat) logic
+    let recognizer = null;
+    let recognitionAvailable = false;
+    function setupRecognition(){
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+      if (!SpeechRecognition) {
+        recognitionAvailable = false;
+        supportInfo.textContent = 'Speech Recognition: not available in this browser.';
+        return;
+      }
+      recognitionAvailable = true;
+      recognizer = new SpeechRecognition();
+      recognizer.lang = 'en-US';
+      recognizer.interimResults = false;
+      recognizer.maxAlternatives = 1;
+      // event handlers
+      recognizer.onresult = (ev) => {
+        const spoken = ev.results[0][0].transcript;
+        evaluateRepeat(spoken);
+      };
+      recognizer.onerror = (ev) => {
+        repeatFeedback.innerHTML = `<div class="feedback bad">Recognition error: ${ev.error}</div>`;
+      };
+      supportInfo.textContent = 'Speech Recognition: available.';
+    }
+
+    // evaluate child's repeat against expected line (simple approach)
+    function evaluateRepeat(spoken){
+      const expected = storyLines[currentLineIndex].text;
+      const sNorm = norm(spoken);
+      const eNorm = norm(expected);
+      // quick similarity: check how many words from expected appear in spoken
+      const eWords = new Set(eNorm.split(' ').filter(Boolean));
+      const sWords = sNorm.split(' ').filter(Boolean);
+      let matchCount = 0;
+      sWords.forEach(w => { if (eWords.has(w)) matchCount++; });
+      const ratio = matchCount / Math.max(1, eWords.size);
+      if (ratio > 0.45) {
+        showTempFeedback('Great repetition! You repeated the line well.', 'ok');
+        speak('Great attempt! That sounded very good.');
+      } else {
+        showTempFeedback('Nice try — listen again and repeat.', 'bad');
+        speak('Nice try. Listen again and repeat after me.');
+      }
+    }
+
+    // play current line via speech synthesis
+    let playing = false;
+    function playCurrentLine(){
+      const line = storyLines[currentLineIndex].text;
+      speak(line);
+      playing = true;
+    }
+
+    // pause (cancel synthesis)
+    function pauseSpeech(){
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      playing = false;
+    }
+
+    // navigation
+    prevLine.addEventListener('click', ()=>{
+      if (currentLineIndex > 0) currentLineIndex--;
+      renderLine();
+    });
+    nextLine.addEventListener('click', ()=>{
+      if (currentLineIndex < storyLines.length - 1) currentLineIndex++;
+      renderLine();
+    });
+
+    // play / pause / repeat buttons
+    playBtn.addEventListener('click', ()=> {
+      playCurrentLine();
+    });
+    pauseBtn.addEventListener('click', ()=> {
+      pauseSpeech();
+    });
+    repeatBtn.addEventListener('click', ()=> {
+      // If recognition available, start and prompt user
+      if (recognitionAvailable && recognizer) {
+        repeatFeedback.innerHTML = `<div class="feedback">Listening... please speak the line now.</div>`;
+        // give a short audible prompt then start recognition so the child knows when to speak
+        setTimeout(()=> {
+          try {
+            recognizer.start();
+          } catch (e) {
+            // start may throw if in invalid state; reset
+            repeatFeedback.innerHTML = `<div class="feedback bad">Could not start recognition: ${e.message}</div>`;
+          }
+        }, 350);
+      } else {
+        // fallback: instruct user to record on outside device or use visual repeat
+        repeatFeedback.innerHTML = `<div class="feedback bad">Speech recognition not supported. Try repeating aloud or use a browser with speech support (Chrome).</div>`;
+      }
+    });
+
+    // quiz buttons
+    quizButtons.forEach(b => {
+      b.addEventListener('click', (e)=> {
+        const answer = e.currentTarget.dataset.answer;
+        const correct = (answer === 'k'); // "Cat" -> /k/ in our prototype
+        if (correct) {
+          quizFeedback.innerHTML = `<div class="feedback ok">Correct! Cat starts with the /k/ sound.</div>`;
+          speak('Correct! Cat starts with the k sound.');
+        } else {
+          quizFeedback.innerHTML = `<div class="feedback bad">Not quite — try listening again.</div>`;
+          speak('Not quite. Listen again and try.');
+        }
+        setTimeout(()=> { quizFeedback.innerHTML = ''; }, 2200);
+      });
+    });
+
+    // initialize
+    setupRecognition();
+    renderLine();
+
+    // populate available rhyme status visually at load
+    renderRhymesList();
+  </script>
+</body>
+</html>

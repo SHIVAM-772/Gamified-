@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phonic Echo Match - Listen & Repeat Game</title>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanari:wght@400;600;700&family=Noto+Sans+Oriya:wght@400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #fff3e0;
+      --bg-secondary: #ffcc80;
+      --text-primary: #e65100;
+      --text-secondary: #ff8f00;
+      --accent-primary: #e65100;
+      --accent-secondary: #ff6d00;
+      --success: #4caf50;
+      --error: #f44336;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --shadow: 0 8px 32px rgba(230, 81, 0, 0.2);
+      --border: rgba(230, 81, 0, 0.3);
+    }
+
+    [lang="hi"] {
+      font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+    }
+
+    [lang="or"] {
+      font-family: 'Noto Sans Oriya', 'Inter', sans-serif;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, #ffb74d 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      position: relative;
+      touch-action: manipulation;
+    }
+
+    /* Header & Language Switcher */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 3px solid var(--border);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .language-switcher {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 25px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .language-switcher:hover {
+      background: var(--accent-primary);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* Main Game Container */
+    .game-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      background: var(--card-bg);
+      border-radius: 25px;
+      padding: 4px;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
+    }
+
+    .progress-fill {
+      height: 20px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 20px;
+      transition: width 0.5s ease;
+      text-align: center;
+      color: white;
+      font-weight: 600;
+      line-height: 20px;
+    }
+
+    /* Game Title */
+    .game-title {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .instruction {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      padding: 0 1rem;
+    }
+
+    /* Audio Controls */
+    .audio-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .audio-btn {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 50px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .audio-btn:hover {
+      background: var(--accent-primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(230, 81, 0, 0.3);
+    }
+
+    .audio-btn.active {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    /* Game Area */
+    .game-area {
+      background: var(--card-bg);
+      border-radius: 30px;
+      padding: 3rem 2rem;
+      box-shadow: var(--shadow);
+      border: 3px solid var(--border);
+      min-height: 450px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      text-align: center;
+    }
+
+    /* Letter Display */
+    .letter-display {
+      font-size: 8rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: bounce 1s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    /* Word Example */
+    .word-example {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      color: var(--accent-primary);
+      text-align: center;
+      min-height: 2.5rem;
+      line-height: 1.2;
+      padding: 0 1rem;
+    }
+    
+    /* Confirmation Button */
+    .confirm-btn {
+        background: linear-gradient(135deg, #2196F3, #1976D2);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+    
+    .confirm-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(33, 150, 243, 0.4);
+    }
+    
+    /* Feedback Message */
+    .feedback {
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      margin: 1rem 0;
+      min-height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feedback.success {
+      background: linear-gradient(135deg, var(--success), #388e3c);
+      color: white;
+    }
+
+    /* Next Button */
+    .next-btn {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none; /* Hidden by default */
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 1rem;
+    }
+
+    .next-btn.show {
+      display: inline-block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .next-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(230, 81, 0, 0.4);
+    }
+
+    /* Game Over Screen */
+    .game-over {
+      text-align: center;
+      padding: 3rem;
+      background: var(--card-bg);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      border: 3px solid var(--border);
+      display: none;
+      margin: 2rem 0;
+    }
+
+    .game-over.show {
+      display: block;
+    }
+
+    .score-display {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+      margin: 1rem 0;
+    }
+
+    .restart-btn {
+      background: linear-gradient(135deg, var(--success), #388e3c);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .restart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .game-title { font-size: 2rem; }
+      .instruction { font-size: 1rem; }
+      .letter-display { font-size: 6rem; }
+      .word-example { font-size: 1.5rem; }
+      .audio-controls { flex-direction: column; align-items: center; }
+    }
+
+    @media (max-width: 480px) {
+      .header { padding: 0.5rem 1rem; flex-direction: column; gap: 1rem; }
+      .game-title { font-size: 1.8rem; }
+      .letter-display { font-size: 4rem; }
+      .word-example { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">🗣️ Phonic Echo Match</div>
+    <select class="language-switcher" id="languageSelect">
+      <option value="en">🇺🇸 English</option>
+      <option value="hi">🇮🇳 हिंदी</option>
+      <option value="or">🇮🇳 ଓଡ଼ିଆ</option>
+    </select>
+  </div>
+
+  <div class="game-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill">0%</div>
+    </div>
+
+    <h1 class="game-title" data-translate="gameTitle">Phonic Echo Match</h1>
+    
+    <div class="instruction" data-translate="instruction">
+      Listen to the sound, then repeat it out loud and tap the button!
+    </div>
+
+    <div class="audio-controls">
+      <button class="audio-btn active" id="playSoundBtn" data-translate="playSound">
+        🔊 Play Sound
+      </button>
+      <button class="audio-btn" id="repeatBtn" data-translate="repeat">
+        🔁 Repeat
+      </button>
+    </div>
+
+    <div class="game-area" id="gameArea">
+      <div class="letter-display" id="letterDisplay"></div>
+      
+      <div class="word-example" id="wordExample"></div>
+      
+      <button class="confirm-btn" id="confirmBtn" data-translate="tapConfirm">
+        ✅ I Said It!
+      </button>
+      
+      <div class="feedback" id="feedback"></div>
+      
+      <button class="next-btn" id="nextBtn" data-translate="nextSound">
+        Next Sound
+      </button>
+    </div>
+
+    <div class="game-over" id="gameOver">
+      <h2 data-translate="congratulations">🎉 Congratulations!</h2>
+      <div class="score-display" id="finalScore">0/26</div>
+      <p data-translate="completedPhonics">You practiced all phonics sounds!</p>
+      <button class="restart-btn" id="restartBtn" data-translate="playAgain">
+        Play Again
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Language Translations
+    const translations = {
+      en: {
+        gameTitle: "Phonic Echo Match",
+        instruction: "Listen to the sound, then repeat it out loud and tap the button!",
+        playSound: "🔊 Play Sound",
+        repeat: "🔁 Repeat",
+        tapConfirm: "✅ I Said It!",
+        nextSound: "Next Sound",
+        congratulations: "🎉 Congratulations!",
+        completedPhonics: "You practiced all phonics sounds!",
+        playAgain: "Play Again",
+        correct: "Perfect echo! Good job!",
+      },
+      hi: {
+        gameTitle: "फोनिक इको मैच",
+        instruction: "ध्वनि सुनें, फिर ज़ोर से दोहराएं और बटन टैप करें!",
+        playSound: "🔊 ध्वनि चलाएं",
+        repeat: "🔁 दोहराएं",
+        tapConfirm: "✅ मैंने कहा!",
+        nextSound: "अगली ध्वनि",
+        congratulations: "🎉 बधाई हो!",
+        completedPhonics: "आपने सभी फोनिक ध्वनियों का अभ्यास किया!",
+        playAgain: "फिर खेलें",
+        correct: "उत्तम इको! अच्छा काम!",
+      },
+      or: {
+        gameTitle: "ଫୋନିକ୍ ଇକୋ ମ୍ୟାଚ୍",
+        instruction: "ଧ୍ୱନି ଶୁଣନ୍ତୁ, ତାପରେ ପାଟିରେ କହି ବଟନ୍ ଟ୍ୟାପ୍ କରନ୍ତୁ!",
+        playSound: "🔊 ଧ୍ୱନି ଚଳାନ୍ତୁ",
+        repeat: "🔁 ପୁନରାବୃତ୍ତି",
+        tapConfirm: "✅ ମୁଁ କହିଲି!",
+        nextSound: "ପରବର୍ତ୍ତୀ ଧ୍ୱନି",
+        congratulations: "🎉 ଅଭିନନ୍ଦନ!",
+        completedPhonics: "ଆପଣ ସମସ୍ତ ଫୋନିକ୍ ଧ୍ୱନିଗୁଡ଼ିକର ଅଭ୍ୟାସ କରିଲେ!",
+        playAgain: "ଆହୁରି ଖେଳନ୍ତୁ",
+        correct: "ଉତ୍ତମ ଇକୋ! ଭଲ କାମ!",
+      }
+    };
+
+    // Game Data
+    const phonicsData = [
+      { phonic: 'A', word: 'Apple' }, { phonic: 'B', word: 'Ball' },
+      { phonic: 'C', word: 'Cat' }, { phonic: 'D', word: 'Dog' },
+      { phonic: 'E', word: 'Elephant' }, { phonic: 'F', word: 'Fish' },
+      { phonic: 'G', word: 'Grapes' }, { phonic: 'H', word: 'House' },
+      { phonic: 'I', word: 'Ice Cream' }, { phonic: 'J', word: 'Juice' },
+      { phonic: 'K', word: 'Kite' }, { phonic: 'L', word: 'Lion' },
+      { phonic: 'M', word: 'Monkey' }, { phonic: 'N', word: 'Nest' },
+      { phonic: 'O', word: 'Orange' }, { phonic: 'P', word: 'Penguin' },
+      { phonic: 'Q', word: 'Queen' }, { phonic: 'R', word: 'Rabbit' },
+      { phonic: 'S', word: 'Sun' }, { phonic: 'T', word: 'Tiger' },
+      { phonic: 'U', word: 'Umbrella' }, { phonic: 'V', word: 'Van' },
+      { phonic: 'W', word: 'Whale' }, { phonic: 'X', word: 'Xylophone' },
+      { phonic: 'Y', word: 'Yogurt' }, { phonic: 'Z', word: 'Zebra' }
+    ];
+
+    // Game State
+    let currentIndex = 0;
+    let score = 0;
+    let currentLanguage = 'en';
+    let isPlaying = false;
+
+    // DOM Elements
+    const playSoundBtn = document.getElementById('playSoundBtn');
+    const repeatBtn = document.getElementById('repeatBtn');
+    const letterDisplay = document.getElementById('letterDisplay');
+    const wordExample = document.getElementById('wordExample');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('nextBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const progressFill = document.getElementById('progressFill');
+    const gameArea = document.getElementById('gameArea');
+    const gameOver = document.getElementById('gameOver');
+    const finalScore = document.getElementById('finalScore');
+    const restartBtn = document.getElementById('restartBtn');
+    const languageSelect = document.getElementById('languageSelect');
+
+    // Speech Synthesis for playing sounds
+    function speak(text, rate = 0.8, pitch = 1.0) {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel(); // Cancel any previous speech
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = rate;
+        utterance.pitch = pitch;
+        utterance.lang = currentLanguage === 'hi' ? 'hi-IN' : currentLanguage === 'or' ? 'or-IN' : 'en-US';
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Play phonic sound
+    function playPhonicSound() {
+      if (isPlaying) return;
+      
+      isPlaying = true;
+      playSoundBtn.classList.add('active');
+      
+      const current = phonicsData[currentIndex];
+      const phrase = `${current.phonic} for ${current.word}`;
+      speak(phrase);
+      
+      setTimeout(() => {
+        speak(current.phonic, 0.6, 0.8); // Slower for emphasis
+      }, 1500);
+      
+      setTimeout(() => {
+        isPlaying = false;
+        playSoundBtn.classList.remove('active');
+      }, 3000);
+    }
+
+    // Confirmation button click handler
+    confirmBtn.addEventListener('click', () => {
+      score++; // Give credit for trying
+      feedback.textContent = translations[currentLanguage].correct;
+      feedback.className = 'feedback success show';
+      speak(translations[currentLanguage].correct);
+      
+      confirmBtn.style.display = 'none'; // Hide confirm button
+      nextBtn.classList.add('show'); // Show next button
+    });
+
+    // Update progress bar
+    function updateProgress() {
+      const progress = ((currentIndex + 1) / phonicsData.length) * 100;
+      progressFill.style.width = progress + '%';
+      progressFill.textContent = `${Math.round(progress)}%`;
+    }
+
+    // Go to the next phonic
+    nextBtn.addEventListener('click', () => {
+      currentIndex++;
+      
+      if (currentIndex >= phonicsData.length) {
+        gameArea.style.display = 'none';
+        gameOver.classList.add('show');
+        finalScore.textContent = `${score}/${phonicsData.length}`;
+        speak(translations[currentLanguage].congratulations);
+      } else {
+        loadCurrentPhonic();
+      }
+    });
+
+    // Load the current phonic data onto the screen
+    function loadCurrentPhonic() {
+      const current = phonicsData[currentIndex];
+      letterDisplay.textContent = current.phonic;
+      wordExample.textContent = `for ${current.word}`;
+      
+      // Reset UI for the new round
+      feedback.classList.remove('show');
+      nextBtn.classList.remove('show');
+      confirmBtn.style.display = 'inline-block';
+
+      updateProgress();
+      playPhonicSound();
+    }
+
+    // Restart the game
+    restartBtn.addEventListener('click', () => {
+      currentIndex = 0;
+      score = 0;
+      gameOver.classList.remove('show');
+      gameArea.style.display = 'flex';
+      loadCurrentPhonic();
+    });
+
+    // Set the language for the UI
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        document.documentElement.lang = lang; // Set lang attribute on <html>
+        document.body.setAttribute('lang', lang);
+
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            if(translations[lang] && translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+        document.title = translations[lang].gameTitle + ' - Listen & Repeat Game';
+        localStorage.setItem('preferredLanguage', lang);
+    }
+
+    // Event Listeners
+    playSoundBtn.addEventListener('click', playPhonicSound);
+    repeatBtn.addEventListener('click', playPhonicSound);
+    languageSelect.addEventListener('change', (e) => {
+      setLanguage(e.target.value);
+      loadCurrentPhonic(); // Reload to apply new language to spoken words
+    });
+
+    // Initialize the game
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+      languageSelect.value = savedLang;
+      setLanguage(savedLang);
+      loadCurrentPhonic();
+    });
+  </script>
+</body>
+</html>

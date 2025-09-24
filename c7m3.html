@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics Quiz Game - Class 8</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fffaf0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 0;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            color: #FF9800;
+        }
+        #question {
+            font-size: 18px;
+            margin-bottom: 20px;
+            min-height: 50px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+        }
+        button {
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        button:hover:not(:disabled) {
+            background-color: #F57C00;
+        }
+        button:disabled {
+            cursor: not-allowed;
+        }
+        #score {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+        #fact {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+            background-color: #f9f9f9;
+            border-left: 4px solid #FFC107;
+            padding: 10px;
+            text-align: left;
+            min-height: 40px;
+            display: none; /* Initially hidden */
+        }
+        #next {
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Economics Quiz Game</h1>
+        <div id="question"></div>
+        <div class="options" id="options"></div>
+        <div id="fact"></div>
+        <button id="next" onclick="nextQuestion()">Next Question</button>
+        <div id="score">Score: 0</div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What is the term for the total value of goods and services produced in a country in a year?",
+                options: ["GDP", "Inflation", "Budget", "Tax"],
+                answer: "GDP",
+                fact: "GDP stands for Gross Domestic Product. India has one of the fastest-growing major economies in the world."
+            },
+            {
+                question: "Who issues currency notes in India?",
+                options: ["Reserve Bank of India (RBI)", "State Bank of India (SBI)", "Ministry of Finance", "NITI Aayog"],
+                answer: "Reserve Bank of India (RBI)",
+                fact: "The RBI was established on 1 April 1935. The one-rupee note is the only note issued by the Ministry of Finance."
+            },
+            {
+                question: "Which sector of the economy is also known as the agricultural sector?",
+                options: ["Primary Sector", "Secondary Sector", "Tertiary Sector", "Public Sector"],
+                answer: "Primary Sector",
+                fact: "The primary sector employs the largest number of people in India, even though its contribution to GDP is less than other sectors."
+            },
+            {
+                question: "What does GST, implemented in 2017 in India, stand for?",
+                options: ["Goods and Services Tax", "General Sales Tax", "Government Service Tax", "Goods Supply Tax"],
+                answer: "Goods and Services Tax",
+                fact: "GST is an indirect tax that replaced many other indirect taxes like VAT, service tax, and excise duty."
+            },
+            {
+                question: "Which of these is NOT a nationalised bank in India?",
+                options: ["HDFC Bank", "State Bank of India", "Punjab National Bank", "Bank of Baroda"],
+                answer: "HDFC Bank",
+                fact: "HDFC is a private sector bank. The first major bank nationalisation in India happened in 1969."
+            },
+            {
+                question: "The 'White Revolution' in India is associated with an increase in the production of:",
+                options: ["Milk", "Rice", "Cotton", "Eggs"],
+                answer: "Milk",
+                fact: "Dr. Verghese Kurien is known as the 'Father of the White Revolution' in India. It made India the world's largest milk producer."
+            },
+            {
+                question: "The MGNREGA scheme in India guarantees a minimum of how many days of employment?",
+                options: ["100 days", "150 days", "200 days", "50 days"],
+                answer: "100 days",
+                fact: "The Mahatma Gandhi National Rural Employment Guarantee Act (MGNREGA) was enacted in 2005 to enhance livelihood security in rural areas."
+            },
+            {
+                question: "The headquarters of the Reserve Bank of India (RBI) is located in:",
+                options: ["Mumbai", "New Delhi", "Kolkata", "Chennai"],
+                answer: "Mumbai",
+                fact: "Mumbai is often called the financial capital of India as it hosts the headquarters of RBI, SEBI, and major stock exchanges."
+            },
+            {
+                question: "Which economic system does India follow?",
+                options: ["Mixed Economy", "Capitalist Economy", "Socialist Economy", "Communist Economy"],
+                answer: "Mixed Economy",
+                fact: "A mixed economy combines elements of both capitalist (private ownership) and socialist (public ownership) systems."
+            },
+            {
+                question: "The economic survey in India is published by the:",
+                options: ["Ministry of Finance", "NITI Aayog", "Reserve Bank of India", "Prime Minister's Office"],
+                answer: "Ministry of Finance",
+                fact: "The Economic Survey is presented in the Parliament a day before the Union Budget. It reviews the country's economic development over the past year."
+            },
+            {
+                question: "Which sector is known as the 'service sector'?",
+                options: ["Tertiary Sector", "Primary Sector", "Secondary Sector", "Organised Sector"],
+                answer: "Tertiary Sector",
+                fact: "The Tertiary Sector is the largest contributor to India's GDP, including services like IT, banking, and transportation."
+            },
+            {
+                question: "A situation of rising prices in an economy is known as:",
+                options: ["Inflation", "Deflation", "Recession", "Stagflation"],
+                answer: "Inflation",
+                fact: "Moderate inflation is generally considered healthy for an economy, but high inflation can reduce the purchasing power of money."
+            },
+            {
+                question: "Who is known as the 'Father of Economics'?",
+                options: ["Adam Smith", "Amartya Sen", "Manmohan Singh", "Karl Marx"],
+                answer: "Adam Smith",
+                fact: "Adam Smith's famous book, 'The Wealth of Nations' (1776), laid the foundation for modern economic theory."
+            },
+            {
+                question: "What is the main source of revenue for the Indian government?",
+                options: ["Taxes", "Loans", "Foreign aid", "Profits from PSUs"],
+                answer: "Taxes",
+                fact: "Taxes are broadly divided into two categories: Direct Taxes (like Income Tax) and Indirect Taxes (like GST)."
+            },
+            {
+                question: "NITI Aayog replaced which of the following institutions?",
+                options: ["Planning Commission", "Finance Commission", "Election Commission", "Knowledge Commission"],
+                answer: "Planning Commission",
+                fact: "NITI Aayog was formed on January 1, 2015. NITI stands for National Institution for Transforming India."
+            },
+            {
+                question: "The 'Green Revolution' in India was primarily associated with the production of:",
+                options: ["Wheat and Rice", "Pulses", "Sugarcane", "Oilseeds"],
+                answer: "Wheat and Rice",
+                fact: "M. S. Swaminathan is considered the 'Father of the Green Revolution' in India, which began in the 1960s."
+            },
+            {
+                question: "Which of the following is an example of a public sector company?",
+                options: ["Indian Oil Corporation Ltd. (IOCL)", "Reliance Industries", "Infosys", "Tata Motors"],
+                answer: "Indian Oil Corporation Ltd. (IOCL)",
+                fact: "Public Sector Undertakings (PSUs) are companies where the majority of the ownership is held by the government."
+            },
+            {
+                question: "The base year for calculating India's GDP is currently:",
+                options: ["2011-12", "2004-05", "2014-15", "2000-01"],
+                answer: "2011-12",
+                fact: "The base year is periodically updated to ensure that the GDP figures reflect the real changes in the economy's structure."
+            },
+            {
+                question: "What does FDI stand for in the context of the Indian economy?",
+                options: ["Foreign Direct Investment", "Fiscal Deposit Insurance", "Foreign Domestic Investment", "Financial Debt Instrument"],
+                answer: "Foreign Direct Investment",
+                fact: "FDI is an investment made by a company or individual from one country into business interests located in another country."
+            },
+            {
+                question: "The tax levied on goods imported into India is known as:",
+                options: ["Customs Duty", "Excise Duty", "Income Tax", "GST"],
+                answer: "Customs Duty",
+                fact: "Customs Duty is used by the government to raise revenue and to protect domestic industries from foreign competition."
+            },
+            {
+                question: "Which organisation in India is responsible for protecting investors in the stock market?",
+                options: ["SEBI", "RBI", "IRDAI", "PFRDA"],
+                answer: "SEBI",
+                fact: "SEBI stands for Securities and Exchange Board of India. It was established in 1992."
+            },
+            {
+                question: "Poverty line in India is primarily determined based on:",
+                options: ["Consumption Expenditure", "Income Level", "Housing Condition", "Literacy Rate"],
+                answer: "Consumption Expenditure",
+                fact: "The poverty line is the minimum level of income or consumption deemed necessary to achieve an adequate standard of living."
+            },
+            {
+                question: "The financial year in India runs from:",
+                options: ["April 1 to March 31", "January 1 to December 31", "July 1 to June 30", "October 1 to September 30"],
+                answer: "April 1 to March 31",
+                fact: "This financial year structure was adopted from the British colonial period and is still followed for budgeting and accounting."
+            },
+            {
+                question: "The 'Make in India' initiative was launched to promote:",
+                options: ["Manufacturing in India", "Exports from India", "Tourism in India", "Agriculture in India"],
+                answer: "Manufacturing in India",
+                fact: "Launched in 2014, the 'Make in India' campaign aims to make India a global manufacturing hub."
+            },
+            {
+                question: "What is the full form of MSME in the industrial sector?",
+                options: ["Micro, Small and Medium Enterprises", "Major, Small and Medium Enterprises", "Micro, Social and Modern Enterprises", "Ministry of Small and Medium Enterprises"],
+                answer: "Micro, Small and Medium Enterprises",
+                fact: "The MSME sector is a significant contributor to India's GDP and provides large-scale employment after agriculture."
+            },
+            {
+                question: "Which of these is a direct tax?",
+                options: ["Income Tax", "GST", "Customs Duty", "Service Tax"],
+                answer: "Income Tax",
+                fact: "A direct tax is paid directly by the person or organisation on whom it is levied, whereas an indirect tax can be passed on to others."
+            },
+            {
+                question: "The difference between the value of a country's exports and imports is called:",
+                options: ["Balance of Trade", "Balance of Payment", "Budget Deficit", "Fiscal Deficit"],
+                answer: "Balance of Trade",
+                fact: "A positive balance of trade (exports > imports) is called a trade surplus, while a negative balance is a trade deficit."
+            },
+            {
+                question: "SEZ in India stands for:",
+                options: ["Special Economic Zone", "Small Enterprise Zone", "Special Education Zone", "Service and Export Zone"],
+                answer: "Special Economic Zone",
+                fact: "SEZs are areas in a country that are subject to different economic regulations than other regions to attract foreign investment and boost exports."
+            },
+            {
+                question: "Who presents the Union Budget in the Parliament of India?",
+                options: ["Finance Minister", "Prime Minister", "President", "RBI Governor"],
+                answer: "Finance Minister",
+                fact: "The Union Budget is an annual financial statement detailing the government's revenue and expenditure for the upcoming fiscal year."
+            },
+            {
+                question: "The activity of converting raw materials into finished goods belongs to which sector?",
+                options: ["Secondary Sector", "Primary Sector", "Tertiary Sector", "Quaternary Sector"],
+                answer: "Secondary Sector",
+                fact: "The Secondary sector is also known as the industrial or manufacturing sector. It includes industries like construction and textile manufacturing."
+            },
+            {
+                question: "The stock market index of the Bombay Stock Exchange (BSE) is called:",
+                options: ["Sensex", "Nifty", "Dow Jones", "Nikkei"],
+                answer: "Sensex",
+                fact: "The BSE, established in 1875, is Asia's oldest stock exchange. Sensex is an index of its 30 largest and most actively-traded stocks."
+            },
+            {
+                question: "What is the term for a situation where a person is willing to work but is unable to find a job?",
+                options: ["Unemployment", "Underemployment", "Disguised Unemployment", "Frictional Unemployment"],
+                answer: "Unemployment",
+                fact: "The unemployment rate is a key indicator of the health of an economy."
+            },
+            {
+                question: "The 'Blue Revolution' is related to the increase in the production of:",
+                options: ["Fish", "Water conservation", "Indigo", "Drinking water"],
+                answer: "Fish",
+                fact: "The Blue Revolution aimed to increase the production of fish and marine products through modern aquaculture techniques."
+            },
+            {
+                question: "Money that is used to purchase assets like land, buildings, and machinery is called:",
+                options: ["Capital", "Loan", "Debt", "Credit"],
+                answer: "Capital",
+                fact: "Capital is one of the four factors of production, along with land, labor, and entrepreneurship."
+            },
+            {
+                question: "Which of the following is a Kharif crop in India?",
+                options: ["Paddy (Rice)", "Wheat", "Mustard", "Gram"],
+                answer: "Paddy (Rice)",
+                fact: "Kharif crops are grown with the onset of the monsoon season in June and are harvested in September-October."
+            },
+            {
+                question: "The process of selling shares of Public Sector Undertakings (PSUs) to the public is called:",
+                options: ["Disinvestment", "Investment", "Privatisation", "Nationalisation"],
+                answer: "Disinvestment",
+                fact: "The government uses disinvestment to raise funds and improve the efficiency of PSUs by bringing in private ownership."
+            },
+            {
+                question: "The law of demand states that, other things being equal, if the price of a good rises, the quantity demanded will:",
+                options: ["Fall", "Rise", "Stay the same", "Become zero"],
+                answer: "Fall",
+                fact: "This inverse relationship between price and quantity demanded is a fundamental principle in microeconomics."
+            },
+            {
+                question: "Which committee recommended the establishment of NABARD in India?",
+                options: ["Sivaraman Committee", "Narasimham Committee", "Malhotra Committee", "Urjit Patel Committee"],
+                answer: "Sivaraman Committee",
+                fact: "NABARD (National Bank for Agriculture and Rural Development) was established in 1982 to provide credit for agriculture and rural development."
+            },
+            {
+                question: "In India, the Consumer Protection Act was first enacted in:",
+                options: ["1986", "1991", "2002", "1947"],
+                answer: "1986",
+                fact: "This act, also known as COPRA, was a landmark law that gave consumers rights against unfair trade practices. It was updated in 2019."
+            },
+            {
+                question: "The minimum price at which the government purchases crops from farmers is known as:",
+                options: ["Minimum Support Price (MSP)", "Market Price", "Issue Price", "Fair Price"],
+                answer: "Minimum Support Price (MSP)",
+                fact: "MSP is a form of market intervention by the Government of India to insure farmers against any sharp fall in farm prices."
+            },
+            {
+                question: "What does 'L' stand for in the LPG reforms of 1991 in India?",
+                options: ["Liberalisation", "Localisation", "Land", "Labour"],
+                answer: "Liberalisation",
+                fact: "The LPG reforms stand for Liberalisation, Privatisation, and Globalisation, which opened up the Indian economy to the world."
+            },
+            {
+                question: "The Human Development Index (HDI) is published by the:",
+                options: ["United Nations Development Programme (UNDP)", "World Bank", "International Monetary Fund (IMF)", "World Economic Forum"],
+                answer: "United Nations Development Programme (UNDP)",
+                fact: "HDI is a composite index that measures average achievement in three key dimensions: a long and healthy life, knowledge, and a decent standard of living."
+            },
+            {
+                question: "The currency symbol for the Indian Rupee (₹) was officially adopted in which year?",
+                options: ["2010", "2008", "2012", "2015"],
+                answer: "2010",
+                fact: "The symbol was designed by Udaya Kumar Dharmalingam. It combines the Devanagari letter 'र' (Ra) and the Latin capital letter 'R'."
+            },
+            {
+                question: "A market structure with only one seller is called a:",
+                options: ["Monopoly", "Oligopoly", "Monopsony", "Perfect Competition"],
+                answer: "Monopoly",
+                fact: "Indian Railways is an example of a monopoly in India, as it is the sole provider of railway services."
+            },
+            {
+                question: "The 'Golden Revolution' in India is related to the production of:",
+                options: ["Horticulture and Honey", "Gold", "Oilseeds", "Jute"],
+                answer: "Horticulture and Honey",
+                fact: "This revolution, from 1991 to 2003, made India a world leader in the production of fruits like mangoes, bananas, and coconuts."
+            },
+            {
+                question: "Which organisation collects data on poverty in India?",
+                options: ["National Sample Survey Office (NSSO)", "Reserve Bank of India (RBI)", "Census of India", "NITI Aayog"],
+                answer: "National Sample Survey Office (NSSO)",
+                fact: "The NSSO, now part of the National Statistical Office (NSO), conducts large-scale sample surveys throughout India to collect socioeconomic data."
+            },
+            {
+                question: "The Jan Dhan Yojana scheme is related to:",
+                options: ["Financial Inclusion", "Rural Health", "Girls' Education", "LPG Subsidy"],
+                answer: "Financial Inclusion",
+                fact: "Launched in 2014, the Pradhan Mantri Jan Dhan Yojana (PMJDY) aims to ensure access to financial services like bank accounts for all households."
+            },
+            {
+                question: "The integration of a country's economy with the world economy is known as:",
+                options: ["Globalisation", "Privatisation", "Liberalisation", "Nationalisation"],
+                answer: "Globalisation",
+                fact: "Globalisation has led to an increased flow of goods, services, capital, and technology across international borders."
+            },
+            {
+                question: "Which of these is a measure to control inflation by the RBI?",
+                options: ["Increasing the Repo Rate", "Decreasing the Repo Rate", "Printing more money", "Reducing taxes"],
+                answer: "Increasing the Repo Rate",
+                fact: "The repo rate is the rate at which the RBI lends money to commercial banks. Increasing it makes borrowing more expensive, reducing money supply."
+            },
+            {
+                question: "In which Five-Year Plan did India opt for a mixed economy?",
+                options: ["Second Five-Year Plan", "First Five-Year Plan", "Third Five-Year Plan", "Fifth Five-Year Plan"],
+                answer: "Second Five-Year Plan",
+                fact: "The Second Plan (1956-61), based on the Mahalanobis model, focused on rapid industrialisation and the development of the public sector."
+            }
+        ];
+
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById('question');
+        const optionsDiv = document.getElementById('options');
+        const scoreEl = document.getElementById('score');
+        const nextBtn = document.getElementById('next');
+        const factEl = document.getElementById('fact');
+
+        function loadQuestion() {
+            factEl.style.display = 'none';
+            factEl.innerText = '';
+            
+            const q = questions[currentQuestion];
+            questionEl.innerText = q.question;
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt);
+                optionsDiv.appendChild(btn);
+            });
+            nextBtn.style.display = 'none';
+        }
+
+        function checkAnswer(selected) {
+            const q = questions[currentQuestion];
+            
+            if (selected === q.answer) {
+                score++;
+                scoreEl.innerText = `Score: ${score}`;
+            }
+
+            factEl.innerText = `💡 Fact: ${q.fact}`;
+            factEl.style.display = 'block';
+
+            const buttons = optionsDiv.getElementsByTagName('button');
+            for (let btn of buttons) {
+                btn.disabled = true;
+                if (btn.innerText === q.answer) {
+                    btn.style.backgroundColor = '#4CAF50'; // Correct answer in green
+                } else if (btn.innerText === selected) {
+                    btn.style.backgroundColor = '#f44336'; // Incorrect answer in red
+                }
+            }
+            nextBtn.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.innerText = `Quiz Completed! Your final score is ${score} out of ${questions.length}.`;
+                optionsDiv.innerHTML = '';
+                nextBtn.style.display = 'none';
+                factEl.style.display = 'none';
+            }
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>

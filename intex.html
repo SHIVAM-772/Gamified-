@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Classes & Subjects</title>
+<style>
+/* 🌈 Animated Background */
+@keyframes bgAnimate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+body {
+  margin:0;
+  font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+  background: linear-gradient(-45deg,#7e6bfb,#9c27f5,#1e34fa,#f84fb5);
+  background-size: 400% 400%;
+  animation: bgAnimate 15s ease infinite;
+  color:#0f172a;
+  padding:24px;
+  overflow-x:hidden;
+}
+.container{max-width:1100px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+h1{margin:0;font-size:1.9rem;color:#fff;text-shadow:1px 1px 4px rgba(0,0,0,0.3)}
+p.lead{margin:4px 0 0;color:#e6e6e6}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:18px}
+.card{
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(6px);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 6px 18px rgba(2,6,23,0.25);
+  transition:0.4s;
+}
+.card:hover{transform:translateY(-6px) scale(1.03);box-shadow:0 12px 28px rgba(0,0,0,0.35);}
+.card h2{margin:0 0 8px 0;font-size:1.2rem;color:#fff}
+
+.subjects{list-style:none;padding:0;margin:0}
+.subjects li{
+  padding:8px;
+  border-radius:8px;
+  margin-bottom:8px;
+  background:linear-gradient(135deg,#ffffff,#f2f2f2);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  box-shadow:0 3px 6px rgba(0,0,0,0.1);
+  transition:all 0.3s;
+}
+.subjects li:hover{
+  background:linear-gradient(135deg,#d6f0ff,#f6e6ff);
+  box-shadow:0 6px 12px rgba(0,0,0,0.2);
+}
+.subject-link{
+  text-decoration:none;
+  color:inherit;
+  display:flex;
+  justify-content:space-between;
+  width:100%;
+}
+.subject-link:hover .subject-name{
+  color:#1e34fa;
+}
+.subject-name{font-weight:600}
+.code{font-size:0.85rem;color:#555}
+
+/* Units list */
+.chapters-list {
+  list-style:none;
+  margin:6px 0 0 15px;
+  padding:0;
+  display:none;
+  animation:fadeIn 0.4s ease;
+}
+.chapters-list li {
+  padding:6px 8px;
+  margin:4px 0;
+  border-radius:6px;
+  background:#f9f9f9;
+  box-shadow:0 2px 4px rgba(0,0,0,0.1);
+}
+.chapters-list li a {
+  text-decoration:none;
+  color:#333;
+  font-size:0.9rem;
+}
+.chapters-list li:hover{background:#e0f0ff;}
+@keyframes fadeIn {from{opacity:0} to{opacity:1}}
+
+/* Controls */
+.controls{display:flex;gap:8px;align-items:center;margin-top:14px}
+select,input[type=search]{
+  padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.15);color:#fff
+}
+button{
+  background:#1e34fa;color:white;border:none;padding:8px 10px;border-radius:8px;
+  cursor:pointer;transition:0.3s
+}
+button:hover{background:#1624b8}
+footer{margin-top:20px;color:#fff;font-size:0.9rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div>
+    <h1>Animated Classes & Subjects</h1>
+    <p class="lead">Click a subject name to open its page or empty area to expand units.</p>
+  </div>
+  <div class="controls">
+    <select id="classSelect">
+      <option value="all">All Classes</option>
+      <option value="class7">Class 7</option>
+      <option value="class8">Class 8</option>
+      <option value="class9">Class 9</option>
+    </select>
+    <input id="search" type="search" placeholder="Search subjects or units">
+    <button id="clear">Clear</button>
+  </div>
+</header>
+
+<main>
+<section class="grid" id="classesGrid">
+
+<!-- Class 8 -->
+<article class="card" data-class="class7">
+  <h2>class 8</h2>
+  <ul class="subjects">
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="mathematics.html" target="_blank">
+        <span class="subject-name">Mathematics</span><span class="code">(Math)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="science.html" target="_blank">
+        <span class="subject-name">Science</span><span class="code">(Sci)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="english.html" target="_blank">
+        <span class="subject-name">English</span><span class="code">(Eng)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="history.html" target="_blank">
+        <span class="subject-name">History</span><span class="code">(His)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="computer.html" target="_blank">
+        <span class="subject-name">Computer</span><span class="code">(ICT)</span>
+      </a>
+    </li>
+  </ul>
+</article>
+<!-- Class 9 -->
+<article class="card" data-class="class7">
+  <h2>Class 9</h2>
+  <ul class="subjects">
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="mathematics9.html" target="_blank">
+        <span class="subject-name">Mathematics</span><span class="code">(Math)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="science.html" target="_blank">
+        <span class="subject-name">Science</span><span class="code">(Sci)</span>
+      </a>          
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="english9.html" target="_blank">
+        <span class="subject-name">English</span><span class="code">(Eng)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="history.html" target="_blank">
+        <span class="subject-name">History</span><span class="code">(His)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="computer.html" target="_blank">
+        <span class="subject-name">Computer</span><span class="code">(ICT)</span>
+      </a>
+    </li>
+  </ul>
+</article>
+<!-- Class 7 -->
+<article class="card" data-class="class7">
+  <h2>Class 10</h2>
+  <ul class="subjects">
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="math.html" target="_blank">
+        <span class="subject-name">Mathematics</span><span class="code">(Math)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="science.html" target="_blank">
+        <span class="subject-name">Science</span><span class="code">(Sci)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="english.html" target="_blank">
+        <span class="subject-name">English</span><span class="code">(Eng)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="history.html" target="_blank">
+        <span class="subject-name">History</span><span class="code">(His)</span>
+      </a>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <a class="subject-link" href="computer.html" target="_blank">
+        <span class="subject-name">Computer</span><span class="code">(ICT)</span>
+      </a>
+    </li>
+  </ul>
+</article>
+
+<!-- Repeat the same pattern for Class 8 and Class 9 -->
+<!-- You can copy the above <li> blocks and change href targets like math8.html, etc. -->
+
+</section>
+</main>
+
+<footer>
+  <p>© 2025 Animated School Portal — Subjects link to their pages and expand units.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  const select = document.getElementById('classSelect');
+  const search = document.getElementById('search');
+  const clearBtn = document.getElementById('clear');
+  const cards = document.querySelectorAll('[data-class]');
+
+  // Filter by class
+  function highlightClass(value){
+    cards.forEach(c=>{
+      c.style.display = (value==='all' || c.dataset.class===value) ? '' : 'none';
+    });
+  }
+  select.addEventListener('change', ()=> highlightClass(select.value));
+
+  // Toggle units when clicking LI but NOT when clicking the link
+  document.querySelectorAll('.subjects li').forEach(li=>{
+    li.addEventListener('click', (e)=>{
+      if(e.target.closest('a.subject-link')) return; // skip if link clicked
+      const existing = li.querySelector('.chapters-list');
+      if(existing){ existing.remove(); return; }
+      document.querySelectorAll('.chapters-list').forEach(el=>el.remove());
+      const units = li.dataset.chapters.split('|');
+      const ul = document.createElement('ul');
+      ul.className = 'chapters-list';
+      units.forEach((u,i)=>{
+        const cli = document.createElement('li');
+        cli.innerHTML = `<a href="unit${i+1}.html" target="_blank">${u}</a>`;
+        ul.appendChild(cli);
+      });
+      li.appendChild(ul);
+    });
+  });
+
+  // Search filter
+  search.addEventListener('input', ()=>{
+    const q = search.value.trim().toLowerCase();
+    cards.forEach(card=>{
+      const items = card.querySelectorAll('.subjects li');
+      let anyVisible=false;
+      items.forEach(li=>{
+        const txt = li.textContent.toLowerCase();
+        if(q==='' || txt.includes(q)){
+          li.style.display='';
+          anyVisible=true;
+        } else li.style.display='none';
+      });
+      card.style.display=anyVisible?'':'none';
+    });
+  });
+
+  // Clear filters
+  clearBtn.addEventListener('click', ()=>{
+    select.value='all'; search.value='';
+    highlightClass('all');
+    cards.forEach(c=>{
+      c.style.display='';
+      c.querySelectorAll('.subjects li').forEach(li=>li.style.display='');
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 Computer - Introduction to Programming</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:20px;
+    background: linear-gradient(120deg,#89f7fe,#66a6ff);
+    color:#333;
+}
+h1 {
+    text-align:center;
+    color:#fff;
+    text-shadow: 1px 1px 4px #000;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+.unit-list {
+    list-style:none;
+    padding:0;
+}
+.unit-list li {
+    background: rgba(255,255,255,0.8);
+    margin:10px 0;
+    padding:12px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+}
+.unit-list li:hover {
+    background: rgba(255,255,255,1);
+    transform: scale(1.02);
+}
+.details {
+    margin-top:10px;
+    padding:10px 15px;
+    border-left:4px solid #ff7f50;
+    background: rgba(255,255,255,0.9);
+    display:none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Class 9 Computer - Introduction to Programming</h1>
+
+    <ul class="unit-list">
+        <li data-detail="Programming is the process of writing instructions for a computer to perform specific tasks. It involves coding, testing, and debugging.">
+            Introduction to Programming
+            <div class="details"></div>
+        </li>
+        <li data-detail="Programming Concepts include understanding algorithms, flowcharts, variables, data types, operators, control structures (if-else, loops), and functions.">
+            Programming Concepts
+            <div class="details"></div>
+        </li>
+        <li data-detail="An Algorithm is a step-by-step procedure to solve a problem. Flowcharts are visual representations of algorithms.">
+            Algorithms and Flowcharts
+            <div class="details"></div>
+        </li>
+        <li data-detail="Variables store data in memory. Data types determine the kind of values stored, e.g., integer, float, string, boolean.">
+            Variables and Data Types
+            <div class="details"></div>
+        </li>
+        <li data-detail="Control Structures guide the flow of a program. Conditional statements and loops are key control structures.">
+            Control Structures
+            <div class="details"></div>
+        </li>
+    </ul>
+</div>
+
+<script>
+document.querySelectorAll('.unit-list li').forEach(li=>{
+    li.addEventListener('click', ()=>{
+        const detailDiv = li.querySelector('.details');
+        if(detailDiv.style.display==='block'){
+            detailDiv.style.display='none';
+        } else {
+            // Close others
+            document.querySelectorAll('.details').forEach(d=>d.style.display='none');
+            detailDiv.textContent = li.dataset.detail;
+            detailDiv.style.display='block';
+        }
+    });
+});
+</script>
+</body>
+</html>

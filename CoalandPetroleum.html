@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coal & Petroleum Game</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(-45deg,#2c3e50,#3498db,#1abc9c,#e67e22);
+    background-size: 400% 400%;
+    animation: bgAnimate 15s ease infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+  }
+
+  @keyframes bgAnimate {
+    0% { background-position:0% 50%; }
+    50% { background-position:100% 50%; }
+    100% { background-position:0% 50%; }
+  }
+
+  h1 { margin: 20px 0 10px; text-align: center; }
+  #scoreBoard, #levelBoard { font-size: 1.2rem; margin: 5px; }
+
+  #gameArea {
+    width: 80%;
+    height: 400px;
+    border: 2px solid #fff;
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.2);
+  }
+
+  .resource {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s;
+  }
+
+  .resource:hover {
+    transform: scale(1.2);
+  }
+
+  #videoSection {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  video {
+    max-width: 80%;
+    border: 2px solid #fff;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Coal & Petroleum Interactive Game</h1>
+<div id="scoreBoard">Score: 0</div>
+<div id="levelBoard">Level: 1</div>
+<div id="gameArea"></div>
+
+<div id="videoSection">
+  <h2>Learn about Coal & Petroleum</h2>
+  <video controls>
+    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+    Your browser does not support HTML video.
+  </video>
+</div>
+
+<script>
+const gameArea = document.getElementById('gameArea');
+let score = 0;
+let level = 1;
+const scoreBoard = document.getElementById('scoreBoard');
+const levelBoard = document.getElementById('levelBoard');
+
+const resources = [
+  {name: 'Coal', color: '#2c3e50'},
+  {name: 'Petroleum', color: '#f39c12'}
+];
+
+function createResource() {
+  const resource = document.createElement('div');
+  resource.classList.add('resource');
+
+  const type = resources[Math.floor(Math.random()*resources.length)];
+  resource.textContent = type.name;
+  resource.style.backgroundColor = type.color;
+
+  resource.style.top = Math.random() * (gameArea.clientHeight-50) + 'px';
+  resource.style.left = Math.random() * (gameArea.clientWidth-50) + 'px';
+
+  let dx = (Math.random()*2 + level);
+  let dy = (Math.random()*2 + level);
+  if(Math.random()>0.5) dx *= -1;
+  if(Math.random()>0.5) dy *= -1;
+
+  resource.addEventListener('click', () => {
+    score++;
+    scoreBoard.textContent = `Score: ${score}`;
+    resource.remove();
+    if(score % 10 === 0){
+      level++;
+      levelBoard.textContent = `Level: ${level}`;
+    }
+  });
+
+  gameArea.appendChild(resource);
+  moveResource(resource, dx, dy);
+}
+
+function moveResource(resource, dx, dy){
+  let top = parseFloat(resource.style.top);
+  let left = parseFloat(resource.style.left);
+
+  function animate(){
+    top += dy;
+    left += dx;
+
+    if(top < 0 || top > gameArea.clientHeight-50) dy *= -1;
+    if(left < 0 || left > gameArea.clientWidth-50) dx *= -1;
+
+    resource.style.top = top + 'px';
+    resource.style.left = left + 'px';
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+}
+
+setInterval(createResource, 1500);
+</script>
+
+</body>
+</html>

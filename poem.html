@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 English Poems</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg, #f6d365, #fda085);
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    color: #222;
+  }
+  .poems {
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    gap: 15px;
+  }
+  .poem-card {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .poem-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .poem-content {
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #aaa;
+    color: #111;
+  }
+  .poem-content p {
+    margin: 6px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Class 9 English Poems</h1>
+<div class="poems">
+  <div class="poem-card" onclick="toggleContent(this)">
+    <h2>The Noble Nature</h2>
+    <div class="poem-content">
+      <p>[Insert the full poem content here]</p>
+      <p>You can also add images, animations, or quiz questions here.</p>
+    </div>
+  </div>
+
+  <div class="poem-card" onclick="toggleContent(this)">
+    <h2>A Slumber Did My Spirit Seal</h2>
+    <div class="poem-content">
+      <p>[Insert the full poem content here]</p>
+      <p>Interactive elements like videos or questions can be added here too.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleContent(card){
+  const content = card.querySelector('.poem-content');
+  content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+
+</body>
+</html>

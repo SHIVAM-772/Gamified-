@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crop Production & Management Game</title>
+<style>
+  /* 🌈 Animated Background */
+  @keyframes bgAnimate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(-45deg,#7e6bfb,#9c27f5,#1e34fa,#f84fb5);
+    background-size: 400% 400%;
+    animation: bgAnimate 15s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .game-container {
+    text-align: center;
+    border: 2px solid #000;
+    padding: 20px;
+    background-color: rgba(255,255,255,0.95);
+    border-radius: 10px;
+    max-width: 600px;
+  }
+
+  h1 { margin-bottom: 20px; color: #222; }
+  .field {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+  }
+  .plot {
+    width: 100px;
+    height: 100px;
+    border: 2px solid #000;
+    background-color: #c2b280;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+  }
+  .controls button {
+    margin: 5px;
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .controls button:hover { background-color: #45a049; }
+  .message {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #d9534f;
+  }
+
+  /* Subject / Unit Animation Section */
+  .subjects { list-style:none; padding:0; margin-top:20px; }
+  .subjects li {
+    padding:8px; border-radius:8px; margin-bottom:8px;
+    background:linear-gradient(135deg,#ffffff,#f2f2f2);
+    display:flex; justify-content:space-between; align-items:center;
+    cursor:pointer; box-shadow:0 3px 6px rgba(0,0,0,0.1);
+    transition:all 0.3s;
+  }
+  .subjects li:hover {
+    background:linear-gradient(135deg,#d6f0ff,#f6e6ff);
+    box-shadow:0 6px 12px rgba(0,0,0,0.2);
+  }
+  .subject-name { font-weight:600; }
+  .code { font-size:0.85rem;color:#555; }
+  .chapters-list { list-style:none; margin:6px 0 0 15px; padding:0; display:none; animation:fadeIn 0.4s ease; }
+  .chapters-list li {
+    padding:6px 8px; margin:4px 0; border-radius:6px;
+    background:#f9f9f9; box-shadow:0 2px 4px rgba(0,0,0,0.1);
+  }
+  .chapters-list li a { text-decoration:none; color:#333; font-size:0.9rem; }
+  .chapters-list li:hover{ background:#e0f0ff; }
+  @keyframes fadeIn {from{opacity:0} to{opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <h1>Crop Production & Management</h1>
+
+  <!-- Crop Game -->
+  <div id="field" class="field">
+    <div class="plot" id="plot1"></div>
+    <div class="plot" id="plot2"></div>
+    <div class="plot" id="plot3"></div>
+  </div>
+  <div class="controls">
+    <button onclick="plantCrop(1)">Plant Crop 1</button>
+    <button onclick="plantCrop(2)">Plant Crop 2</button>
+    <button onclick="plantCrop(3)">Plant Crop 3</button>
+    <button onclick="waterCrops()">Water Crops</button>
+    <button onclick="harvestCrops()">Harvest Crops</button>
+  </div>
+  <div id="message" class="message"></div>
+
+  <!-- Subject / Units Example -->
+  <ul class="subjects">
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <span class="subject-name">Mathematics</span><span class="code">(Math)</span>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <span class="subject-name">Science</span><span class="code">(Sci)</span>
+    </li>
+    <li data-chapters="Unit1|Unit2|Unit3|Unit4|Unit5|Unit6">
+      <span class="subject-name">English</span><span class="code">(Eng)</span>
+    </li>
+  </ul>
+</div>
+
+<script>
+// Game Logic
+let crops = {
+    1: { planted: false, watered: false, harvested: false },
+    2: { planted: false, watered: false, harvested: false },
+    3: { planted: false, watered: false, harvested: false }
+};
+
+function plantCrop(plotNumber) {
+    if (crops[plotNumber].planted) {
+        document.getElementById('message').textContent = `Plot ${plotNumber} already has a crop planted.`;
+    } else {
+        crops[plotNumber].planted = true;
+        document.getElementById(`plot${plotNumber}`).style.backgroundColor = '#8b4513';
+        document.getElementById('message').textContent = `Crop planted in plot ${plotNumber}.`;
+    }
+}
+
+function waterCrops() {
+    let watered = false;
+    for (let i = 1; i <= 3; i++) {
+        if (crops[i].planted && !crops[i].watered) {
+            crops[i].watered = true;
+            document.getElementById(`plot${i}`).style.backgroundColor = '#228b22';
+            watered = true;
+        }
+    }
+    document.getElementById('message').textContent = watered ? 'Crops watered.' : 'No crops to water.';
+}
+
+function harvestCrops() {
+    let harvested = false;
+    for (let i = 1; i <= 3; i++) {
+        if (crops[i].planted && crops[i].watered && !crops[i].harvested) {
+            crops[i].harvested = true;
+            document.getElementById(`plot${i}`).style.backgroundColor = '#ffd700';
+            harvested = true;
+        }
+    }
+    document.getElementById('message').textContent = harvested ? 'Crops harvested.' : 'No crops ready to harvest.';
+}
+
+// Subject / Units Toggle
+document.querySelectorAll('.subjects li').forEach(li=>{
+    li.addEventListener('click', ()=>{
+        const existing = li.querySelector('.chapters-list');
+        if(existing){ existing.remove(); return; }
+
+        document.querySelectorAll('.chapters-list').forEach(el=>el.remove());
+        const units = li.dataset.chapters.split('|');
+        const ul = document.createElement('ul');
+        ul.className = 'chapters-list';
+        units.forEach((u,i)=>{
+            const cli = document.createElement('li');
+            cli.innerHTML = `<a href="unit${i+1}.html" target="_blank">${u}</a>`;
+            ul.appendChild(cli);
+        });
+        li.appendChild(ul);
+    });
+});
+</script>
+
+</body>
+</html>

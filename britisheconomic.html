@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>British Economic Policy in India</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg,#fff4e6,#d0f0fd);
+    margin: 0; padding: 20px; color: #333;
+  }
+  h1 { text-align:center; color:#1b262c; margin-bottom: 20px; }
+  .cards { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+  .card {
+    background: #ffffffcc;
+    border-radius: 12px; padding: 16px;
+    width: 250px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .card:hover { transform: scale(1.05); box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+  .card h3 { margin: 0 0 8px 0; color:#ff6f61; }
+  .card p { display:none; margin:0; color:#333; }
+  video { max-width: 100%; margin-top: 20px; border-radius: 10px; }
+  .timeline { margin-top: 30px; border-left: 4px solid #ff6f61; padding-left: 20px; }
+  .timeline-event { margin-bottom: 20px; }
+  .timeline-event h4 { margin:0; color:#1b262c; }
+  .timeline-event p { margin:4px 0 0 0; }
+  .quiz { margin-top: 20px; text-align:center; }
+  .quiz button {
+    padding: 8px 12px; margin: 5px;
+    border-radius: 6px; border: none;
+    background-color: #1b262c; color: #fff; cursor: pointer; transition: 0.2s;
+  }
+  .quiz button:hover { background-color: #3282b8; }
+</style>
+</head>
+<body>
+
+<h1>British Economic Policy and Its Effects in India</h1>
+
+<!-- Economic Policy Cards -->
+<div class="cards">
+  <div class="card" onclick="toggleText(this)">
+    <h3>Land Revenue Systems</h3>
+    <p>Permanent Settlement, Ryotwari, and Mahalwari systems heavily taxed farmers, causing widespread distress.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Deindustrialization</h3>
+    <p>British policies led to decline of traditional handicrafts and local industries, forcing Indians into agriculture.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Drain of Wealth</h3>
+    <p>Revenue and profits were exported to Britain, resulting in India's economic stagnation.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Famines</h3>
+    <p>Economic exploitation and neglect caused recurring famines, leading to massive loss of life.</p>
+  </div>
+</div>
+
+<!-- Timeline -->
+<div class="timeline">
+  <div class="timeline-event">
+    <h4>1765 - British Take Over Revenue Collection</h4>
+    <p>Introduction of Permanent Settlement in Bengal.</p>
+  </div>
+  <div class="timeline-event">
+    <h4>1800-1850 - Expansion of British Economic Policies</h4>
+    <p>Spread of Ryotwari and Mahalwari systems, deindustrialization of local crafts.</p>
+  </div>
+  <div class="timeline-event">
+    <h4>1857 onwards - Widespread Economic Effects</h4>
+    <p>Famines and increased drain of wealth intensified.</p>
+  </div>
+</div>
+
+<!-- Embedded Video -->
+<video controls>
+  <source src="british_economy_video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<!-- Quiz -->
+<div class="quiz">
+  <h3>Quiz: Test Your Knowledge</h3>
+  <p>Which system introduced by the British heavily taxed farmers in Bengal?</p>
+  <button onclick="checkAnswer(this,'correct')">Permanent Settlement</button>
+  <button onclick="checkAnswer(this,'wrong')">Ryotwari</button>
+  <button onclick="checkAnswer(this,'wrong')">Mahalwari</button>
+</div>
+
+<script>
+  function toggleText(card) {
+    const p = card.querySelector('p');
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function checkAnswer(btn, result) {
+    if(result==='correct'){
+      alert('Correct! 🎉');
+    } else {
+      alert('Oops! Try again. ❌');
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class 11 Science & Reasoning Games</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #e0f7fa, #bbdefb);
+      font-family: 'Arial', sans-serif;
+    }
+    .game-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    #timer {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+  <h1 class="text-4xl font-bold text-gray-800 mb-8">Class 11 Science & Reasoning Games</h1>
+
+  <div id="game-selection" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="game-card bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame('chemical-bonding')">
+      <h2 class="text-2xl font-semibold text-blue-600">Chemical Bonding Puzzle</h2>
+      <p class="text-gray-600 mt-2">Match compounds to their bond types!</p>
+    </div>
+    <div class="game-card bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame('cell-biology')">
+      <h2 class="text-2xl font-semibold text-blue-600">Cell Biology Quest</h2>
+      <p class="text-gray-600 mt-2">Explore the cell by solving questions!</p>
+    </div>
+    <div class="game-card bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame('logic-grid')">
+      <h2 class="text-2xl font-semibold text-blue-600">Logic Grid Puzzle</h2>
+      <p class="text-gray-600 mt-2">Solve logic puzzles to match clues!</p>
+    </div>
+    <div class="game-card bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame('pattern-sequence')">
+      <h2 class="text-2xl font-semibold text-blue-600">Pattern Sequence Challenge</h2>
+      <p class="text-gray-600 mt-2">Predict the next term in the sequence!</p>
+    </div>
+  </div>
+
+  <div id="game-area" class="hidden bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+    <h2 id="game-title" class="text-3xl font-bold text-gray-800 mb-4"></h2>
+    <div id="question" class="text-lg text-gray-700 mb-4"></div>
+    <input id="answer-input" type="text" placeholder="Enter your answer" class="w-full p-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button onclick="submitAnswer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Submit Answer</button>
+    <p id="feedback" class="mt-4 text-lg"></p>
+    <div id="timer" class="text-xl text-red-600 mt-4">Time: 60s</div>
+    <button onclick="nextQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-green-700">Next Question</button>
+    <button onclick="endGame()" class="bg-red-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-red-700">End Game</button>
+  </div>
+
+  <script>
+    let currentGame = '';
+    let timerInterval;
+    let timeLeft = 60;
+    let currentQuestion = 0;
+    const questions = {
+      'chemical-bonding': [
+        { question: 'Identify the bond type in NaCl.', answer: 'Ionic' },
+        { question: 'What is the shape of CO₂ molecule?', answer: 'Linear' },
+        { question: 'What is the shape of a methane (CH₄) molecule?', answer: 'Tetrahedral' },
+        { question: 'What is the hybridization of carbon in acetylene (C₂H₂)?', answer: 'sp' },
+        { question: 'How many sigma and pi bonds are in a nitrogen molecule (N₂)?', answer: '1 sigma, 2 pi' },
+        { question: 'According to MOT, what is the bond order of an oxygen molecule (O₂)?', answer: '2' },
+        { question: 'Which molecule exhibits hydrogen bonding: H₂O, CH₄, or H₂S?', answer: 'H₂O' },
+        { question: 'What is the formal charge on the central oxygen atom in an ozone (O₃) molecule?', answer: '+1' },
+        { question: 'Which bond is more polar: HF or HCl?', answer: 'HF' },
+        { question: 'What type of bond is formed by the sideways overlap of p-orbitals?', answer: 'Pi bond' },
+        { question: 'What is the shape of a PCl₅ molecule?', answer: 'Trigonal bipyramidal' },
+        { question: 'What is the approximate bond angle in a water (H₂O) molecule?', answer: '104.5 degrees' },
+        { question: 'Which of these molecules is nonpolar: NH₃ or BF₃?', answer: 'BF₃' },
+        { question: 'What is the name for the force that holds metal atoms together in a crystal?', answer: 'Metallic bond' },
+        { question: 'What type of bond is formed when one atom donates both electrons to the shared pair?', answer: 'Coordinate bond' }
+      ],
+      'cell-biology': [
+        { question: 'Name the phase of mitosis where chromosomes align at the equator.', answer: 'Metaphase' },
+        { question: 'Which organelle is primarily responsible for generating ATP?', answer: 'Mitochondrion' },
+        { question: 'Which organelle, containing hydrolytic enzymes, is known as the \'suicide bag\'?', answer: 'Lysosome' },
+        { question: 'What is the site of protein synthesis in a cell?', answer: 'Ribosome' },
+        { question: 'The fluid mosaic model is used to describe the structure of what cellular component?', answer: 'Cell membrane' },
+        { question: 'In which phase of the cell cycle does DNA replication occur?', answer: 'S phase' },
+        { question: 'The cellular process of engulfing a solid particle is called?', answer: 'Phagocytosis' },
+        { question: 'How many haploid daughter cells are produced at the end of meiosis?', answer: '4' },
+        { question: 'Which organelle packages and modifies proteins for secretion?', answer: 'Golgi apparatus' },
+        { question: 'Which type of cell (prokaryotic or eukaryotic) lacks a true, membrane-bound nucleus?', answer: 'Prokaryotic cell' },
+        { question: 'Genetic recombination by crossing over occurs during which phase of meiosis I?', answer: 'Prophase I' },
+        { question: 'The cell walls of plants are primarily composed of which polysaccharide?', answer: 'Cellulose' },
+        { question: 'What molecule is the primary carrier of genetic information in most organisms?', answer: 'DNA' },
+        { question: 'The movement of water across a semipermeable membrane is called?', answer: 'Osmosis' },
+        { question: 'What are the biological protein catalysts that speed up chemical reactions?', answer: 'Enzymes' }
+      ],
+      'logic-grid': [
+        { question: 'Three students (A, B, C) take Math, Physics, Chemistry. A scores highest in Math, B doesn’t take Physics. Who takes Chemistry?', answer: 'B' },
+        { question: 'If A is not in Chemistry and C is in Physics, who is in Math?', answer: 'A' },
+        { question: 'If all Bloops are Razzies and all Razzies are Lazzies, are all Bloops also Lazzies?', answer: 'Yes' },
+        { question: 'You don\'t bury survivors. If a plane crashes on a border, where are the survivors buried?', answer: 'Nowhere' },
+        { question: 'It takes 5 machines 5 mins to make 5 widgets. How long would it take 100 machines to make 100 widgets?', answer: '5 minutes' },
+        { question: 'To cross a river, a man must take a fox, goose, and beans across one at a time. The fox can\'t be left with the goose, nor the goose with the beans. Which does he take first?', answer: 'Goose' },
+        { question: 'Which word does not belong in the group: Apple, Banana, Rose, Orange?', answer: 'Rose' },
+        { question: 'A is the father of B, but B is not the son of A. What is B to A?', answer: 'Daughter' },
+        { question: '"Brothers and sisters I have none, but that man\'s father is my father\'s son." Who is the man in the portrait?', answer: 'His son' },
+        { question: 'A bat and a ball cost ₹110. The bat costs ₹100 more than the ball. How much does the ball cost?', answer: '₹5' },
+        { question: 'What is heavier: a tonne of feathers or a tonne of bricks?', answer: 'Neither' },
+        { question: 'A butcher is 5\'10" tall and wears size 9 shoes. What does he weigh?', answer: 'Meat' },
+        { question: 'If you unscramble the letters "CIFAIPC", you get the name of what?', answer: 'Ocean' },
+        { question: 'How many months have 28 days?', answer: 'All of them' },
+        { question: 'What has an eye, but cannot see?', answer: 'A needle' }
+      ],
+      'pattern-sequence': [
+        { question: 'Find the next number: 2, 6, 12, 20, 30, __.', answer: '42' },
+        { question: 'What is the next perfect square in the sequence: 1, 4, 9, 16, 25, __.', answer: '36' },
+        { question: 'Find the next number in the Fibonacci sequence: 1, 1, 2, 3, 5, 8, __.', answer: '13' },
+        { question: 'What is the next letter in the sequence: A, C, E, G, __.', answer: 'I' },
+        { question: 'Find the next perfect cube: 1, 8, 27, 64, __.', answer: '125' },
+        { question: 'What is the next number in the sequence: 50, 45, 40, 35, __.', answer: '30' },
+        { question: 'What is the next letter in this sequence: O, T, T, F, F, S, S, E, __.', answer: 'N' },
+        { question: 'Find the next number in the pattern (n²+1): 2, 5, 10, 17, 26, __.', answer: '37' },
+        { question: 'What is the next letter in the sequence of months: J, F, M, A, M, __.', answer: 'J' },
+        { question: 'Find the next number in the pattern 77, 49, 36, 18, __. (Hint: Multiply the digits)', answer: '8' },
+        { question: 'What is the next term: 3, 9, 21, 45, __. (Hint: Multiply by 2 and add 3)', answer: '93' },
+        { question: 'Find the missing term: F2, __, D8, C16, B32.', answer: 'E4' },
+        { question: 'What comes next in the sequence: 1/2, 1/4, 1/8, 1/16, __.', answer: '1/32' },
+        { question: 'Find the next pair in the series: AZ, BY, CX, __.', answer: 'DW' },
+        { question: 'What is the next number in the sequence: 4, 7, 12, 19, 28, __. (Hint: Add consecutive odd numbers)', answer: '39' }
+      ]
+    };
+
+    function startGame(game) {
+      currentGame = game;
+      currentQuestion = 0;
+      timeLeft = 60;
+      document.getElementById('game-selection').classList.add('hidden');
+      document.getElementById('game-area').classList.remove('hidden');
+      document.getElementById('game-title').textContent = {
+        'chemical-bonding': 'Chemical Bonding Puzzle',
+        'cell-biology': 'Cell Biology Quest',
+        'logic-grid': 'Logic Grid Puzzle',
+        'pattern-sequence': 'Pattern Sequence Challenge'
+      }[game];
+      loadQuestion();
+      startTimer();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < questions[currentGame].length) {
+        document.getElementById('question').textContent = questions[currentGame][currentQuestion].question;
+        document.getElementById('answer-input').value = '';
+        document.getElementById('feedback').textContent = '';
+      } else {
+        endGame('You have answered all questions!');
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          endGame('Time is up!');
+        }
+      }, 1000);
+    }
+
+    function submitAnswer() {
+        const userAnswer = document.getElementById('answer-input').value.trim();
+        const correctAnswer = questions[currentGame][currentQuestion].answer;
+        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+            document.getElementById('feedback').textContent = 'Correct!';
+            document.getElementById('feedback').style.color = 'green';
+        } else {
+            document.getElementById('feedback').textContent = `Incorrect. The correct answer is ${correctAnswer}.`;
+            document.getElementById('feedback').style.color = 'red';
+        }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      loadQuestion();
+    }
+
+    function endGame(message = 'Game Over!') {
+      clearInterval(timerInterval);
+      document.getElementById('game-area').classList.add('hidden');
+      document.getElementById('game-selection').classList.remove('hidden');
+      alert(`${message} You attempted ${currentQuestion} questions.`);
+    }
+
+    document.getElementById('answer-input').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            submitAnswer();
+        }
+    });
+  </script>
+</body>
+</html>

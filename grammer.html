@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 English Grammar Units</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg, #a6c0fe, #f68084);
+    margin: 0;
+    padding: 20px;
+    color: #222;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #111;
+  }
+  .units {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    gap: 15px;
+  }
+  .unit-card {
+    background: rgba(255,255,255,0.85);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .unit-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .unit-content {
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #888;
+    color: #111;
+  }
+  .unit-content p {
+    margin: 6px 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Class 9 English Grammar Units</h1>
+
+<div class="units">
+
+  <div class="unit-card" onclick="toggleUnit(this)">
+    <h2>Adverbs and Adverbials</h2>
+    <div class="unit-content">
+      <p>Adverbs modify verbs, adjectives, or other adverbs. Example: She runs <strong>quickly</strong>.</p>
+      <p>Adverbials are phrases or clauses that give information about time, place, manner, reason, etc.</p>
+    </div>
+  </div>
+
+  <div class="unit-card" onclick="toggleUnit(this)">
+    <h2>Negatives and Interrogatives</h2>
+    <div class="unit-content">
+      <p>Negatives: Words that express the denial or absence of something. Example: I <strong>do not</strong> like spinach.</p>
+      <p>Interrogatives: Words used to ask questions. Example: <strong>What</strong> is your name?</p>
+    </div>
+  </div>
+
+  <div class="unit-card" onclick="toggleUnit(this)">
+    <h2>The Predicate Phrase</h2>
+    <div class="unit-content">
+      <p>The predicate tells what the subject does or is. Example: She <strong>is reading a book</strong>.</p>
+      <p>It includes the main verb and any auxiliary verbs or modifiers.</p>
+    </div>
+  </div>
+
+  <div class="unit-card" onclick="toggleUnit(this)">
+    <h2>Auxiliaries</h2>
+    <div class="unit-content">
+      <p>Helping verbs used with main verbs to form tenses, questions, and negatives. Example: She <strong>is</strong> studying.</p>
+      <p>Common auxiliaries: <strong>is, am, are, have, has, do, does</strong>.</p>
+    </div>
+  </div>
+
+  <div class="unit-card" onclick="toggleUnit(this)">
+    <h2>Interrogatives</h2>
+    <div class="unit-content">
+      <p>Words or phrases used to ask questions. Example: <strong>Who</strong> is at the door?</p>
+      <p>Common interrogatives: <strong>Who, What, Where, When, Why, How</strong>.</p>
+    </div>
+  </div>
+
+  <div class="unit-card" onclick="toggleUnit(this)">
+    <h2>The Noun Phrase</h2>
+    <div class="unit-content">
+      <p>A group of words that acts as a noun. Example: <strong>The tall, young boy</strong> is my friend.</p>
+      <p>Includes determiners, adjectives, and the main noun.</p>
+    </div>
+  </div>
+
+  <div class="unit-card" onclick="toggleUnit(this)">
+    <h2>Pre & Post Modifiers in the Noun Phrase</h2>
+    <div class="unit-content">
+      <p>Pre-modifiers: Words before the noun (adjectives, determiners). Example: <strong>The beautiful garden</strong></p>
+      <p>Post-modifiers: Words after the noun (clauses, prepositional phrases). Example: The man <strong>who is standing there</strong>.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleUnit(card) {
+  const content = card.querySelector('.unit-content');
+  content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+
+</body>
+</html>

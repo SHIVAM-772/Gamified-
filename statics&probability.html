@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Statistics & Probability — Class 9</title>
+<style>
+  :root{
+    --bg:#f4f7fb; --card:#ffffff; --accent:#2b6ef6; --muted:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#0b1733;
+    padding:20px;
+  }
+  .container{max-width:1100px;margin:0 auto}
+  header{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:18px}
+  h1{margin:0;font-size:1.6rem;color:var(--accent)}
+  p.lead{margin:0;color:var(--muted)}
+
+  .grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:18px}
+  @media(min-width:980px){.grid{grid-template-columns: 1fr 420px}}
+
+  .card{background:var(--card);border-radius:10px;padding:16px;box-shadow:0 6px 18px rgba(15,23,51,0.06)}
+  h2{margin:0 0 10px 0;color:var(--accent)}
+  small{color:var(--muted)}
+
+  /* input area */
+  .input-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+  input[type=text], textarea, select{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eefc}
+  button{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+  button.secondary{background:#11a37f}
+
+  ul{margin:0;padding-left:1em}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:6px;border:1px solid #eef3ff;text-align:center}
+
+  .small-muted{font-size:0.9rem;color:var(--muted)}
+  .result{margin-top:10px;font-weight:600}
+
+  /* chart */
+  #barCanvas{width:100%;height:220px;display:block;border-radius:8px;background:#fff;padding:8px}
+
+  /* quiz */
+  .quiz qitem{display:block}
+  .feedback{margin-top:8px;font-weight:700}
+
+  footer{margin-top:18px;text-align:center;color:var(--muted);font-size:0.9rem}
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Statistics & Probability — Class 9</h1>
+      <p class="lead">Interactive notes, calculators and small simulations for practice.</p>
+    </header>
+
+    <main class="grid">
+
+      <!-- LEFT: Content + Calculators -->
+      <section>
+
+        <!-- Intro -->
+        <div class="card">
+          <h2>What is Statistics?</h2>
+          <p class="small-muted">Statistics is the branch of mathematics that deals with collecting, organizing, presenting, analyzing and interpreting data.</p>
+          <ul>
+            <li><strong>Data</strong> — numbers or information collected.</li>
+            <li><strong>Frequency distribution</strong> — lists values with their counts.</li>
+            <li><strong>Measures of central tendency</strong> — Mean, Median, Mode.</li>
+          </ul>
+        </div>
+
+        <!-- Input dataset -->
+        <div class="card" id="dataCard">
+          <h2>Enter Dataset (numbers)</h2>
+          <p class="small-muted">Type numbers separated by commas (e.g. <em>2, 5, 3, 5, 7</em>)</p>
+          <div class="input-row">
+            <input id="datasetInput" type="text" placeholder="Enter numbers separated by comma" />
+            <button onclick="loadData()">Load</button>
+          </div>
+
+          <div id="dataInfo" class="small-muted" style="margin-top:12px;display:none">
+            <div><strong>N:</strong> <span id="nCount">0</span> &nbsp;&nbsp; <strong>Sorted:</strong> <span id="sortedData"></span></div>
+            <div id="freqTableHolder" style="margin-top:10px"></div>
+          </div>
+
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="calcMean()">Mean</button>
+            <button onclick="calcMedian()">Median</button>
+            <button onclick="calcMode()">Mode</button>
+            <button onclick="drawBarChart()" class="secondary">Draw Frequency Bar</button>
+            <button onclick="clearData()">Clear</button>
+          </div>
+
+          <div id="statResult" class="result"></div>
+
+          <canvas id="barCanvas"></canvas>
+        </div>
+
+        <!-- Probability -->
+        <div class="card" id="probCard" style="margin-top:14px">
+          <h2>What is Probability?</h2>
+          <p class="small-muted">Probability measures how likely an event is. For equally likely outcomes: <br><strong>P(event) = number of favourable outcomes / total number of outcomes</strong></p>
+
+          <h3 style="margin:8px 0 6px 0">Simple Probability Calculator</h3>
+          <div class="input-row">
+            <input id="favCount" type="text" placeholder="Number of favourable outcomes (e.g. 1)" />
+            <input id="totalCount" type="text" placeholder="Total outcomes (e.g. 6)" />
+            <button onclick="calcProbability()">Compute</button>
+          </div>
+          <div id="probResult" class="result"></div>
+
+          <h3 style="margin-top:12px">Simulations</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="simulate('coin',100)">Simulate 100 Coin Tosses</button>
+            <button onclick="simulate('die',200)">Simulate 200 Dice Rolls</button>
+            <button onclick="simulate('card',100)">Simulate 100 Pick Cards (Hearts?)</button>
+          </div>
+          <div id="simResult" class="small-muted" style="margin-top:8px"></div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT: Notes & Quiz -->
+      <aside>
+
+        <div class="card">
+          <h2>Key Formulas & Facts</h2>
+          <ul>
+            <li><strong>Mean (average):</strong> sum of observations / number of observations.</li>
+            <li><strong>Median:</strong> middle value when data is sorted (if even, average of two middle values).</li>
+            <li><strong>Mode:</strong> most frequent value(s).</li>
+            <li><strong>Frequency distribution:</strong> table of value → frequency.</li>
+            <li><strong>Variance & SD (intro):</strong> measure of spread (covered later).</li>
+          </ul>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h2>Quick Quiz</h2>
+          <p class="small-muted">Try these:</p>
+          <ol>
+            <li>Mean of [2,4,6,8] is ? <br>
+              <button onclick="checkQuiz(1,'5')">5</button>
+              <button onclick="checkQuiz(1,'6')">6</button>
+              <button onclick="checkQuiz(1,'4')">4</button>
+            </li><br>
+
+            <li>In a fair die, P(odd number) = ? <br>
+              <button onclick="checkQuiz(2,'1/2')">1/2</button>
+              <button onclick="checkQuiz(2,'1/3')">1/3</button>
+              <button onclick="checkQuiz(2,'1/6')">1/6</button>
+            </li><br>
+
+            <li>If data set is [3,3,4,5,3], mode is ? <br>
+              <button onclick="checkQuiz(3,'3')">3</button>
+              <button onclick="checkQuiz(3,'4')">4</button>
+              <button onclick="checkQuiz(3,'no')">No Mode</button>
+            </li>
+          </ol>
+          <div id="quizFeedback" class="feedback"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h2>Worked Example</h2>
+          <p class="small-muted"><strong>Problem:</strong> The marks of 10 students are: <em>12, 14, 14, 16, 12, 18, 16, 14, 12, 20</em>. Find mean, median and mode.</p>
+          <p><strong>Solution (quick):</strong></p>
+          <ul>
+            <li>Sort: 12,12,12,14,14,14,16,16,18,20</li>
+            <li>Mean = (sum = 148) / 10 = 14.8</li>
+            <li>Median = average of 5th and 6th = (14+14)/2 = 14</li>
+            <li>Mode = 12 and 14? (12 occurs 3, 14 occurs 3) → Bimodal: 12 and 14</li>
+          </ul>
+        </div>
+
+      </aside>
+
+    </main>
+
+    <footer>
+      Tip: Use many practice datasets — frequency tables and graphs make statistics easy to understand.
+    </footer>
+  </div>
+
+<script>
+/* ---------- Utilities ---------- */
+function parseNumbers(str){
+  if(!str) return [];
+  return str.split(',').map(s=>s.trim()).filter(s=>s!=='').map(Number).filter(n=>!Number.isNaN(n));
+}
+
+/* ---------- DATASET HANDLING ---------- */
+let currentData = [];
+
+function loadData(){
+  const raw = document.getElementById('datasetInput').value;
+  const arr = parseNumbers(raw);
+  if(arr.length===0){
+    alert('Please enter valid numbers separated by commas.');
+    return;
+  }
+  currentData = arr.slice();
+  currentData.sort((a,b)=>a-b);
+  document.getElementById('nCount').textContent = currentData.length;
+  document.getElementById('sortedData').textContent = currentData.join(', ');
+  document.getElementById('dataInfo').style.display = 'block';
+  buildFrequencyTable();
+  document.getElementById('statResult').textContent = '';
+  clearCanvas();
+}
+
+function clearData(){
+  currentData=[];
+  document.getElementById('datasetInput').value='';
+  document.getElementById('nCount').textContent='0';
+  document.getElementById('sortedData').textContent='';
+  document.getElementById('freqTableHolder').innerHTML='';
+  document.getElementById('dataInfo').style.display='none';
+  document.getElementById('statResult').textContent='';
+  clearCanvas();
+}
+
+/* Frequency table */
+function buildFrequencyTable(){
+  const freq = {};
+  currentData.forEach(v=>freq[v]=(freq[v]||0)+1);
+  const keys = Object.keys(freq).map(Number).sort((a,b)=>a-b);
+  let html = '<table><tr><th>Value</th><th>Frequency</th></tr>';
+  keys.forEach(k=>{
+    html += `<tr><td>${k}</td><td>${freq[k]}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('freqTableHolder').innerHTML = html;
+  return {freq, keys};
+}
+
+/* ---------- Mean / Median / Mode ---------- */
+function calcMean(){
+  if(currentData.length===0){ alert('Load data first'); return; }
+  const sum = currentData.reduce((s,v)=>s+v,0);
+  const mean = sum/currentData.length;
+  document.getElementById('statResult').textContent = 'Mean = ' + round(mean);
+}
+
+function calcMedian(){
+  if(currentData.length===0){ alert('Load data first'); return; }
+  const n = currentData.length;
+  let median;
+  if(n%2===1) median = currentData[(n-1)/2];
+  else median = (currentData[n/2 -1] + currentData[n/2])/2;
+  document.getElementById('statResult').textContent = 'Median = ' + round(median);
+}
+
+function calcMode(){
+  if(currentData.length===0){ alert('Load data first'); return; }
+  const {freq, keys} = buildFrequencyTable();
+  let maxF = 0;
+  keys.forEach(k=>{ if(freq[k]>maxF) maxF = freq[k]; });
+  const modes = keys.filter(k=>freq[k]===maxF);
+  let text = 'Mode = ' + (modes.length===keys.length ? 'No mode (all equal freq)' : modes.join(', '));
+  document.getElementById('statResult').textContent = text;
+}
+
+/* ---------- Bar Chart (simple) ---------- */
+const canvas = document.getElementById('barCanvas');
+const ctx = canvas.getContext ? canvas.getContext('2d') : null;
+function clearCanvas(){ if(!ctx) return; ctx.clearRect(0,0,canvas.width,canvas.height); canvas.height = 220; canvas.width = canvas.clientWidth;}
+
+window.addEventListener('resize', ()=>{ if(currentData.length) drawBarChart(); });
+
+function drawBarChart(){
+  if(!ctx){ alert('Canvas not supported'); return; }
+  if(currentData.length===0){ alert('Load data first'); return; }
+  const {freq, keys} = buildFrequencyTable();
+  // prepare canvas
+  canvas.width = canvas.clientWidth;
+  canvas.height = 220;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // chart area
+  const padding = 30;
+  const chartW = canvas.width - padding*2;
+  const chartH = canvas.height - padding*2;
+  const maxF = Math.max(...keys.map(k=>freq[k]));
+  const barW = chartW / keys.length * 0.7;
+  keys.forEach((k,i)=>{
+    const x = padding + i*(chartW/keys.length) + (chartW/keys.length - barW)/2;
+    const h = (freq[k]/maxF) * (chartH*0.9);
+    const y = canvas.height - padding - h;
+    // draw bar
+    ctx.fillStyle = '#2b6ef6';
+    roundRect(ctx,x,y,barW,h,6,true,false);
+    // label value
+    ctx.fillStyle = '#111';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(k, x + barW/2, canvas.height - padding + 14);
+    ctx.fillText(freq[k], x + barW/2, y - 6);
+  });
+  // axes (simple)
+  ctx.strokeStyle = '#aaa';
+  ctx.beginPath(); ctx.moveTo(padding, padding); ctx.lineTo(padding, canvas.height - padding); ctx.lineTo(canvas.width - padding, canvas.height - padding); ctx.stroke();
+}
+
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+  if (typeof r === 'undefined') r = 5;
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+  if(fill) ctx.fill();
+  if(stroke) ctx.stroke();
+}
+
+/* ---------- Probability calculations & simulations ---------- */
+function calcProbability(){
+  const fav = Number(document.getElementById('favCount').value);
+  const tot = Number(document.getElementById('totalCount').value);
+  if(!Number.isFinite(fav) || !Number.isFinite(tot) || tot<=0 || fav<0 || fav>tot){
+    alert('Enter valid counts: 0 ≤ favourable ≤ total, total > 0');
+    return;
+  }
+  const frac = fav / tot;
+  document.getElementById('probResult').textContent = `P = ${fav}/${tot} = ${round(frac)} (${(frac*100).toFixed(2)}%)`;
+}
+
+function simulate(type, n){
+  if(type==='coin'){
+    let heads=0;
+    for(let i=0;i<n;i++) if(Math.random()<0.5) heads++;
+    document.getElementById('simResult').textContent = `Coin tosses: Heads=${heads}, Tails=${n-heads}, P(heads) ≈ ${round(heads/n)}`;
+  } else if(type==='die'){
+    const counts = [0,0,0,0,0,0];
+    for(let i=0;i<n;i++){ const r = Math.floor(Math.random()*6)+1; counts[r-1]++; }
+    document.getElementById('simResult').textContent = `Dice counts: [1..6] = ${counts.join(', ')}. P(6) ≈ ${round(counts[5]/n)}`;
+  } else if(type==='card'){
+    // simulate picking random card from 52, check hearts (13/52)
+    let hearts=0;
+    for(let i=0;i<n;i++){
+      const r = Math.floor(Math.random()*52); // 0..51
+      if(r < 13) hearts++;
+    }
+    document.getElementById('simResult').textContent = `Picked ${n} random cards: Hearts=${hearts}, P(hearts) ≈ ${round(hearts/n)} (theoretical 1/4)`;
+  }
+}
+
+/* ---------- Quiz feedback ---------- */
+function checkQuiz(id, answer){
+  const feedback = document.getElementById('quizFeedback');
+  if(id===1){
+    if(answer==='5'){ feedback.textContent = 'Correct — mean = (2+4+6+8)/4 = 5'; feedback.style.color='green'; }
+    else { feedback.textContent = 'Incorrect — try again'; feedback.style.color='red'; }
+  } else if(id===2){
+    if(answer==='1/2'){ feedback.textContent = 'Correct — odd outcomes are 1,3,5 (3/6 = 1/2)'; feedback.style.color='green'; }
+    else { feedback.textContent = 'Incorrect — think about how many odd outcomes out of 6'; feedback.style.color='red'; }
+  } else if(id===3){
+    if(answer==='3'){ feedback.textContent = 'Correct — 3 occurs most often'; feedback.style.color='green'; }
+    else { feedback.textContent = 'Incorrect — count frequencies carefully'; feedback.style.color='red'; }
+  }
+}
+
+/* ---------- helpers ---------- */
+function round(x){ return Math.round((x + Number.EPSILON)*1000)/1000; }
+</script>
+</body>
+</html>

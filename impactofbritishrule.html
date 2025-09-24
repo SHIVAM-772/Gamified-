@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impact of British Rule in India</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg,#f6f8f9,#d0e1f9);
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
+  h1 { text-align:center; color:#1b262c; }
+  .cards { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-top:20px; }
+  .card {
+    background: #ffffffcc;
+    border-radius: 12px;
+    padding: 16px;
+    width: 250px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .card:hover { transform: scale(1.05); box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+  .card h3 { margin: 0 0 8px 0; color:#ff7f50; }
+  .card p { display:none; margin:0; color:#333; }
+  video { max-width: 100%; margin-top: 20px; border-radius: 10px; }
+  .quiz { margin-top: 20px; text-align:center; }
+  .quiz button {
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 6px;
+    border: none;
+    background-color: #1b262c;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .quiz button:hover { background-color: #3282b8; }
+</style>
+</head>
+<body>
+
+<h1>Impact of British Rule in India</h1>
+
+<!-- Impact Cards -->
+<div class="cards">
+  <div class="card" onclick="toggleText(this)">
+    <h3>Economic Impact</h3>
+    <p>British policies led to deindustrialization, drain of wealth, and famines in India.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Political Impact</h3>
+    <p>Centralized administration was established, princely states lost autonomy, and British control expanded.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Social Impact</h3>
+    <p>Introduction of Western education, social reforms, and emergence of a new middle class.</p>
+  </div>
+  <div class="card" onclick="toggleText(this)">
+    <h3>Cultural Impact</h3>
+    <p>Western culture influenced literature, architecture, and lifestyle; Indian traditions changed in some areas.</p>
+  </div>
+</div>
+
+<!-- Embedded Video -->
+<video controls>
+  <source src="british_rule_impact.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<!-- Quiz -->
+<div class="quiz">
+  <h3>Quiz: Test Your Knowledge</h3>
+  <p>Which of the following was a major economic impact of British rule?</p>
+  <button onclick="checkAnswer(this,'wrong')">Industrial Growth</button>
+  <button onclick="checkAnswer(this,'correct')">Drain of Wealth</button>
+  <button onclick="checkAnswer(this,'wrong')">Land Reforms for Farmers</button>
+</div>
+
+<script>
+  function toggleText(card) {
+    const p = card.querySelector('p');
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function checkAnswer(btn, result) {
+    if(result==='correct'){
+      alert('Correct! 🎉');
+    } else {
+      alert('Oops! Try again. ❌');
+    }
+  }
+</script>
+
+</body>
+</html>

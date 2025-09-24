@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rational Numbers Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #fff8dc;
+    text-align: center;
+    padding: 50px;
+  }
+  h1 {
+    color: #333;
+  }
+  .question {
+    margin: 20px 0;
+    font-size: 20px;
+  }
+  .btn {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    background: #ff7f50;
+    color: white;
+    transition: 0.3s;
+  }
+  .btn:hover {
+    background: #ff4500;
+  }
+  #result {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Rational Numbers Game</h1>
+<div class="question" id="question"></div>
+
+<button class="btn" onclick="checkAnswer(true)">Rational ✅</button>
+<button class="btn" onclick="checkAnswer(false)">Not Rational ❌</button>
+
+<div id="result"></div>
+
+<script>
+  // List of numbers for the game
+  const numbers = [1/2, 3, -4/5, Math.sqrt(2), 0.25, -7, Math.PI, 5/3];
+  let current = 0;
+  let score = 0;
+
+  function showQuestion() {
+    if(current < numbers.length) {
+      document.getElementById('question').textContent = 
+        `Is ${numbers[current]} a rational number?`;
+      document.getElementById('result').textContent = '';
+    } else {
+      document.getElementById('question').textContent = 'Game Over!';
+      document.getElementById('result').textContent = `Your score: ${score} / ${numbers.length}`;
+    }
+  }
+
+  function checkAnswer(isRational) {
+    const num = numbers[current];
+    // Rational numbers are numbers that can be written as a fraction
+    const correct = Number.isFinite(num) && !Number.isNaN(num) && !(num % 1 !== 0 && Number.isInteger(num) === false && num !== Math.sqrt(2) && num !== Math.PI);
+    if(isRational === correct) {
+      score++;
+      document.getElementById('result').textContent = "✅ Correct!";
+      document.getElementById('result').style.color = 'green';
+    } else {
+      document.getElementById('result').textContent = "❌ Wrong!";
+      document.getElementById('result').style.color = 'red';
+    }
+    current++;
+    setTimeout(showQuestion, 1000);
+  }
+
+  showQuestion();
+</script>
+
+</body>
+</html>

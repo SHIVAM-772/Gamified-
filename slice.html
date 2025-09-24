@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Number Ninja</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: radial-gradient(circle at top, #ffe29f, #ffa751);
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 3.5em;
+      margin: 20px 0;
+      color: #ff3e3e;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    #game-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    #game-area {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      overflow: hidden;
+      background: url('https://images.unsplash.com/photo-1604908177522-3f3f3f3f3f3f?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+      border: 6px solid #333;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      margin: 20px auto;
+    }
+    .fruit {
+      position: absolute;
+      font-size: 2em;
+      padding: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+      user-select: none;
+    }
+    .fruit:hover {
+      transform: scale(1.2);
+    }
+    .fruit.correct {
+      background-color: rgba(0, 255, 0, 0.3);
+    }
+    .fruit.incorrect {
+      background-color: rgba(255, 0, 0, 0.3);
+    }
+    #score, #timer, #question {
+      font-size: 2em;
+      margin: 10px;
+      color: #fff;
+      background-color: #ff6347;
+      display: inline-block;
+      padding: 15px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s;
+    }
+    #score {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      font-size: 2.5em;
+      background-color: #28a745;
+    }
+    #timer {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 2.5em;
+      background-color: #007bff;
+    }
+    #question {
+      font-size: 2.2em;
+      background-color: #ff4500;
+    }
+    #game-over {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 20px 40px;
+      border-radius: 15px;
+      font-size: 2em;
+      z-index: 1000;
+    }
+    #restart-btn {
+      margin-top: 20px;
+      padding: 15px 30px;
+      font-size: 1.5em;
+      background-color: #ff3e3e;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #restart-btn:hover {
+      background-color: #e32b2b;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h1>🍎 Number Ninja</h1>
+    <div id="question">Slice all number <span id="target-number">5</span>s!</div>
+    <div id="game-area"></div>
+    <div id="score">Score: 0</div>
+    <div id="timer">Time: 30</div>
+    <div id="game-over">
+      <div>⏰ Time's up!</div>
+      <div>Final Score: <span id="final-score">0</span></div>
+      <button id="restart-btn">Play Again</button>
+    </div>
+  </div>
+  <script>
+    const gameArea = document.getElementById("game-area");
+    const scoreDisplay = document.getElementById("score");
+    const timerDisplay = document.getElementById("timer");
+    const questionDisplay = document.getElementById("question");
+    const targetNumberDisplay = document.getElementById("target-number");
+    const gameOverDisplay = document.getElementById("game-over");
+    const finalScoreDisplay = document.getElementById("final-score");
+    const restartBtn = document.getElementById("restart-btn");
+    let score = 0;
+    let timeLeft = 30;
+    let targetNumber = 5;
+    let gameInterval, timerInterval;
+    const fruitImages = [
+      '🍎', '🥭', '🍉', '🍌', '🍊', '🍇', '🍍', '🍑',
+      '🍒', '🍓', '🥝', '🍋', '🍐', '🍈', '🍅'
+    ];
+    function getRandomNumber() {
+      // Ensure target number appears at least 30% of the time
+      return Math.random() < 0.3 ? targetNumber : Math.floor(Math.random() * 10);
+    }
+    function spawnFruit() {
+      const fruit = document.createElement("div");
+      fruit.classList.add("fruit");
+      const value = getRandomNumber();
+      const fruitType = fruitImages[Math.floor(Math.random() * fruitImages.length)];
+      fruit.textContent = `${fruitType} ${value}`;
+      fruit.dataset.value = value;
+      fruit.style.left = Math.random() * (gameArea.offsetWidth - 100) + "px";
+      fruit.style.top = gameArea.offsetHeight + "px";
+      fruit.classList.add(value === targetNumber ? "correct" : "incorrect");
+      gameArea.appendChild(fruit);
+      let pos = gameArea.offsetHeight;
+      const rise = setInterval(() => {
+        pos -= 5;
+        fruit.style.top = pos + "px";
+        if (pos < -50) {
+          clearInterval(rise);
+          fruit.remove();
+        }
+      }, 50);
+      fruit.addEventListener("click", () => {
+        if (parseInt(fruit.dataset.value) === targetNumber) {
+          score += 1;
+          scoreDisplay.textContent = `Score: ${score}`;
+          fruit.classList.add("correct");
+        } else {
+          score = Math.max(0, score - 1);
+          scoreDisplay.textContent = `Score: ${score}`;
+          fruit.classList.add("incorrect");
+        }
+        fruit.remove();
+        clearInterval(rise);
+      });
+    }
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      targetNumber = Math.floor(Math.random() * 10);
+      scoreDisplay.textContent = "Score: 0";
+      timerDisplay.textContent = "Time: 30";
+      targetNumberDisplay.textContent = targetNumber;
+      questionDisplay.innerHTML = `Slice all number <span id="target-number">${targetNumber}</span>s!`;
+      gameOverDisplay.style.display = "none";
+      gameArea.innerHTML = "";
+      gameInterval = setInterval(spawnFruit, 800);
+      timerInterval = setInterval(() => {
+        timeLeft -= 1;
+        timerDisplay.textContent = `Time: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(gameInterval);
+          clearInterval(timerInterval);
+          gameOverDisplay.style.display = "block";
+          finalScoreDisplay.textContent = score;
+        }
+      }, 1000);
+    }
+    restartBtn.addEventListener("click", startGame);
+    startGame();
+  </script>
+</body>
+</html>

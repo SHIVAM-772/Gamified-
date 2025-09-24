@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 9 History - Odisha Board</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fdf6e3;
+        }
+        header {
+            background-color: #8B4513;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+        }
+        nav button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        nav button:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        section {
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #aaa;
+        }
+        h2 {
+            color: #8B4513;
+        }
+        .quiz {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff0d4;
+            border-radius: 8px;
+        }
+        .quiz button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .quiz button:hover {
+            background-color: #a0522d;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Class 9 History - Odisha Board</h1>
+</header>
+
+<nav>
+    <button onclick="showSection('chapter1')">Pastoralists in Modern World</button>
+    <button onclick="showSection('chapter2')">Peasants and Farmers</button>
+</nav>
+
+<!-- Chapter 1: Pastoralists in the Modern World -->
+<section id="chapter1">
+    <h2>Pastoralists in the Modern World</h2>
+    <p>
+        Pastoralists are communities that depend on domesticated animals for their livelihood. They move from place to place in search of pastures and water.
+    </p>
+    <h3>Features:</h3>
+    <ul>
+        <li>Livelihood based on herding animals</li>
+        <li>Nomadic or semi-nomadic lifestyle</li>
+        <li>Trade of animal products like milk, wool, and meat</li>
+    </ul>
+    <h3>Impact of Modern Changes:</h3>
+    <ul>
+        <li>Loss of grazing land due to industrialization</li>
+        <li>Government policies limiting mobility</li>
+        <li>Challenges in maintaining traditional lifestyles</li>
+    </ul>
+
+    <div class="quiz">
+        <p><strong>Quiz:</strong> What is the main livelihood of pastoralists?</p>
+        <button onclick="checkAnswer('chapter1', 'herding')">Herding animals</button>
+        <button onclick="checkAnswer('chapter1', 'farming')">Farming crops</button>
+        <button onclick="checkAnswer('chapter1', 'trading')">Trading goods</button>
+        <div class="result" id="chapter1Result"></div>
+    </div>
+</section>
+
+<!-- Chapter 2: Peasants and Farmers -->
+<section id="chapter2" style="display:none">
+    <h2>Peasants and Farmers</h2>
+    <p>
+        Peasants and farmers formed the backbone of the agricultural economy. Their lives were shaped by colonial policies and social structures.
+    </p>
+    <h3>Challenges Faced:</h3>
+    <ul>
+        <li>Heavy taxes imposed by colonial rulers</li>
+        <li>Loss of land and indebtedness</li>
+        <li>Exploitation by landlords and moneylenders</li>
+    </ul>
+    <h3>Peasant Movements:</h3>
+    <ul>
+        <li>Resistance against unfair revenue systems</li>
+        <li>Protests against land dispossession</li>
+        <li>Struggles for better working conditions</li>
+    </ul>
+
+    <div class="quiz">
+        <p><strong>Quiz:</strong> What was a common problem faced by peasants under colonial rule?</p>
+        <button onclick="checkAnswer('chapter2', 'heavy taxes')">Heavy Taxes</button>
+        <button onclick="checkAnswer('chapter2', 'freedom')">Freedom</button>
+        <button onclick="checkAnswer('chapter2', 'education')">Education</button>
+        <div class="result" id="chapter2Result"></div>
+    </div>
+</section>
+
+<script>
+    function showSection(chapterId) {
+        document.getElementById('chapter1').style.display = 'none';
+        document.getElementById('chapter2').style.display = 'none';
+        document.getElementById(chapterId).style.display = 'block';
+    }
+
+    function checkAnswer(chapter, answer) {
+        let correct = '';
+        if(chapter === 'chapter1') correct = 'herding';
+        if(chapter === 'chapter2') correct = 'heavy taxes';
+
+        const resultDiv = document.getElementById(chapter + 'Result');
+        if(answer.toLowerCase() === correct) {
+            resultDiv.innerHTML = '✅ Correct!';
+            resultDiv.style.color = 'green';
+        } else {
+            resultDiv.innerHTML = '❌ Incorrect. Try again!';
+            resultDiv.style.color = 'red';
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alphabet Sound Explorer - Phonics Game for Kids</title>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Oriya:wght@400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #f8f9ff;
+      --bg-secondary: #e8f0fe;
+      --text-primary: #1a1a2e;
+      --text-secondary: #6c757d;
+      --accent-primary: #4f46e5;
+      --accent-secondary: #7c3aed;
+      --success: #10b981;
+      --error: #ef4444;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --border: rgba(79, 70, 229, 0.2);
+    }
+
+    [lang="hi"] {
+      font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+    }
+
+    [lang="or"] {
+      font-family: 'Noto Sans Oriya', 'Inter', sans-serif;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, #c3dafe 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      position: relative;
+      touch-action: manipulation;
+    }
+
+    /* Header & Language Switcher */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .language-switcher {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 25px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .language-switcher:hover {
+      background: var(--accent-primary);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* Main Game Container */
+    .game-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      background: var(--card-bg);
+      border-radius: 25px;
+      padding: 4px;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
+    }
+
+    .progress-fill {
+      height: 20px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 20px;
+      transition: width 0.5s ease;
+      text-align: center;
+      color: white;
+      font-weight: 600;
+      line-height: 20px;
+    }
+
+    /* Game Title */
+    .game-title {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .instruction {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Audio Controls */
+    .audio-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .audio-btn {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 50px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .audio-btn:hover {
+      background: var(--accent-primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .audio-btn.active {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    /* Game Area */
+    .game-area {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
+      min-height: 400px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Letter Display */
+    .letter-display {
+      font-size: 8rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: bounce 1s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    /* Word Example */
+    .word-example {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      color: var(--accent-primary);
+      text-align: center;
+      min-height: 2.5rem;
+    }
+
+    /* Options Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 2rem;
+    }
+
+    .option-card {
+      aspect-ratio: 1;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .option-card:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .option-card img {
+      width: 80%;
+      height: 60%;
+      object-fit: cover;
+      border-radius: 15px;
+      margin-bottom: 0.5rem;
+    }
+
+    .option-label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 0 0.5rem;
+      line-height: 1.2;
+    }
+
+    /* Correct Answer Animation */
+    .option-card.correct {
+      border-color: var(--success);
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+      animation: correctAnswer 0.6s ease-out;
+      transform: scale(1.1);
+    }
+
+    .option-card.wrong {
+      border-color: var(--error);
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes correctAnswer {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1.1); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    /* Feedback Message */
+    .feedback {
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      margin: 1rem 0;
+      min-height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .feedback.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feedback.success {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+    }
+
+    .feedback.error {
+      background: linear-gradient(135deg, var(--error), #dc2626);
+      color: white;
+    }
+
+    /* Next Button */
+    .next-btn {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .next-btn.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .next-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+    }
+
+    /* Game Over Screen */
+    .game-over {
+      text-align: center;
+      padding: 3rem;
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
+      display: none;
+    }
+
+    .game-over.show {
+      display: block;
+    }
+
+    .score-display {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+      margin: 1rem 0;
+    }
+
+    .restart-btn {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .restart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .game-title {
+        font-size: 2rem;
+      }
+      
+      .instruction {
+        font-size: 1rem;
+      }
+      
+      .options-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+      
+      .option-label {
+        font-size: 1rem;
+      }
+      
+      .letter-display {
+        font-size: 6rem;
+      }
+      
+      .audio-controls {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 0.5rem 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .game-title {
+        font-size: 1.8rem;
+      }
+      
+      .options-grid {
+        grid-template-columns: 1fr;
+        max-width: 300px;
+      }
+      
+      .letter-display {
+        font-size: 4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">🎯 Alphabet Explorer</div>
+    <select class="language-switcher" id="languageSelect">
+      <option value="en">🇺🇸 English</option>
+      <option value="hi">🇮🇳 हिंदी</option>
+      <option value="or">🇮🇳 ଓଡ଼ିଆ</option>
+    </select>
+  </div>
+
+  <div class="game-container">
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill">0%</div>
+    </div>
+
+    <!-- Game Title -->
+    <h1 class="game-title" data-translate="gameTitle">Alphabet Sound Explorer</h1>
+    
+    <!-- Instructions -->
+    <div class="instruction" data-translate="instruction">
+      Listen to the letter sound and tap the correct picture!
+    </div>
+
+    <!-- Audio Controls -->
+    <div class="audio-controls">
+      <button class="audio-btn active" id="playSoundBtn" data-translate="playSound">
+        🔊 Play Sound
+      </button>
+      <button class="audio-btn" id="repeatBtn" data-translate="repeat">
+        🔁 Repeat
+      </button>
+    </div>
+
+    <!-- Game Area -->
+    <div class="game-area" id="gameArea">
+      <!-- Letter Display -->
+      <div class="letter-display" id="letterDisplay"></div>
+      
+      <!-- Word Example -->
+      <div class="word-example" id="wordExample"></div>
+      
+      <!-- Options Grid -->
+      <div class="options-grid" id="optionsGrid">
+        <!-- Options will be generated by JavaScript -->
+      </div>
+      
+      <!-- Feedback -->
+      <div class="feedback" id="feedback"></div>
+      
+      <!-- Next Button -->
+      <button class="next-btn" id="nextBtn" data-translate="nextLetter">
+        Next Letter
+      </button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="game-over" id="gameOver">
+      <h2 data-translate="congratulations">🎉 Congratulations!</h2>
+      <div class="score-display" id="finalScore">0/26</div>
+      <p data-translate="completedAlphabet">You completed the entire alphabet!</p>
+      <button class="restart-btn" id="restartBtn" data-translate="playAgain">
+        Play Again
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Language Translations
+    const translations = {
+      en: {
+        gameTitle: "Alphabet Sound Explorer",
+        instruction: "Listen to the letter sound and tap the correct picture!",
+        playSound: "🔊 Play Sound",
+        repeat: "🔁 Repeat",
+        nextLetter: "Next Letter",
+        congratulations: "🎉 Congratulations!",
+        completedAlphabet: "You completed the entire alphabet!",
+        playAgain: "Play Again",
+        correct: "Great job! That's right!",
+        wrong: "Try again! Listen carefully.",
+        loadingSound: "Loading...",
+        score: "Score: {score}/{total}"
+      },
+      hi: {
+        gameTitle: "वर्णमाला ध्वनि खोज",
+        instruction: "ध्वनि सुनें और सही चित्र पर टैप करें!",
+        playSound: "🔊 ध्वनि चलाएं",
+        repeat: "🔁 दोहराएं",
+        nextLetter: "अगला अक्षर",
+        congratulations: "🎉 बधाई हो!",
+        completedAlphabet: "आपने पूरी वर्णमाला पूरी कर ली!",
+        playAgain: "फिर से खेलें",
+        correct: "बहुत अच्छा! यह सही है!",
+        wrong: "फिर कोशिश करें! ध्यान से सुनें।",
+        loadingSound: "लोड हो रहा है...",
+        score: "स्कोर: {score}/{total}"
+      },
+      or: {
+        gameTitle: "ଅକ୍ଷର ଧ୍ୱନି ଅନୁସନ୍ଧାନ",
+        instruction: "ଧ୍ୱନି ଶୁଣନ୍ତୁ ଏବଂ ସଠିକ୍ ଚିତ୍ରରେ ଟ୍ୟାପ୍ କରନ୍ତୁ!",
+        playSound: "🔊 ଧ୍ୱନି ଚଳାନ୍ତୁ",
+        repeat: "🔁 ପୁନରାବୃତ୍ତି",
+        nextLetter: "ପରବର୍ତ୍ତୀ ଅକ୍ଷର",
+        congratulations: "🎉 ଅଭିନନ୍ଦନ!",
+        completedAlphabet: "ଆପଣ ସମ୍ପୂର୍ଣ୍ଣ ଅକ୍ଷରମାଳା ସମ୍ପୂର୍ଣ୍ଣ କରିଲେ!",
+        playAgain: "ଆହୁରି ଖେଳନ୍ତୁ",
+        correct: "ବହୁତ ଭଲ! ଏହା ସଠିକ୍!",
+        wrong: "ଆହୁରି ଚେଷ୍ଟା କରନ୍ତୁ! ଧ୍ୟାନରେ ଶୁଣନ୍ତୁ।",
+        loadingSound: "ଲୋଡ୍ ହେଉଛି...",
+        score: "ସ୍କୋର: {score}/{total}"
+      }
+    };
+
+    // Game Data - Simple English Alphabet with pictures
+    const alphabetData = [
+      { letter: 'A', word: 'Apple', image: '🍎', sound: 'a_for_apple.mp3' },
+      { letter: 'B', word: 'Ball', image: '⚽', sound: 'b_for_ball.mp3' },
+      { letter: 'C', word: 'Cat', image: '🐱', sound: 'c_for_cat.mp3' },
+      { letter: 'D', word: 'Dog', image: '🐶', sound: 'd_for_dog.mp3' },
+      { letter: 'E', word: 'Elephant', image: '🐘', sound: 'e_for_elephant.mp3' },
+      { letter: 'F', word: 'Fish', image: '🐟', sound: 'f_for_fish.mp3' },
+      { letter: 'G', word: 'Grapes', image: '🍇', sound: 'g_for_grapes.mp3' },
+      { letter: 'H', word: 'House', image: '🏠', sound: 'h_for_house.mp3' },
+      { letter: 'I', word: 'Ice Cream', image: '🍦', sound: 'i_for_icecream.mp3' },
+      { letter: 'J', word: 'Juice', image: '🧃', sound: 'j_for_juice.mp3' },
+      { letter: 'K', word: 'Kite', image: '🪁', sound: 'k_for_kite.mp3' },
+      { letter: 'L', word: 'Lion', image: '🦁', sound: 'l_for_lion.mp3' },
+      { letter: 'M', word: 'Monkey', image: '🐒', sound: 'm_for_monkey.mp3' },
+      { letter: 'N', word: 'Nest', image: '🪹', sound: 'n_for_nest.mp3' },
+      { letter: 'O', word: 'Orange', image: '🍊', sound: 'o_for_orange.mp3' },
+      { letter: 'P', word: 'Penguin', image: '🐧', sound: 'p_for_penguin.mp3' },
+      { letter: 'Q', word: 'Queen', image: '👑', sound: 'q_for_queen.mp3' },
+      { letter: 'R', word: 'Rabbit', image: '🐰', sound: 'r_for_rabbit.mp3' },
+      { letter: 'S', word: 'Sun', image: '☀️', sound: 's_for_sun.mp3' },
+      { letter: 'T', word: 'Tiger', image: '🐯', sound: 't_for_tiger.mp3' },
+      { letter: 'U', word: 'Umbrella', image: '☔', sound: 'u_for_umbrella.mp3' },
+      { letter: 'V', word: 'Van', image: '🚐', sound: 'v_for_van.mp3' },
+      { letter: 'W', word: 'Whale', image: '🐋', sound: 'w_for_whale.mp3' },
+      { letter: 'X', word: 'Xylophone', image: '🎹', sound: 'x_for_xylophone.mp3' },
+      { letter: 'Y', word: 'Yogurt', image: '🥛', sound: 'y_for_yogurt.mp3' },
+      { letter: 'Z', word: 'Zebra', image: '🦓', sound: 'z_for_zebra.mp3' }
+    ];
+
+    // Game State
+    let currentIndex = 0;
+    let score = 0;
+    let currentLanguage = 'en';
+    let isPlaying = false;
+
+    // DOM Elements
+    const gameTitle = document.querySelector('.game-title');
+    const instruction = document.querySelector('.instruction');
+    const playSoundBtn = document.getElementById('playSoundBtn');
+    const repeatBtn = document.getElementById('repeatBtn');
+    const letterDisplay = document.getElementById('letterDisplay');
+    const wordExample = document.getElementById('wordExample');
+    const optionsGrid = document.getElementById('optionsGrid');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressFill = document.getElementById('progressFill');
+    const gameOver = document.getElementById('gameOver');
+    const finalScore = document.getElementById('finalScore');
+    const restartBtn = document.getElementById('restartBtn');
+    const languageSelect = document.getElementById('languageSelect');
+
+    // Audio Context for sound effects
+    let audioContext;
+    let currentAudio = null;
+
+    // Initialize Audio Context
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    // Simple text-to-speech function
+    function speak(text, rate = 0.8, pitch = 1.2) {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = rate;
+        utterance.pitch = pitch;
+        utterance.lang = currentLanguage === 'hi' ? 'hi-IN' : currentLanguage === 'or' ? 'or-IN' : 'en-US';
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Play phonic sound with letter pronunciation
+    async function playLetterSound() {
+      if (isPlaying) return;
+      
+      isPlaying = true;
+      playSoundBtn.classList.add('active');
+      playSoundBtn.textContent = translations[currentLanguage].loadingSound;
+      
+      try {
+        const currentLetter = alphabetData[currentIndex];
+        const letterSound = `${currentLetter.letter} for ${currentLetter.word}`;
+        
+        // Speak the letter introduction
+        speak(letterSound);
+        
+        // Simple delay for pronunciation effect
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Speak the phonic sound emphasis
+        const phonicSound = currentLetter.letter.toLowerCase();
+        speak(phonicSound, 0.6, 0.8); // Slower and lower pitch for emphasis
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Repeat the full phrase
+        speak(`${currentLetter.word} starts with ${phonicSound}`);
+        
+      } catch (error) {
+        console.error('Error playing sound:', error);
+      } finally {
+        isPlaying = false;
+        playSoundBtn.classList.remove('active');
+        playSoundBtn.textContent = translations[currentLanguage].playSound;
+      }
+    }
+
+    // Generate options for current letter
+    function generateOptions() {
+      const currentLetter = alphabetData[currentIndex];
+      const correctIndex = Math.floor(Math.random() * 4); // Random position for correct answer
+      
+      const options = [];
+      options[correctIndex] = currentLetter;
+      
+      // Generate 3 wrong options
+      let wrongOptions = [...alphabetData];
+      wrongOptions.splice(alphabetData.indexOf(currentLetter), 1);
+      wrongOptions = wrongOptions.slice(0, 10); // Limit pool
+      
+      for (let i = 0; i < 4; i++) {
+        if (i !== correctIndex && options[i] === undefined) {
+          const randomWrong = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+          options[i] = randomWrong;
+          wrongOptions.splice(wrongOptions.indexOf(randomWrong), 1);
+        }
+      }
+      
+      return options;
+    }
+
+    // Create option cards
+    function createOptionCard(option, index) {
+      const card = document.createElement('div');
+      card.className = 'option-card';
+      card.dataset.correct = option === alphabetData[currentIndex];
+      card.dataset.index = index;
+      
+      card.innerHTML = `
+        <div style="font-size: 4rem; margin-bottom: 0.5rem;">${option.image}</div>
+        <div class="option-label">${option.word}</div>
+      `;
+      
+      card.addEventListener('click', handleOptionClick);
+      card.addEventListener('touchstart', handleOptionClick);
+      
+      return card;
+    }
+
+    // Handle option selection
+    function handleOptionClick(e) {
+      const card = e.currentTarget;
+      const isCorrect = card.dataset.correct === 'true';
+      
+      // Disable all cards
+      document.querySelectorAll('.option-card').forEach(c => {
+        c.style.pointerEvents = 'none';
+      });
+      
+      if (isCorrect) {
+        // Correct answer
+        card.classList.add('correct');
+        score++;
+        feedback.textContent = translations[currentLanguage].correct;
+        feedback.className = 'feedback success show';
+        updateProgress();
+        speak(translations[currentLanguage].correct);
+      } else {
+        // Wrong answer
+        card.classList.add('wrong');
+        document.querySelector('.option-card[data-correct="true"]').classList.add('correct');
+        feedback.textContent = translations[currentLanguage].wrong;
+        feedback.className = 'feedback error show';
+        speak(translations[currentLanguage].wrong);
+      }
+      
+      // Show next button after delay
+      setTimeout(() => {
+        nextBtn.classList.add('show');
+      }, 1500);
+    }
+
+    // Update progress
+    function updateProgress() {
+      const progress = ((currentIndex + 1) / alphabetData.length) * 100;
+      progressFill.style.width = progress + '%';
+      progressFill.textContent = `${Math.round(progress)}%`;
+      
+      const currentScore = score;
+      const total = currentIndex + 1;
+      // Update score display if needed
+    }
+
+    // Next letter
+    function nextLetter() {
+      currentIndex++;
+      
+      // Hide feedback and next button
+      feedback.classList.remove('show');
+      nextBtn.classList.remove('show');
+      
+      // Re-enable cards
+      document.querySelectorAll('.option-card').forEach(c => {
+        c.style.pointerEvents = 'auto';
+        c.classList.remove('correct', 'wrong');
+      });
+      
+      if (currentIndex >= alphabetData.length) {
+        // Game completed
+        endGame();
+      } else {
+        // Load next letter
+        loadCurrentLetter();
+      }
+    }
+
+    // Load current letter display
+    function loadCurrentLetter() {
+      const currentLetter = alphabetData[currentIndex];
+      
+      // Update display
+      letterDisplay.textContent = currentLetter.letter;
+      wordExample.textContent = `for ${currentLetter.word}`;
+      
+      // Generate and display options
+      const options = generateOptions();
+      optionsGrid.innerHTML = '';
+      options.forEach((option, index) => {
+        const card = createOptionCard(option, index);
+        optionsGrid.appendChild(card);
+      });
+      
+      // Update progress
+      updateProgress();
+    }
+
+    // End game
+    function endGame() {
+      gameArea.style.display = 'none';
+      gameOver.classList.add('show');
+      finalScore.textContent = `${score}/${alphabetData.length}`;
+      
+      // Speak congratulations
+      speak(translations[currentLanguage].congratulations);
+    }
+
+    // Restart game
+    function restartGame() {
+      currentIndex = 0;
+      score = 0;
+      gameOver.classList.remove('show');
+      gameArea.style.display = 'flex';
+      loadCurrentLetter();
+    }
+
+    // Language Management
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      document.documentElement.lang = lang;
+      document.body.setAttribute('lang', lang);
+      
+      // Update all translatable elements
+      document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[lang] && translations[lang][key]) {
+          element.textContent = translations[lang][key];
+        }
+      });
+      
+      // Update game title and instructions
+      gameTitle.textContent = translations[lang].gameTitle;
+      instruction.textContent = translations[lang].instruction;
+      
+      // Save preference
+      localStorage.setItem('preferredLanguage', lang);
+    }
+
+    // Initialize language
+    function initLanguage() {
+      const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+      languageSelect.value = savedLang;
+      setLanguage(savedLang);
+    }
+
+    // Event Listeners
+    playSoundBtn.addEventListener('click', playLetterSound);
+    repeatBtn.addEventListener('click', playLetterSound);
+    nextBtn.addEventListener('click', nextLetter);
+    restartBtn.addEventListener('click', restartGame);
+    languageSelect.addEventListener('change', (e) => setLanguage(e.target.value));
+
+    // Initialize game
+    document.addEventListener('DOMContentLoaded', () => {
+      initLanguage();
+      initAudio();
+      loadCurrentLetter();
+      
+      // Add keyboard support for accessibility
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (nextBtn.classList.contains('show')) {
+            nextBtn.click();
+          } else if (document.querySelector('.option-card:not(.correct):not(.wrong)')) {
+            document.querySelector('.option-card:not(.correct):not(.wrong)').click();
+          }
+        }
+        if (e.key === ' ') {
+          e.preventDefault();
+          playSoundBtn.click();
+        }
+      });
+    });
+
+    // Prevent context menu on long press for mobile
+    document.addEventListener('contextmenu', e => e.preventDefault());
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algebraic Expressions Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #fffaf0;
+    text-align: center;
+    padding: 50px;
+  }
+  h1 {
+    color: #333;
+  }
+  .question {
+    font-size: 24px;
+    margin: 20px 0;
+  }
+  .options button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background: #ffa500;
+    color: white;
+    transition: 0.3s;
+  }
+  .options button:hover {
+    background: #ff8c00;
+  }
+  #result {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Algebraic Expressions & Identities Game</h1>
+
+<div class="question" id="question"></div>
+<div class="options" id="options"></div>
+<div id="result"></div>
+
+<script>
+  const questions = [
+    {
+      question: "(a + b)^2 = ?",
+      options: ["a^2 + b^2", "a^2 + 2ab + b^2", "a^2 - 2ab + b^2", "2a + 2b"],
+      answer: "a^2 + 2ab + b^2"
+    },
+    {
+      question: "(x - y)^2 = ?",
+      options: ["x^2 - y^2", "x^2 + y^2", "x^2 - 2xy + y^2", "x^2 + 2xy + y^2"],
+      answer: "x^2 - 2xy + y^2"
+    },
+    {
+      question: "(a + b)(a - b) = ?",
+      options: ["a^2 - b^2", "a^2 + b^2", "a^2 - 2ab + b^2", "ab"],
+      answer: "a^2 - b^2"
+    },
+    {
+      question: "(x + 3)^2 = ?",
+      options: ["x^2 + 6x + 9", "x^2 + 9", "x^2 + 3x", "x^2 - 6x + 9"],
+      answer: "x^2 + 6x + 9"
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+
+  function showQuestion() {
+    if(current < questions.length) {
+      const q = questions[current];
+      document.getElementById('question').textContent = q.question;
+      const optionsDiv = document.getElementById('options');
+      optionsDiv.innerHTML = '';
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(opt);
+        optionsDiv.appendChild(btn);
+      });
+      document.getElementById('result').textContent = '';
+    } else {
+      document.getElementById('question').textContent = 'Game Over!';
+      document.getElementById('options').innerHTML = '';
+      document.getElementById('result').textContent = `Your score: ${score} / ${questions.length}`;
+    }
+  }
+
+  function checkAnswer(selected) {
+    const q = questions[current];
+    if(selected === q.answer) {
+      document.getElementById('result').textContent = "✅ Correct!";
+      document.getElementById('result').style.color = 'green';
+      score++;
+    } else {
+      document.getElementById('result').textContent = `❌ Wrong! Correct Answer: ${q.answer}`;
+      document.getElementById('result').style.color = 'red';
+    }
+    current++;
+    setTimeout(showQuestion, 1500);
+  }
+
+  showQuestion();
+</script>
+
+</body>
+</html>

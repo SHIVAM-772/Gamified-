@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sets Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f8ff;
+    text-align: center;
+    padding: 50px;
+  }
+  h1 {
+    color: #333;
+  }
+  .set-container {
+    margin: 20px 0;
+  }
+  .element {
+    display: inline-block;
+    margin: 5px;
+    padding: 10px 20px;
+    background: #87cefa;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+  }
+  .element:hover {
+    background: #1e90ff;
+  }
+  #result {
+    margin-top: 20px;
+    font-size: 18px;
+    color: green;
+  }
+</style>
+</head>
+<body>
+
+<h1>Set Game: Identify Elements in Set A</h1>
+
+<div class="set-container">
+  <div class="element" onclick="checkElement('A', 1)">1</div>
+  <div class="element" onclick="checkElement('A', 2)">2</div>
+  <div class="element" onclick="checkElement('A', 3)">3</div>
+  <div class="element" onclick="checkElement('A', 4)">4</div>
+  <div class="element" onclick="checkElement('A', 5)">5</div>
+  <div class="element" onclick="checkElement('A', 6)">6</div>
+</div>
+
+<div id="result"></div>
+
+<script>
+  // Define Set A
+  const setA = [2, 4, 6];
+
+  function checkElement(setName, value) {
+    const resultDiv = document.getElementById('result');
+    if (setA.includes(value)) {
+      resultDiv.textContent = `✅ ${value} is in Set ${setName}!`;
+      resultDiv.style.color = 'green';
+    } else {
+      resultDiv.textContent = `❌ ${value} is NOT in Set ${setName}!`;
+      resultDiv.style.color = 'red';
+    }
+  }
+</script>
+
+</body>
+</html>

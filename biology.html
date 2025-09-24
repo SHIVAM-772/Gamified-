@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 9 Life Science</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+        }
+        nav button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        nav button:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        section {
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #aaa;
+        }
+        h2 {
+            color: #4CAF50;
+        }
+        .quiz {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f3e7;
+            border-radius: 8px;
+        }
+        .quiz button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .quiz button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Class 9 Life Science</h1>
+</header>
+
+<nav>
+    <button onclick="showSection('chapter1')">The Fundamental Unit of Life</button>
+    <button onclick="showSection('chapter2')">Tissues</button>
+</nav>
+
+<!-- Chapter 1 -->
+<section id="chapter1">
+    <h2>The Fundamental Unit of Life</h2>
+    <p>
+        Life is composed of tiny units called <strong>cells</strong>. Cells are the **basic structural and functional units of life**. 
+        All living organisms are made of cells, which carry out essential life processes.
+    </p>
+    <h3>Types of Cells:</h3>
+    <ul>
+        <li><strong>Prokaryotic Cells:</strong> No nucleus, simple structure (e.g., bacteria)</li>
+        <li><strong>Eukaryotic Cells:</strong> Contain nucleus and organelles, complex structure (e.g., plants, animals)</li>
+    </ul>
+    <h3>Functions of Cells:</h3>
+    <ul>
+        <li>Metabolism</li>
+        <li>Growth</li>
+        <li>Response to stimuli</li>
+        <li>Reproduction</li>
+    </ul>
+
+    <div class="quiz">
+        <p><strong>Quiz:</strong> What is the fundamental unit of life?</p>
+        <button onclick="checkAnswer('chapter1', 'cell')">Cell</button>
+        <button onclick="checkAnswer('chapter1', 'tissue')">Tissue</button>
+        <button onclick="checkAnswer('chapter1', 'organ')">Organ</button>
+        <div class="result" id="chapter1Result"></div>
+    </div>
+</section>
+
+<!-- Chapter 2 -->
+<section id="chapter2" style="display:none">
+    <h2>Tissues</h2>
+    <p>
+        A <strong>tissue</strong> is a group of similar cells that perform a specific function together. 
+        Tissues provide structure, support, and function to the organism.
+    </p>
+
+    <h3>Animal Tissues:</h3>
+    <ul>
+        <li><strong>Epithelial Tissue:</strong> Covers body surfaces and lines cavities</li>
+        <li><strong>Connective Tissue:</strong> Supports and connects body parts (e.g., bones, blood)</li>
+        <li><strong>Muscular Tissue:</strong> Enables movement (e.g., skeletal, cardiac, smooth muscles)</li>
+        <li><strong>Nervous Tissue:</strong> Transmits signals and controls body activities</li>
+    </ul>
+
+    <h3>Plant Tissues:</h3>
+    <ul>
+        <li><strong>Meristematic Tissue:</strong> Actively dividing cells for growth</li>
+        <li><strong>Permanent Tissue:</strong> Differentiated cells for support, storage, and photosynthesis</li>
+    </ul>
+
+    <div class="quiz">
+        <p><strong>Quiz:</strong> Which tissue transmits impulses in animals?</p>
+        <button onclick="checkAnswer('chapter2', 'nervous')">Nervous Tissue</button>
+        <button onclick="checkAnswer('chapter2', 'muscular')">Muscular Tissue</button>
+        <button onclick="checkAnswer('chapter2', 'connective')">Connective Tissue</button>
+        <div class="result" id="chapter2Result"></div>
+    </div>
+</section>
+
+<script>
+    function showSection(chapterId) {
+        document.getElementById('chapter1').style.display = 'none';
+        document.getElementById('chapter2').style.display = 'none';
+        document.getElementById(chapterId).style.display = 'block';
+    }
+
+    function checkAnswer(chapter, answer) {
+        let correct = '';
+        if(chapter === 'chapter1') correct = 'cell';
+        if(chapter === 'chapter2') correct = 'nervous';
+
+        const resultDiv = document.getElementById(chapter + 'Result');
+        if(answer.toLowerCase() === correct) {
+            resultDiv.innerHTML = '✅ Correct!';
+            resultDiv.style.color = 'green';
+        } else {
+            resultDiv.innerHTML = '❌ Incorrect. Try again!';
+            resultDiv.style.color = 'red';
+        }
+    }
+</script>
+
+</body>
+</html>

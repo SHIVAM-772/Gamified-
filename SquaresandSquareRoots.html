@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squares & Square Roots Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #fff0f5;
+    text-align: center;
+    padding: 50px;
+  }
+  h1 {
+    color: #333;
+  }
+  .question {
+    font-size: 24px;
+    margin: 20px 0;
+  }
+  input[type="number"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 120px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    margin-right: 10px;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #ff69b4;
+    color: white;
+    border: none;
+    transition: 0.3s;
+  }
+  button:hover {
+    background: #ff1493;
+  }
+  #result {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Squares & Square Roots Game</h1>
+
+<div class="question" id="question"></div>
+<input type="number" id="answer" placeholder="Your Answer">
+<button onclick="checkAnswer()">Submit</button>
+
+<div id="result"></div>
+
+<script>
+  const questions = [
+    {number: 5, type: 'square'},     // 5^2 = 25
+    {number: 9, type: 'sqrt'},       // √9 = 3
+    {number: 7, type: 'square'},     // 7^2 = 49
+    {number: 16, type: 'sqrt'},      // √16 = 4
+    {number: 12, type: 'square'},    // 12^2 = 144
+    {number: 25, type: 'sqrt'}       // √25 = 5
+  ];
+
+  let current = 0;
+  let score = 0;
+
+  function showQuestion() {
+    if(current < questions.length) {
+      const q = questions[current];
+      if(q.type === 'square') {
+        document.getElementById('question').textContent = `Find the square of ${q.number}`;
+      } else {
+        document.getElementById('question').textContent = `Find the square root of ${q.number}`;
+      }
+      document.getElementById('answer').value = '';
+      document.getElementById('result').textContent = '';
+    } else {
+      document.getElementById('question').textContent = 'Game Over!';
+      document.getElementById('result').textContent = `Your score: ${score} / ${questions.length}`;
+    }
+  }
+
+  function checkAnswer() {
+    const userAns = Number(document.getElementById('answer').value);
+    const q = questions[current];
+    let correctAns;
+
+    if(q.type === 'square') {
+      correctAns = q.number ** 2;
+    } else {
+      correctAns = Math.sqrt(q.number);
+    }
+
+    if(userAns === correctAns) {
+      document.getElementById('result').textContent = "✅ Correct!";
+      document.getElementById('result').style.color = 'green';
+      score++;
+    } else {
+      document.getElementById('result').textContent = `❌ Wrong! Correct Answer: ${correctAns}`;
+      document.getElementById('result').style.color = 'red';
+    }
+
+    current++;
+    setTimeout(showQuestion, 1500);
+  }
+
+  showQuestion();
+</script>
+
+</body>
+</html>

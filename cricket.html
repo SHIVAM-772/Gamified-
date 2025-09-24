@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 9 History - Cricket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #eef2f3;
+        }
+        header {
+            background-color: #1E90FF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        section {
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #aaa;
+        }
+        h2 {
+            color: #1E90FF;
+        }
+        .quiz {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d4f0ff;
+            border-radius: 8px;
+        }
+        .quiz button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #1E90FF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .quiz button:hover {
+            background-color: #1c7acb;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Class 9 History - Odisha Board</h1>
+</header>
+
+<section>
+    <h2>History and Sport: The Story of Cricket</h2>
+    <p>
+        Cricket is a popular sport that originated in England and spread worldwide through British colonization. It became a significant part of cultural life and social history.
+    </p>
+    <h3>Origins:</h3>
+    <ul>
+        <li>Cricket began in England in the 16th century.</li>
+        <li>Initially played in rural villages and towns.</li>
+    </ul>
+    <h3>Spread of Cricket:</h3>
+    <ul>
+        <li>Spread globally through the British Empire.</li>
+        <li>Introduced in India, Australia, West Indies, and other colonies.</li>
+    </ul>
+    <h3>Cricket as a Social Phenomenon:</h3>
+    <ul>
+        <li>Linked to cultural identity and national pride.</li>
+        <li>Used for diplomacy and community gatherings.</li>
+        <li>Modern professional leagues and international tournaments.</li>
+    </ul>
+
+    <div class="quiz">
+        <p><strong>Quiz:</strong> Where did cricket originate?</p>
+        <button onclick="checkAnswer('cricket', 'england')">England</button>
+        <button onclick="checkAnswer('cricket', 'india')">India</button>
+        <button onclick="checkAnswer('cricket', 'australia')">Australia</button>
+        <div class="result" id="cricketResult"></div>
+    </div>
+</section>
+
+<script>
+    function checkAnswer(topic, answer) {
+        let correct = '';
+        if(topic === 'cricket') correct = 'england';
+
+        const resultDiv = document.getElementById(topic + 'Result');
+        if(answer.toLowerCase() === correct) {
+            resultDiv.innerHTML = '✅ Correct!';
+            resultDiv.style.color = 'green';
+        } else {
+            resultDiv.innerHTML = '❌ Incorrect. Try again!';
+            resultDiv.style.color = 'red';
+        }
+    }
+</script>
+
+</body>
+</html>

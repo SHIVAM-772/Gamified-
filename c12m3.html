@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class 12 Chemistry: Organic Chemistry Synthesis Challenge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #e0f7fa, #bbdefb);
+      font-family: 'Arial', sans-serif;
+    }
+    .game-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    #timer {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+  <h1 class="text-4xl font-bold text-gray-800 mb-8">Class 12 Chemistry: Organic Chemistry Synthesis Challenge</h1>
+
+  <div id="game-selection" class="bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame()">
+    <h2 class="text-2xl font-semibold text-blue-600">Organic Chemistry Synthesis Challenge</h2>
+    <p class="text-gray-600 mt-2">Build molecules through reactions!</p>
+  </div>
+
+  <div id="game-area" class="hidden bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+    <h2 id="game-title" class="text-3xl font-bold text-gray-800 mb-4">Organic Chemistry Synthesis Challenge</h2>
+    <div id="question" class="text-lg text-gray-700 mb-4"></div>
+    <input id="answer-input" type="text" placeholder="Enter your answer" class="w-full p-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button onclick="submitAnswer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Submit Answer</button>
+    <p id="feedback" class="mt-4 text-lg"></p>
+    <div id="timer" class="text-xl text-red-600 mt-4">Time: 60s</div>
+    <button onclick="nextQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-green-700">Next Question</button>
+    <button onclick="endGame()" class="bg-red-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-red-700">End Game</button>
+  </div>
+
+  <script>
+    let timerInterval;
+    let timeLeft = 60;
+    let currentQuestion = 0;
+    const questions = [
+      // Original Questions
+      { question: 'Name the product when ethanol reacts with ethanoic acid in the presence of H₂SO₄.', answer: 'Ethyl ethanoate' },
+      { question: 'Identify the reagent to convert benzene to nitrobenzene.', answer: 'HNO3/H2SO4' },
+      { question: 'What is the major product of the reaction of propene with HBr in the presence of peroxides?', answer: '1-Bromopropane' },
+      // Haloalkanes and Haloarenes
+      { question: 'Which reagent is used to convert ethyl chloride to ethyl iodide in the Finkelstein reaction?', answer: 'NaI/acetone' },
+      { question: 'What is the major product when chlorobenzene reacts with sodium in dry ether?', answer: 'Biphenyl' },
+      { question: 'What is the major product from the dehydrohalogenation of 2-bromopentane?', answer: 'Pent-2-ene' },
+      { question: 'Which reaction mechanism (SN1 or SN2) involves a carbocation intermediate?', answer: 'SN1' },
+      { question: 'The reaction of an alkyl chloride with NaI in acetone is known as which named reaction?', answer: 'Finkelstein reaction' },
+      { question: 'What toxic gas is produced when chloroform is exposed to air and sunlight?', answer: 'Phosgene' },
+      { question: 'Which has a higher boiling point: 1-chlorobutane or 2-chlorobutane?', answer: '1-chlorobutane' },
+      { question: 'The reaction of two molecules of an alkyl halide with sodium metal is called?', answer: 'Wurtz reaction' },
+      // Alcohols, Phenols, and Ethers
+      { question: 'What is the major product when ethanol is heated with conc. H₂SO₄ at 443 K?', answer: 'Ethene' },
+      { question: 'The reaction of phenol with chloroform in aqueous NaOH is known as which named reaction?', answer: 'Reimer-Tiemann reaction' },
+      { question: 'The synthesis of ethers by reacting an alkyl halide with a sodium alkoxide is called?', answer: 'Williamson synthesis' },
+      { question: 'Which test is used to distinguish between primary, secondary, and tertiary alcohols?', answer: 'Lucas test' },
+      { question: 'Name a mild oxidizing agent that converts primary alcohols to aldehydes.', answer: 'PCC' },
+      { question: 'What is the product when phenol is treated with excess bromine water?', answer: '2,4,6-tribromophenol' },
+      { question: 'Which reagent is used to convert phenol to benzene?', answer: 'Zinc dust' },
+      { question: 'Acid-catalyzed hydration of propene yields which major product?', answer: 'Propan-2-ol' },
+      { question: 'Which is more acidic: phenol or ethanol?', answer: 'Phenol' },
+      // Aldehydes, Ketones, and Carboxylic Acids
+      { question: 'The self-condensation of two molecules of an aldehyde having an α-hydrogen is called?', answer: 'Aldol condensation' },
+      { question: 'The reaction of an aldehyde without an α-hydrogen with concentrated alkali is known as?', answer: 'Cannizzaro reaction' },
+      { question: 'Name the reagent used in Clemmensen reduction to convert a carbonyl group to a CH₂ group.', answer: 'Zn-Hg/HCl' },
+      { question: 'Which test, using ammoniacal silver nitrate, is used to identify aldehydes?', answer: 'Tollen\'s test' },
+      { question: 'What is the main product when benzoic acid reacts with Cl₂ in the presence of FeCl₃?', answer: 'm-chlorobenzoic acid' },
+      { question: 'The reaction of a carboxylic acid with a halogen in the presence of red phosphorus is known as?', answer: 'Hell-Volhard-Zelinsky reaction' },
+      { question: 'Name the reagent used to convert benzoyl chloride to benzaldehyde (Rosenmund reduction).', answer: 'H2/Pd-BaSO4' },
+      { question: 'What is the product of the dry distillation of calcium acetate?', answer: 'Acetone' },
+      { question: 'The Iodoform test is given by compounds containing which functional group?', answer: 'Methyl ketone' },
+      { question: 'What is the common name for methanoic acid?', answer: 'Formic acid' },
+      // Amines
+      { question: 'The reaction used to convert an amide to a primary amine with one less carbon is called?', answer: 'Hofmann bromamide degradation' },
+      { question: 'Which test, producing a foul-smelling isocyanide, is used to identify primary amines?', answer: 'Carbylamine test' },
+      { question: 'What is the product when aniline reacts with excess bromine water?', answer: '2,4,6-tribromoaniline' },
+      { question: 'Which is more basic: ammonia or aniline?', answer: 'Ammonia' },
+      { question: 'What is the main product when nitrobenzene is reduced using Sn/HCl?', answer: 'Aniline' },
+      { question: 'What reagent is used for the diazotisation of aniline at 0-5°C?', answer: 'NaNO2/HCl' },
+      { question: 'Azo dyes are formed by the coupling reaction of diazonium salts with phenols or what other compounds?', answer: 'Anilines' },
+      { question: 'The synthesis of primary amines using phthalimide is known as which named reaction?', answer: 'Gabriel phthalimide synthesis' }
+    ];
+
+    function startGame() {
+      currentQuestion = 0;
+      timeLeft = 60;
+      document.getElementById('game-selection').classList.add('hidden');
+      document.getElementById('game-area').classList.remove('hidden');
+      loadQuestion();
+      startTimer();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < questions.length) {
+        document.getElementById('question').textContent = questions[currentQuestion].question;
+        document.getElementById('answer-input').value = '';
+        document.getElementById('feedback').textContent = '';
+      } else {
+        endGame('You have completed the challenge!');
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          endGame('Time is up!');
+        }
+      }, 1000);
+    }
+
+    function submitAnswer() {
+      const userAnswer = document.getElementById('answer-input').value.trim().replace(/\s+/g, '').toLowerCase();
+      const correctAnswer = questions[currentQuestion].answer.replace(/\s+/g, '').toLowerCase();
+      const isCorrect = userAnswer === correctAnswer;
+      if (isCorrect) {
+          document.getElementById('feedback').textContent = 'Correct!';
+          document.getElementById('feedback').style.color = 'green';
+      } else {
+          document.getElementById('feedback').textContent = `Incorrect. The answer is ${questions[currentQuestion].answer}.`;
+          document.getElementById('feedback').style.color = 'red';
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      timeLeft = 60;
+      loadQuestion();
+      startTimer();
+    }
+
+    function endGame(message = 'Game Over!') {
+      clearInterval(timerInterval);
+      document.getElementById('game-area').classList.add('hidden');
+      document.getElementById('game-selection').classList.remove('hidden');
+      alert(`${message} You attempted ${currentQuestion} questions.`);
+    }
+
+    document.getElementById('answer-input').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            submitAnswer();
+        }
+    });
+  </script>
+</body>
+</html>

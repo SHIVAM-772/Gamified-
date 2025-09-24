@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class 11 Physics Games</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #e0f7fa, #bbdefb);
+      font-family: 'Arial', sans-serif;
+    }
+    .game-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    #timer {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+  <h1 class="text-4xl font-bold text-gray-800 mb-8">Class 11 Physics Games</h1>
+
+  <div id="game-selection" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="game-card bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame('mechanics')">
+      <h2 class="text-2xl font-semibold text-blue-600">Mechanics Motion Maze</h2>
+      <p class="text-gray-600 mt-2">Navigate a maze with kinematics and dynamics!</p>
+    </div>
+    <div class="game-card bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame('waves-optics')">
+      <h2 class="text-2xl font-semibold text-blue-600">Waves and Optics Challenge</h2>
+      <p class="text-gray-600 mt-2">Predict wave and light behaviors!</p>
+    </div>
+    <div class="game-card bg-white rounded-lg shadow-lg p-6 cursor-pointer" onclick="startGame('thermodynamics')">
+      <h2 class="text-2xl font-semibold text-blue-600">Thermodynamics Escape Room</h2>
+      <p class="text-gray-600 mt-2">Solve heat and work problems to escape!</p>
+    </div>
+  </div>
+
+  <div id="game-area" class="hidden bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+    <h2 id="game-title" class="text-3xl font-bold text-gray-800 mb-4"></h2>
+    <div id="question" class="text-lg text-gray-700 mb-4"></div>
+    <input id="answer-input" type="text" placeholder="Enter your answer" class="w-full p-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button onclick="submitAnswer()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Submit Answer</button>
+    <p id="feedback" class="mt-4 text-lg"></p>
+    <div id="timer" class="text-xl text-red-600 mt-4">Time: 60s</div>
+    <button onclick="nextQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-green-700">Next Question</button>
+    <button onclick="endGame()" class="bg-red-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-red-700">End Game</button>
+  </div>
+
+  <script>
+    let currentGame = '';
+    let timerInterval;
+    let timeLeft = 60;
+    let currentQuestion = 0;
+    const questions = {
+      mechanics: [
+        // Original Questions (2)
+        { question: 'A ball is thrown at 30 m/s at 45°. Find time to max height (g=9.8 m/s²). (ans in s)', answer: '2.16' },
+        { question: 'Work done by friction on a 5 kg block sliding 10 m with μ=0.2 (g=9.8). (ans in J)', answer: '-98' },
+        // Units & Dimensions (5)
+        { question: 'What is the dimensional formula of Force?', answer: 'MLT⁻²' },
+        { question: 'What is the SI unit of angular momentum?', answer: 'kg m²/s' },
+        { question: 'What is the dimensional formula of Gravitational Constant G?', answer: 'M⁻¹L³T⁻²' },
+        { question: 'What physical quantity has the dimensional formula ML⁻¹T⁻²?', answer: 'Pressure' },
+        { question: 'The SI unit of impulse is the same as that of which quantity?', answer: 'Momentum' },
+        // Kinematics (15)
+        { question: 'A car accelerates from rest to 20 m/s in 5s. What is its acceleration? (ans in m/s²)', answer: '4' },
+        { question: 'What is the maximum range of a projectile fired at 98 m/s? (g=9.8 m/s²)', answer: '980' },
+        { question: 'A train moving at 20 m/s brakes to a stop in 10s. What is the distance covered? (ans in m)', answer: '100' },
+        { question: 'What is the vertical component of velocity of a projectile at its maximum height?', answer: '0' },
+        { question: 'Two trains move towards each other at 10 m/s. What is their relative speed? (ans in m/s)', answer: '20' },
+        { question: 'Slope of a velocity-time graph represents what quantity?', answer: 'Acceleration' },
+        { question: 'Area under a velocity-time graph represents what quantity?', answer: 'Displacement' },
+        { question: 'A ball dropped from a tower takes 4s to reach the ground. What is the tower\'s height? (g=10 m/s²)', answer: '80' },
+        { question: 'For a projectile, at what angle is the range equal to the maximum height?', answer: '76' },
+        { question: 'Can an object have zero velocity and non-zero acceleration?', answer: 'Yes' },
+        { question: 'What is the angle between velocity and acceleration for uniform circular motion?', answer: '90' },
+        { question: 'If displacement x = 3t² + 2t, find velocity at t=2s.', answer: '14' },
+        { question: 'What is the magnitude of a unit vector?', answer: '1' },
+        { question: 'A vector is 3i + 4j. What is its magnitude?', answer: '5' },
+        { question: 'What is the dot product of two perpendicular vectors?', answer: '0' },
+        // Laws of Motion (10)
+        { question: 'A 5 kg mass is accelerated by 2 m/s². What is the net force acting on it? (ans in N)', answer: '10' },
+        { question: 'Which of Newton\'s laws is also known as the law of inertia?', answer: 'First' },
+        { question: 'What force is required to keep a 1kg object moving in a circle of radius 1m at 2 m/s? (ans in N)', answer: '4' },
+        { question: 'A force of 10N acts on a body for 0.1s. What is the impulse? (ans in Ns)', answer: '1' },
+        { question: 'Is linear momentum conserved in an inelastic collision?', answer: 'Yes' },
+        { question: 'What is the unit of the coefficient of friction?', answer: 'Unitless' },
+        { question: 'A bullet of mass 10g hits a target with a velocity of 400 m/s and stops. What is the change in momentum?', answer: '-4' },
+        { question: 'Action and reaction forces act on the (same/different) bodies?', answer: 'Different' },
+        { question: 'The tendency of a body to resist a change in its state of motion is called what?', answer: 'Inertia' },
+        { question: 'Which friction is greater, static or kinetic?', answer: 'Static' },
+        // Work, Energy, and Power (8)
+        { question: 'A 2kg object has a momentum of 10 kg·m/s. What is its kinetic energy? (ans in J)', answer: '25' },
+        { question: 'What is the potential energy of a 5kg mass at a height of 10m? (g=10 m/s²)', answer: '500' },
+        { question: 'Is kinetic energy conserved in an inelastic collision?', answer: 'No' },
+        { question: 'A machine does 200 J of work in 10 s. What is its power? (ans in W)', answer: '20' },
+        { question: 'What is the work done by a centripetal force on a body in circular motion?', answer: '0' },
+        { question: 'Work-Energy theorem states that work done is equal to the change in what?', answer: 'Kinetic energy' },
+        { question: 'What is the potential energy stored in a spring with k=100 N/m stretched by 0.1m? (ans in J)', answer: '0.5' },
+        { question: 'What is the commercial unit of energy?', answer: 'kWh' },
+        // Rotational Motion (5)
+        { question: 'A solid sphere and a hollow sphere of the same mass and radius roll down an incline. Which reaches first?', answer: 'Solid sphere' },
+        { question: 'What is the rotational analogue of mass?', answer: 'Moment of inertia' },
+        { question: 'What is the torque if a 10N force is applied 0.5m from the pivot, perpendicularly? (ans in Nm)', answer: '5' },
+        { question: 'If a spinning ice skater pulls her arms in, does her angular velocity increase or decrease?', answer: 'Increase' },
+        { question: 'The direction of angular velocity is given by which rule?', answer: 'Right hand rule' },
+        // Gravitation (5)
+        { question: 'What is the value of the universal gravitational constant G in SI units (use x10⁻¹¹)?', answer: '6.67x10⁻¹¹' },
+        { question: 'What is the escape velocity from Earth\'s surface? (ans in km/s)', answer: '11.2' },
+        { question: 'Does the value of \'g\' increase or decrease as you go up from the Earth\'s surface?', answer: 'Decrease' },
+        { question: 'What is the time period of a geostationary satellite? (ans in hours)', answer: '24' },
+        { question: 'Kepler\'s second law is a consequence of the conservation of what?', answer: 'Angular momentum' }
+      ],
+      'waves-optics': [
+        // Original Questions (2)
+        { question: 'For waves y1=2sin(ωt), y2=3sin(ωt+π/2), find resultant amplitude. (ans to 2dp)', answer: '3.61' },
+        { question: 'For a convex lens, if an object is at 2F, where is the image formed?', answer: '2F' },
+        // Oscillations (10)
+        { question: 'What is the time period of a simple pendulum of length 9.8m? (g=9.8 m/s²)', answer: '6.28' },
+        { question: 'In SHM, where is the particle\'s velocity maximum?', answer: 'Mean position' },
+        { question: 'In SHM, where is the particle\'s acceleration maximum?', answer: 'Extreme position' },
+        { question: 'What is the phase difference between displacement and velocity in SHM?', answer: 'π/2' },
+        { question: 'If the length of a pendulum is quadrupled, what happens to its time period?', answer: 'Doubles' },
+        { question: 'The total energy of a particle in SHM is proportional to the square of what?', answer: 'Amplitude' },
+        { question: 'What kind of oscillations are produced when a periodic driving force is applied?', answer: 'Forced' },
+        { question: 'What phenomenon occurs when the driving frequency matches the natural frequency?', answer: 'Resonance' },
+        { question: 'For SHM described by x = Acos(ωt+φ), what does φ represent?', answer: 'Phase constant' },
+        { question: 'Does the time period of a spring-mass system depend on gravity?', answer: 'No' },
+        // Waves (15)
+        { question: 'Are sound waves in air transverse or longitudinal?', answer: 'Longitudinal' },
+        { question: 'A wave has a frequency of 50 Hz and a wavelength of 2 m. What is its speed? (ans in m/s)', answer: '100' },
+        { question: 'The formation of beats is a result of what wave phenomenon?', answer: 'Interference' },
+        { question: 'According to the Doppler effect, does the frequency increase or decrease when a source moves towards a stationary observer?', answer: 'Increase' },
+        { question: 'What is a point on a stationary wave where the amplitude is zero?', answer: 'Node' },
+        { question: 'What is the speed of sound in vacuum? (ans in m/s)', answer: '0' },
+        { question: 'Two waves of amplitudes 3 and 4 interfere constructively. What is the max amplitude?', answer: '7' },
+        { question: 'Two waves of amplitudes 3 and 4 interfere destructively. What is the min amplitude?', answer: '1' },
+        { question: 'The speed of a transverse wave on a string depends on tension and what other property?', answer: 'Linear mass density' },
+        { question: 'Does the Doppler effect apply to light waves?', answer: 'Yes' },
+        { question: 'What is the unit of loudness of sound?', answer: 'Decibel' },
+        { question: 'The first harmonic frequency of a closed organ pipe is 100 Hz. What is the frequency of the first overtone?', answer: '300' },
+        { question: 'Are light waves transverse or longitudinal?', answer: 'Transverse' },
+        { question: 'What is the relationship between path difference and phase difference?', answer: 'Phase diff = (2π/λ) * Path diff' },
+        { question: 'The quality of a sound is determined by its what?', answer: 'Timbre' },
+        // Ray Optics (15)
+        { question: 'What is the refractive index of vacuum?', answer: '1' },
+        { question: 'A concave mirror produces a real, inverted, and same-sized image. Where is the object placed?', answer: 'At C' },
+        { question: 'Which type of lens is used to correct myopia (nearsightedness)?', answer: 'Concave' },
+        { question: 'What phenomenon causes a rainbow?', answer: 'Dispersion' },
+        { question: 'The power of a lens is 2 Diopters. What is its focal length? (ans in m)', answer: '0.5' },
+        { question: 'Which mirror is used as a rear-view mirror in vehicles?', answer: 'Convex' },
+        { question: 'What is the critical angle for a medium with refractive index √2 with respect to air?', answer: '45' },
+        { question: 'Does the focal length of a lens change when immersed in water?', answer: 'Yes' },
+        { question: 'What is the linear magnification of a plane mirror?', answer: '1' },
+        { question: 'The twinkling of stars is due to which phenomenon?', answer: 'Atmospheric refraction' },
+        { question: 'A virtual image larger than the object can be formed by which mirror?', answer: 'Concave' },
+        { question: 'What is Snell\'s law\'s formula?', answer: 'n₁sin(i) = n₂sin(r)' },
+        { question: 'What is the focal length of a plane mirror?', answer: 'Infinity' },
+        { question: 'Which color of light deviates the most when passing through a prism?', answer: 'Violet' },
+        { question: 'An air bubble in water shines because of which phenomenon?', answer: 'Total internal reflection' },
+        // Wave Optics (8)
+        { question: 'In Young\'s double-slit experiment, what happens to the fringe width if the screen is moved further away?', answer: 'Increases' },
+        { question: 'Huygens\' principle treats every point on a wavefront as a source of what?', answer: 'Secondary wavelets' },
+        { question: 'The bending of light around the corners of an obstacle is called what?', answer: 'Diffraction' },
+        { question: 'What phenomenon demonstrates the transverse nature of light waves?', answer: 'Polarization' },
+        { question: 'For constructive interference, the path difference must be an integral multiple of what?', answer: 'λ' },
+        { question: 'What is the shape of the wavefront originating from a distant star?', answer: 'Plane' },
+        { question: 'What kind of light source is needed to observe interference?', answer: 'Coherent' },
+        { question: 'Brewster\'s law relates refractive index to what angle?', answer: 'Angle of polarization' }
+      ],
+      thermodynamics: [
+        // Original Questions (2)
+        { question: 'Work done in isothermal expansion of 1 mol gas from 2L to 4L at 300K (R=8.314). (ans in J, rounded)', answer: '1729' },
+        { question: 'If 500 J heat is added and 200 J work is done BY the system, find ΔU. (ans in J)', answer: '300' },
+        // Thermal Properties (10)
+        { question: 'What is the value of absolute zero in degrees Celsius?', answer: '-273.15' },
+        { question: 'Convert 100°C to Kelvin.', answer: '373.15' },
+        { question: 'Which mode of heat transfer does not require a medium?', answer: 'Radiation' },
+        { question: 'What is the SI unit of specific heat capacity?', answer: 'J/kg·K' },
+        { question: 'The process of changing from solid to gas directly is called what?', answer: 'Sublimation' },
+        { question: 'What is the value of latent heat of fusion for water in cal/g?', answer: '80' },
+        { question: 'Water has maximum density at what temperature in degrees Celsius?', answer: '4' },
+        { question: 'A black body is a perfect absorber and a perfect what?', answer: 'Emitter' },
+        { question: 'Newton\'s law of cooling is a special case of which law?', answer: 'Stefan-Boltzmann law' },
+        { question: 'What is the relation between coefficients of linear, area, and volume expansion?', answer: 'α:β:γ = 1:2:3' },
+        // Kinetic Theory (10)
+        { question: 'What is the value of Avogadro\'s number (use x10²³)?', answer: '6.022x10²³' },
+        { question: 'What is the average kinetic energy of a molecule of a monoatomic gas?', answer: '3/2 kT' },
+        { question: 'How many degrees of freedom does a diatomic gas molecule have at room temperature?', answer: '5' },
+        { question: 'The root mean square (RMS) speed of gas molecules is proportional to the square root of what?', answer: 'Temperature' },
+        { question: 'The ideal gas law is given by PV = ?', answer: 'nRT' },
+        { question: 'What is the value of the universal gas constant R in J/mol·K?', answer: '8.314' },
+        { question: 'Does the internal energy of an ideal gas depend on its volume?', answer: 'No' },
+        { question: 'The average distance a molecule travels between collisions is called what?', answer: 'Mean free path' },
+        { question: 'What is the relationship between pressure and volume for a gas at constant temperature?', answer: 'Inversely proportional' },
+        { question: 'The law of equipartition of energy states that energy is equally distributed among what?', answer: 'Degrees of freedom' },
+        // Thermodynamics Laws & Processes (28)
+        { question: 'Which law of thermodynamics defines the concept of temperature?', answer: 'Zeroth' },
+        { question: 'In an isochoric process, what quantity remains constant?', answer: 'Volume' },
+        { question: 'What is the work done in an isochoric process?', answer: '0' },
+        { question: 'In an isobaric process, what quantity remains constant?', answer: 'Pressure' },
+        { question: 'In an adiabatic process, what is exchanged with the surroundings: heat, work, or neither?', answer: 'Work' },
+        { question: 'For an adiabatic process, PV^γ = ?', answer: 'Constant' },
+        { question: 'What is the efficiency of a Carnot engine operating between 500K and 300K?', answer: '0.4' },
+        { question: 'Which law of thermodynamics is a statement of the conservation of energy?', answer: 'First' },
+        { question: 'What thermodynamic quantity is a measure of disorder?', answer: 'Entropy' },
+        { question: 'Can the efficiency of a heat engine be 100%?', answer: 'No' },
+        { question: 'What is the value of the adiabatic exponent (gamma) for a monoatomic gas?', answer: '5/3' },
+        { question: 'What is Mayer\'s formula?', answer: 'Cp - Cv = R' },
+        { question: 'Is melting an isothermal process?', answer: 'Yes' },
+        { question: 'The coefficient of performance (COP) is used to describe the efficiency of what device?', answer: 'Refrigerator' },
+        { question: 'In an isothermal expansion of an ideal gas, what is the change in internal energy?', answer: '0' },
+        { question: 'According to the first law, ΔU = Q - ?', answer: 'W' },
+        { question: 'A process that can be reversed without leaving any trace on the surroundings is called what?', answer: 'Reversible' },
+        { question: 'Which thermodynamic potential is minimized for a system in thermal equilibrium at constant T and V?', answer: 'Helmholtz free energy' },
+        { question: 'For a cyclic process, what is the change in internal energy?', answer: '0' },
+        { question: 'What is the specific heat capacity of water in J/g°C?', answer: '4.18' },
+        { question: 'In which process is the heat supplied to a system used entirely to do work?', answer: 'Isothermal' },
+        { question: 'A heat pump is a heat engine working in which direction?', answer: 'Reverse' },
+        { question: 'Which law states that the entropy of the universe always increases?', answer: 'Second' },
+        { question: 'What is the molar specific heat at constant volume (Cv) for a monoatomic ideal gas?', answer: '3/2 R' },
+        { question: 'What is the molar specific heat at constant pressure (Cp) for a monoatomic ideal gas?', answer: '5/2 R' },
+        { question: 'What is the value of the adiabatic exponent (gamma) for a diatomic gas?', answer: '7/5' },
+        { question: 'The "triple point" of water is at 273.16 K and what pressure in Pascals?', answer: '611.7' },
+        { question: 'What kind of process is the rapid bursting of a tire?', answer: 'Adiabatic' }
+      ]
+    };
+
+    function startGame(game) {
+      currentGame = game;
+      currentQuestion = 0;
+      timeLeft = 60;
+      document.getElementById('game-selection').classList.add('hidden');
+      document.getElementById('game-area').classList.remove('hidden');
+      document.getElementById('game-title').textContent = {
+        mechanics: 'Mechanics Motion Maze',
+        'waves-optics': 'Waves and Optics Challenge',
+        thermodynamics: 'Thermodynamics Escape Room'
+      }[game];
+      loadQuestion();
+      startTimer();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < questions[currentGame].length) {
+        document.getElementById('question').textContent = questions[currentGame][currentQuestion].question;
+        document.getElementById('answer-input').value = '';
+        document.getElementById('feedback').textContent = '';
+      } else {
+        endGame('You have answered all questions!');
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          endGame('Time is up!');
+        }
+      }, 1000);
+    }
+
+    function submitAnswer() {
+      const userAnswer = document.getElementById('answer-input').value.trim().toLowerCase();
+      const correctAnswer = questions[currentGame][currentQuestion].answer.toLowerCase();
+      const isNumeric = !isNaN(parseFloat(userAnswer)) && !isNaN(parseFloat(correctAnswer));
+      
+      let isCorrect = false;
+      if (isNumeric) {
+        // Allow a small tolerance for floating point answers
+        isCorrect = Math.abs(parseFloat(userAnswer) - parseFloat(correctAnswer)) <= 0.05;
+      } else {
+        isCorrect = userAnswer === correctAnswer;
+      }
+
+      if (isCorrect) {
+          document.getElementById('feedback').textContent = 'Correct!';
+          document.getElementById('feedback').style.color = 'green';
+      } else {
+          document.getElementById('feedback').textContent = `Incorrect. The answer is ${questions[currentGame][currentQuestion].answer}.`;
+          document.getElementById('feedback').style.color = 'red';
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      loadQuestion();
+    }
+
+    function endGame(message = 'Game Over!') {
+      clearInterval(timerInterval);
+      document.getElementById('game-area').classList.add('hidden');
+      document.getElementById('game-selection').classList.remove('hidden');
+      alert(`${message} You attempted ${currentQuestion} questions.`);
+    }
+
+    document.getElementById('answer-input').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            submitAnswer();
+        }
+    });
+  </script>
+</body>
+</html>

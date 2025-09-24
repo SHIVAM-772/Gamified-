@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 9 Computer Science - Computer Fundamentals</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+        }
+        header {
+            background-color: #4682b4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        section {
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #aaa;
+        }
+        h2 {
+            color: #4682b4;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        .quiz {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #dbefff;
+            border-radius: 8px;
+        }
+        .quiz button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4682b4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .quiz button:hover {
+            background-color: #35648a;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Class 9 Computer Science</h1>
+</header>
+
+<section>
+    <h2>Computer Fundamentals</h2>
+    <p>
+        Computers are electronic devices that process data to produce meaningful information. Understanding computer fundamentals is essential to learn how computers work.
+    </p>
+
+    <h3>1. Components of a Computer System</h3>
+    <ul>
+        <li><strong>Input Devices:</strong> Devices that allow users to enter data (e.g., Keyboard, Mouse, Scanner)</li>
+        <li><strong>Output Devices:</strong> Devices that display or output data (e.g., Monitor, Printer)</li>
+        <li><strong>Central Processing Unit (CPU):</strong> Brain of the computer that processes data</li>
+        <li><strong>Memory:</strong> Stores data temporarily (RAM) or permanently (ROM, Hard Disk)</li>
+    </ul>
+
+    <h3>2. Types of Computers</h3>
+    <ul>
+        <li>Analog Computers</li>
+        <li>Digital Computers</li>
+        <li>Hybrid Computers</li>
+    </ul>
+
+    <h3>3. Software</h3>
+    <ul>
+        <li><strong>System Software:</strong> Helps run the computer (e.g., Operating System)</li>
+        <li><strong>Application Software:</strong> Performs specific tasks (e.g., MS Word, Excel)</li>
+    </ul>
+
+    <h3>4. Operating System Basics</h3>
+    <ul>
+        <li>Manages hardware and software resources</li>
+        <li>Examples: Windows, Linux, macOS</li>
+        <li>Provides user interface for easy interaction</li>
+    </ul>
+
+    <div class="quiz">
+        <p><strong>Quiz:</strong> Which part of a computer is known as the brain?</p>
+        <button onclick="checkAnswer('cpu', 'cpu')">CPU</button>
+        <button onclick="checkAnswer('cpu', 'ram')">RAM</button>
+        <button onclick="checkAnswer('cpu', 'monitor')">Monitor</button>
+        <div class="result" id="cpuResult"></div>
+    </div>
+</section>
+
+<script>
+    function checkAnswer(topic, answer) {
+        let correct = '';
+        if(topic === 'cpu') correct = 'cpu';
+
+        const resultDiv = document.getElementById(topic + 'Result');
+        if(answer.toLowerCase() === correct) {
+            resultDiv.innerHTML = '✅ Correct!';
+            resultDiv.style.color = 'green';
+        } else {
+            resultDiv.innerHTML = '❌ Incorrect. Try again!';
+            resultDiv.style.color = 'red';
+        }
+    }
+</script>
+
+</body>
+</html>

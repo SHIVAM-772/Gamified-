@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile - Smart Education</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --accent-primary: #00d4ff;
+      --accent-secondary: #ff6b9d;
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #eab308;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      color: var(--text-primary);
+    }
+
+    /* Loading Overlay - Prevents redirect flash */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* Animated Background Grid */
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridMove 20s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    /* Floating Particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      animation: float 15s linear infinite;
+      opacity: 0.6;
+    }
+
+    .particle::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.6;
+      }
+      90% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-100px) translateX(100px) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.3; }
+      100% { transform: scale(1.5); opacity: 0.1; }
+    }
+
+    /* Main Container */
+    .container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      padding: 3rem 2.5rem;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+      z-index: 10;
+      animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Header */
+    h2 {
+      text-align: center;
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 2px;
+      animation: underlineGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes underlineGlow {
+      0%, 100% { width: 60px; opacity: 0.8; }
+      50% { width: 100px; opacity: 1; }
+    }
+
+    /* Profile Picture */
+    .profile-pic-container {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 2rem;
+      cursor: pointer;
+    }
+
+    #profile-pic {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1);
+    }
+
+    .profile-pic-container:hover #profile-pic {
+      border-color: var(--accent-primary);
+      box-shadow: 
+        0 0 0 4px rgba(0, 212, 255, 0.2),
+        0 0 20px rgba(0, 212, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .upload-overlay {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: var(--accent-primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-pic-container:hover .upload-overlay {
+      opacity: 1;
+    }
+
+    #photo-input {
+      display: none;
+    }
+
+    /* Form Elements */
+    .form-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 400;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      appearance: none;
+    }
+
+    input::placeholder, select:invalid {
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 
+        0 0 0 3px rgba(0, 212, 255, 0.1),
+        0 0 0 1px var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    input:focus + .input-label, select:focus + .input-label {
+      transform: translateY(-25px) scale(0.85);
+      color: var(--accent-primary);
+    }
+
+    .input-label {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 400;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Disabled Input */
+    input:disabled {
+      background: rgba(255, 255, 255, 0.01);
+      color: var(--text-secondary);
+      border-color: var(--glass-border);
+    }
+
+    /* Select Arrow */
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper::after {
+      content: '▼';
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      pointer-events: none;
+      transition: color 0.3s ease;
+    }
+
+    select:focus + .select-wrapper::after {
+      color: var(--accent-primary);
+    }
+
+    /* Button Styles */
+    button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, #00aaff 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 
+        0 20px 25px -5px rgba(0, 212, 255, 0.3),
+        0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: translateY(-1px);
+    }
+
+    #logout-btn {
+      background: linear-gradient(135deg, var(--accent-secondary) 0%, #ff4081 100%);
+      margin-top: 0.5rem;
+    }
+
+    #logout-btn:hover {
+      box-shadow: 
+        0 20px 25px -5px rgba(255, 107, 157, 0.3),
+        0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Message */
+    #status-msg {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      min-height: 20px;
+    }
+
+    #status-msg.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    #status-msg.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* Animations */
+    .form-group {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .profile-pic-container {
+      opacity: 0;
+      transform: scale(0.8);
+      animation: picEntrance 0.8s ease-out 0.2s forwards;
+    }
+
+    @keyframes picEntrance {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Stagger Delays */
+    .profile-pic-container { animation-delay: 0.1s; }
+    .form-group:nth-child(1) { animation-delay: 0.3s; }
+    .form-group:nth-child(2) { animation-delay: 0.4s; }
+    .form-group:nth-child(3) { animation-delay: 0.5s; }
+    .form-group:nth-child(4) { animation-delay: 0.6s; }
+    #update-btn { animation-delay: 0.7s; }
+    #logout-btn { animation-delay: 0.8s; }
+
+    button {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .container {
+        margin: 1rem;
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+      }
+      
+      h2 {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .profile-pic-container {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .upload-overlay {
+        width: 35px;
+        height: 35px;
+      }
+      
+      input, select {
+        padding: 14px 16px;
+        font-size: 0.95rem;
+      }
+      
+      button {
+        padding: 14px;
+        font-size: 0.95rem;
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-primary);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-secondary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Animated Background -->
+  <div class="bg-grid"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="container">
+    <h2>My Profile</h2>
+    
+    <div class="profile-pic-container">
+      <img id="profile-pic" src="kid2.png" alt="Profile Picture">
+      <label for="photo-input" class="upload-overlay">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+        </svg>
+      </label>
+      <input type="file" id="photo-input" accept="image/*">
+    </div>
+    
+    <div class="form-group">
+      <input type="text" id="name" placeholder=" " required>
+      <label class="input-label" for="name">Full Name</label>
+    </div>
+    
+    <div class="form-group">
+      <input type="email" id="email" placeholder=" " disabled>
+      <label class="input-label" for="email">Email Address</label>
+    </div>
+    
+    <div class="form-group">
+      <input type="tel" id="mobile" placeholder=" " required>
+      <label class="input-label" for="mobile">Mobile Number</label>
+    </div>
+    
+    <div class="form-group select-wrapper">
+      <select id="grade" required>
+        <option value="" disabled selected></option>
+        <option value="1">Grade 1</option>
+        <option value="2">Grade 2</option>
+        <option value="3">Grade 3</option>
+        <option value="4">Grade 4</option>
+        <option value="5">Grade 5</option>
+        <option value="6">Grade 6</option>
+        <option value="7">Grade 7</option>
+        <option value="8">Grade 8</option>
+        <option value="9">Grade 9</option>
+        <option value="10">Grade 10</option>
+        <option value="11">Grade 11</option>
+        <option value="12">Grade 12</option>
+      </select>
+      <label class="input-label" for="grade">Select Grade</label>
+    </div>
+    
+    <button id="update-btn">
+      <span id="update-text">Update Profile</span>
+    </button>
+    
+    <button id="logout-btn">
+      <span id="logout-text">Logout</span>
+    </button>
+    
+    <p id="status-msg"></p>
+  </div>
+
+  <script type="module">
+    // Firebase v12 Modular SDK Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBPMlHzrEOLXOWZldw6fkk5nWf1m0g45L8",
+      authDomain: "studentportal-bc1ec.firebaseapp.com",
+      projectId: "studentportal-bc1ec",
+      storageBucket: "studentportal-bc1ec.firebasestorage.app",
+      messagingSenderId: "516315325736",
+      appId: "1:516315325736:web:21a4418f69f3f6019fdc1d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // DOM Elements
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const profilePic = document.getElementById('profile-pic');
+    const photoInput = document.getElementById('photo-input');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const mobileInput = document.getElementById('mobile');
+    const gradeSelect = document.getElementById('grade');
+    const statusMsg = document.getElementById('status-msg');
+    const updateBtn = document.getElementById('update-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const updateText = document.getElementById('update-text');
+    const logoutText = document.getElementById('logout-text');
+
+    let currentUser = null;
+    let isInitialized = false;
+
+    // Hide loading overlay after auth state is determined
+    function hideLoadingOverlay() {
+      loadingOverlay.classList.add('hidden');
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+      }, 300);
+    }
+
+    // Check user login with proper initialization
+    onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state changed:', user ? 'User logged in' : 'No user');
+      
+      // First time initialization
+      if (!isInitialized) {
+        isInitialized = true;
+        
+        if (user) {
+          // User is authenticated
+          currentUser = user;
+          emailInput.value = user.email || '';
+          await loadProfile(user.uid);
+          hideLoadingOverlay();
+        } else {
+          // No user - redirect after showing loading
+          setTimeout(() => {
+            window.location.href = "student.html";
+          }, 1000);
+          hideLoadingOverlay();
+        }
+      }
+    });
+
+    // Load profile function
+    async function loadProfile(uid) {
+      try {
+        console.log('Loading profile for UID:', uid);
+        const docRef = doc(db, 'students', uid);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          console.log('Profile data found:', docSnap.data());
+          const data = docSnap.data();
+          nameInput.value = data.name || '';
+          mobileInput.value = data.mobile || '';
+          gradeSelect.value = data.grade || '';
+          
+          if (data.photoURL) {
+            profilePic.src = data.photoURL;
+          }
+          
+          // Animate labels if fields are filled
+          setTimeout(() => {
+            document.querySelectorAll('input, select').forEach(el => {
+              if (el.value) {
+                const label = el.nextElementSibling;
+                if (label && label.classList.contains('input-label')) {
+                  label.style.transform = 'translateY(-25px) scale(0.85)';
+                  label.style.color = 'var(--accent-primary)';
+                }
+              }
+            });
+          }, 500);
+          
+          showMessage('Profile loaded successfully!', 'success');
+        } else {
+          // Create default profile if none exists
+          console.log('No profile found, creating default');
+          await updateDoc(docRef, {
+            name: '',
+            mobile: '',
+            grade: '',
+            photoURL: '',
+            createdAt: serverTimestamp(),
+            lastUpdate: serverTimestamp()
+          });
+          showMessage('Welcome! Please complete your profile.', 'success');
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        showMessage('Error loading profile: ' + error.message, 'error');
+      }
+    }
+
+    // Photo upload
+    photoInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file && currentUser) {
+        const storageRef = ref(storage, `profile_pics/${currentUser.uid}`);
+        
+        // Show loading
+        profilePic.style.filter = 'blur(4px)';
+        profilePic.style.transition = 'filter 0.3s ease';
+        
+        try {
+          console.log('Uploading photo...');
+          // Upload file
+          await uploadBytes(storageRef, file);
+          const downloadURL = await getDownloadURL(storageRef);
+          
+          // Update profile picture
+          profilePic.src = downloadURL;
+          
+          // Update Firestore
+          const docRef = doc(db, 'students', currentUser.uid);
+          await updateDoc(docRef, { 
+            photoURL: downloadURL,
+            lastUpdate: serverTimestamp()
+          });
+          
+          showMessage('Profile picture updated!', 'success');
+          
+          // Remove blur with animation
+          setTimeout(() => {
+            profilePic.style.filter = 'blur(0)';
+          }, 300);
+        } catch (error) {
+          console.error('Photo upload error:', error);
+          showMessage('Error uploading photo: ' + error.message, 'error');
+          profilePic.style.filter = 'blur(0)';
+        }
+      }
+    });
+
+    // Update profile
+    updateBtn.addEventListener('click', async () => {
+      if (!currentUser) {
+        showMessage('Please log in first', 'error');
+        return;
+      }
+
+      const name = nameInput.value.trim();
+      const mobile = mobileInput.value.trim();
+      const grade = gradeSelect.value;
+
+      // Validation
+      if (!name || !mobile || !grade) {
+        showMessage('Please fill all fields', 'error');
+        return;
+      }
+
+      if (!/^\d{10}$/.test(mobile.replace(/\s/g, ''))) {
+        showMessage('Please enter a valid 10-digit mobile number', 'error');
+        return;
+      }
+
+      updateText.innerHTML = '<span class="loading"></span>Updating...';
+      updateBtn.disabled = true;
+
+      try {
+        console.log('Updating profile...');
+        const docRef = doc(db, 'students', currentUser.uid);
+        await updateDoc(docRef, {
+          name: name,
+          mobile: mobile,
+          grade: grade,
+          lastUpdate: serverTimestamp()
+        });
+
+        showMessage('Profile updated successfully!', 'success');
+        updateText.textContent = 'Update Profile';
+        updateBtn.disabled = false;
+      } catch (error) {
+        console.error('Profile update error:', error);
+        showMessage('Error updating profile: ' + error.message, 'error');
+        updateText.textContent = 'Update Profile';
+        updateBtn.disabled = false;
+      }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+      logoutText.innerHTML = '<span class="loading"></span>Logging out...';
+      logoutBtn.disabled = true;
+
+      try {
+        console.log('Logging out...');
+        await signOut(auth);
+        // The onAuthStateChanged will handle the redirect
+      } catch (error) {
+        console.error('Logout error:', error);
+        showMessage('Logout error: ' + error.message, 'error');
+        logoutText.textContent = 'Logout';
+        logoutBtn.disabled = false;
+      }
+    });
+
+    // Message handler
+    function showMessage(message, type) {
+      console.log('Showing message:', message, type);
+      statusMsg.textContent = message;
+      statusMsg.className = type;
+      
+      if (type === 'success') {
+        statusMsg.style.animation = 'pulse 0.6s ease-in-out';
+      }
+    }
+
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Initialize particles after DOM loads
+    document.addEventListener('DOMContentLoaded', () => {
+      createParticles();
+      
+      // Floating label logic
+      document.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('focus', () => {
+          const label = el.nextElementSibling;
+          if (label && label.classList.contains('input-label')) {
+            label.style.transform = 'translateY(-25px) scale(0.85)';
+            label.style.color = 'var(--accent-primary)';
+          }
+        });
+
+        el.addEventListener('blur', () => {
+          if (!el.value) {
+            const label = el.nextElementSibling;
+            if (label && label.classList.contains('input-label')) {
+              label.style.transform = 'translateY(-50%)';
+              label.style.color = 'var(--text-secondary)';
+            }
+          }
+        });
+      });
+    });
+
+    // Add dynamic background color shift
+    let hue = 200;
+    setInterval(() => {
+      hue = (hue + 0.5) % 360;
+      const saturation = 70 + Math.sin(Date.now() * 0.001) * 10;
+      document.querySelector('.bg-grid').style.backgroundImage = 
+        `linear-gradient(hsl(${hue}, ${saturation}%, 10%) 1px, transparent 1px),
+         linear-gradient(90deg, hsl(${hue}, ${saturation}%, 10%) 1px, transparent 1px)`;
+    }, 3000);
+
+    // Prevent redirect during initialization
+    window.addEventListener('beforeunload', (e) => {
+      if (!isInitialized) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+  </script>
+</body>
+</html>
